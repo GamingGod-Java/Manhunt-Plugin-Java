@@ -20,7 +20,7 @@ Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None"
 
 Fix small issues and null pointers
 
-
+//Still doesn't work because I have not implemented a boss bar
   MhRestart:
     description: Resets the /MhStart timer, allows to restart the game
     usage: /mhrestart
