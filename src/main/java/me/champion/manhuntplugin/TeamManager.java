@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.ChatColor;
-
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,10 +51,6 @@ public class TeamManager implements Listener {
         return !frozenPlayers.isEmpty();
     }
 
-    public Team getTeam(Material woolColor) {
-        return teams.get(woolColor);
-    }
-
     public void clearTeams() {
         teams.values().forEach(Team::clear);
     }
@@ -82,6 +78,15 @@ public class TeamManager implements Listener {
 
         // You can add additional logic here if needed
     }
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        String message = event.getMessage();
+        String name = player.getDisplayName(); // This retains the colored name
+
+        // Format the chat message so that the player's name is colored but the message is default
+        event.setFormat(name + ChatColor.WHITE + ": " + message);
+    }
 
     private void sendTitle(Player player, String message) {
         final int fadeInTime = 10; // Time in ticks for the title to fade in
@@ -98,7 +103,8 @@ public class TeamManager implements Listener {
 
     public void removeFromTeam(Player player) {
         playerTeams.remove(player.getUniqueId());
-        player.setPlayerListName(player.getName()); // Resetting the list name
+        player.setDisplayName(player.getName()); // Resetting the display name to default
+        player.setPlayerListName(player.getName()); // Resetting the list name to default
     }
 
     public void registerPlatform(String teamName, Location platformLocation) {
