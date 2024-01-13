@@ -21,37 +21,26 @@ public class TeamSelection implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        // Check if the player stepped on a wool block
-        if (isWoolBlock(event.getPlayer().getLocation().subtract(0, 1, 0).getBlock().getType())) {
-            // Get the color of the wool block (assuming wool is used for team selection)
-            Material woolType = event.getPlayer().getLocation().subtract(0, 1, 0).getBlock().getType();
+        Material blockType = event.getPlayer().getLocation().subtract(0, 1, 0).getBlock().getType();
 
-            // Add the player to the corresponding team based on wool color
-            addToTeam(event.getPlayer(), woolType);
+        // Check if the player stepped on a concrete block
+        if (blockType == Material.RED_CONCRETE || blockType == Material.LIGHT_BLUE_CONCRETE) {
+            addToTeam(event.getPlayer(), blockType);
         }
     }
 
-    private boolean isWoolBlock(Material blockType) {
-        // Check if the block type is wool (you can modify this based on your actual implementation)
-        return blockType.name().contains("WOOL");
-    }
-
-    private void addToTeam(Player player, Material woolType) {
-        if (woolType == null) {
-            return; // Handle the case when woolType is null
-        }
-
+    private void addToTeam(Player player, Material blockType) {
         String team;
 
-        if (woolType == Material.RED_WOOL) {
+        if (blockType == Material.RED_CONCRETE) {
             team = "Zombies";
-        } else if (woolType == Material.BLUE_WOOL) {
+        } else if (blockType == Material.LIGHT_BLUE_CONCRETE) {
             team = "Runners";
         } else {
-            // Handle other block types if needed
-            return;
+            return; // If it's neither red nor light blue concrete, do nothing
         }
 
         teamManager.addToTeam(player, team);
     }
 }
+

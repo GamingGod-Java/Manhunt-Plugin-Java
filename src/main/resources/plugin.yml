@@ -8,9 +8,6 @@ commands:
   MhCreate:
     description: Creates the platforms for team selection
     usage: /MhCreate
-  MhBlock:
-    description: Checks what block is underneath the player
-    usage: /MhBlock
   MhMove:
     description: Moves a player to a team
     usage: /MhMove

@@ -28,7 +28,6 @@ public final class Manhunt extends JavaPlugin {
 
         // Register commands and their executors
         getCommand("MhCreate").setExecutor(new MhCreate(this, teamManager));
-        getCommand("MhBlock").setExecutor(new MhBlock(this));
         getCommand("MhMove").setExecutor(new TeamMove(teamManager));
         getCommand("MhPause").setExecutor(new MhPause(this, teamManager));
         getCommand("MhUnpause").setExecutor(new MhUnpause(teamManager));

@@ -47,14 +47,14 @@ public class MhCreate implements CommandExecutor {
         // Teleport the player to the exact center of the block they're standing on
         teleportPlayerToCenter(player);
 
-        // Generate a 5x5x1 blue wool platform 4 blocks north of the player
-        Location bluePlatformLocation = generateWoolPlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
-                Material.BLUE_WOOL, -4); // North
+        // Generate a 5x5x1 light blue concrete platform north of the player
+        Location bluePlatformLocation = generatePlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
+                Material.LIGHT_BLUE_CONCRETE, -4); // North
         platformLocations.add(bluePlatformLocation);
 
-        // Generate a 5x5x1 red wool platform 4 blocks south of the player
-        Location redPlatformLocation = generateWoolPlatform(player.getLocation().add(0, -1, PLATFORM_DISTANCE / 2),
-                Material.RED_WOOL, 4); // South
+        // Generate a 5x5x1 red concrete platform south of the player
+        Location redPlatformLocation = generatePlatform(player.getLocation().add(0, -1, PLATFORM_DISTANCE / 2),
+                Material.RED_CONCRETE, 4); // South
         platformLocations.add(redPlatformLocation);
 
         // Register platforms with TeamManager
@@ -73,14 +73,14 @@ public class MhCreate implements CommandExecutor {
         player.teleport(new Location(currentLocation.getWorld(), x, y, z));
     }
 
-    private Location generateWoolPlatform(Location centerLocation, Material woolType, int zOffset) {
+    private Location generatePlatform(Location centerLocation, Material platformMaterial, int zOffset) {
         World world = centerLocation.getWorld();
         int xOffset = (PLATFORM_SIZE - 1) / 2;
 
         for (int x = 0; x < PLATFORM_SIZE; x++) {
             for (int z = 0; z < PLATFORM_SIZE; z++) {
-                Location woolLocation = centerLocation.clone().add(x - xOffset, 0, z - xOffset + zOffset);
-                world.getBlockAt(woolLocation).setType(woolType);
+                Location platformLocation = centerLocation.clone().add(x - xOffset, 0, z - xOffset + zOffset);
+                world.getBlockAt(platformLocation).setType(platformMaterial);
             }
         }
 
