@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ManhuntPluginWork.iml" filepath="$PROJECT_DIR$/ManhuntPluginWork.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ManhuntPlugin.iml" filepath="$PROJECT_DIR$/ManhuntPlugin.iml" />
     </modules>
   </component>
 </project>
