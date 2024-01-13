@@ -70,7 +70,9 @@ public final class Manhunt extends JavaPlugin {
         World overworld = Bukkit.getWorlds().get(0); // Get the first world (Overworld)
         World nether = Bukkit.getWorlds().get(1); // Get the second world (Nether)
 
-        double overworldSize = 5000.0; //maybe should set this dynamically? unsure
+
+        double overworldSize = 5000.0;
+
         double netherSize = overworldSize / 8; // Nether is 1/8th the size of the Overworld
 
         // Set the Overworld world border size

@@ -120,8 +120,10 @@ public class TeamManager implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
                 player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
+
                 //Invulnerability logic
                 player.setInvulnerable(true);
+
             }
         }
     }
@@ -133,8 +135,10 @@ public class TeamManager implements Listener {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
                 player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
+
                 //Invulnerability logic
                 player.setInvulnerable(false);
+
             }
         }
     }

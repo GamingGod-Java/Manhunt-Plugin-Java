@@ -27,15 +27,19 @@ public class MhCreate implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player) ) {
+
+        if (!(sender instanceof Player)) {
+
             sender.sendMessage("Only players can use this command!");
             return true;
         }
 
         Player player = (Player) sender;
 
+
         // Check if player has OP
         if (!sender.isOp()) {
+
             player.sendMessage("You do not have permission to use this command.");
             return true;
         }

@@ -9,8 +9,11 @@
         <module name="ManhuntPlugin" />
       </profile>
     </annotationProcessing>
+<<<<<<< HEAD
     <bytecodeTargetLevel>
       <module name="ManhuntPluginWork" target="1.8" />
     </bytecodeTargetLevel>
+=======
+>>>>>>> e3d261f07eb2997f54d138deb20ce12481e6e06a
   </component>
 </project>
