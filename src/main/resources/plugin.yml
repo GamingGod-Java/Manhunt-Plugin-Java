@@ -2,7 +2,7 @@ name: Manhunt
 version: '${project.version}'
 main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
-authors: [ Champion ]
+authors: [ GamingGod-Java, AndreBinbow ]
 description: My first plugin ever
 commands:
   MhCreate:
