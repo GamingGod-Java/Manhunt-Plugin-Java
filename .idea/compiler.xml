@@ -1,19 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <annotationProcessing>
-      <profile name="Maven default annotation processors profile" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <module name="ManhuntPlugin" />
-      </profile>
-    </annotationProcessing>
-<<<<<<< HEAD
     <bytecodeTargetLevel>
-      <module name="ManhuntPluginWork" target="1.8" />
+      <module name="ManhuntPlugin" target="1.8" />
     </bytecodeTargetLevel>
-=======
->>>>>>> e3d261f07eb2997f54d138deb20ce12481e6e06a
   </component>
 </project>

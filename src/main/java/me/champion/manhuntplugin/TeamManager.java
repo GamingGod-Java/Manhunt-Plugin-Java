@@ -67,17 +67,16 @@ public class TeamManager implements Listener {
 
         // Update their display name and nametag based on the team
         if (team.equalsIgnoreCase("Zombies")) {
-            player.setDisplayName("§c" + player.getName());
-            player.setPlayerListName("§c" + player.getName());
+            player.setDisplayName("§c[Zombie] " + player.getName()); // Red color
+            player.setPlayerListName("§c[Zombie] " + player.getName());
             sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
         } else if (team.equalsIgnoreCase("Runners")) {
-            player.setDisplayName("§9" + player.getName());
-            player.setPlayerListName("§9" + player.getName());
-            sendTitle(player, ChatColor.BLUE + "You have joined the Runners team");
+            player.setDisplayName("§b[Runner] " + player.getName()); // Light blue color
+            player.setPlayerListName("§b[Runner] " + player.getName());
+            sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
         }
-
-        // You can add additional logic here if needed
     }
+
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();

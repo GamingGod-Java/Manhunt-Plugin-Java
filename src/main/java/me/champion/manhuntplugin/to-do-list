@@ -37,9 +37,6 @@ Weird logic with saving and restoring teams upon relogging
 If you move an offline player it moves you instead to the team instead of the person you are trying to move,
 disable moving offline players
 
-Remove the "<Player> has joined the <team> because other players can't and shouldn't see it anyway"
-
-Update peoples names in game and in chat with their colour
 
 Prefix
 
@@ -49,9 +46,6 @@ Make the compasses enchanted and unstackable
 
 Disable pause when game is already paused
 
-Clear name when moving to none
-
-Invulnerability
 
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
