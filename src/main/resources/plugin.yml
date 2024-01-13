@@ -1,0 +1,36 @@
+name: Manhunt
+version: '${project.version}'
+main: me.champion.manhuntplugin.Manhunt
+api-version: '1.20'
+authors: [ GamingGod-Java, AndreBinbow ]
+description: My first plugin ever
+commands:
+  MhCreate:
+    description: Creates the platforms for team selection
+    usage: /MhCreate
+  MhBlock:
+    description: Checks what block is underneath the player
+    usage: /MhBlock
+  MhMove:
+    description: Moves a player to a team
+    usage: /MhMove
+  MhPause:
+    description: Triggers a pause of the game, force a manual pause
+    usage: /MhPause
+  MhUnpause:
+    description: Triggers an unpause of the game, force a manual unpause
+    usage: /MhUnpause
+  MhReady:
+    description: This command can only be typed by an OP player, it also includes an alias /mhr and a countdown in chat
+    usage: /MhReady
+    aliases:
+      - mhr
+  MhCompass:
+    description: Gives a runner compass to a player on the Zombies team
+    usage: /MhCompass
+  MhStart:
+    description: Starts both countdowns
+    usage: /MhStart
+  MhRestart:
+    description: Restarts the game so /MhStart can be done all over again
+    usage: /MhStart
