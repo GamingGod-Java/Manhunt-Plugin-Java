@@ -250,15 +250,23 @@ public class TeamManager implements Listener {
     public void pauseZombies() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (isOnTeam(player, "Zombies")) {
+                player.setInvulnerable(true);
                 frozenPlayers.add(player.getUniqueId());
             }
         }
     }
 
     public void unpauseZombies() {
-        frozenPlayers.clear();
-        // Broadcast message or perform other actions when zombies are unpaused
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (isOnTeam(player, "Zombies")) {
+                player.setInvulnerable(false);
+                frozenPlayers.clear();
+            }
+
+            // Broadcast message or perform other actions when zombies are unpaused
+        }
     }
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
