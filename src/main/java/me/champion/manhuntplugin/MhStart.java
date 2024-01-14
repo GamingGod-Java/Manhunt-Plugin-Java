@@ -22,7 +22,7 @@ public class MhStart implements CommandExecutor {
     private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
-        this.teamManager = teamManager;
+        this.teamManager = teamManager; // Store the TeamManager instance
     }
 
     public boolean isGameStarted() {
@@ -71,6 +71,8 @@ public class MhStart implements CommandExecutor {
         startInitialCountdown();
         createAndStartBossBar();
         Bukkit.broadcastMessage("Starting game, disabling team selection");
+        // Give compasses to all players on the Zombies team
+        giveCompassesToZombies();
         return true;
     }
 
@@ -150,6 +152,16 @@ public class MhStart implements CommandExecutor {
             bossBar.removeAll();
             bossBar.setVisible(false);
             bossBar = null; // Dereference the old boss bar
+        }
+    }
+
+    // Give compasses to all players on the Zombies team
+    public void giveCompassesToZombies() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (teamManager.isOnTeam(player, "Zombies")) {
+                MhCompass compassManager = new MhCompass(teamManager, Manhunt.getPlugin());
+                compassManager.giveRunnerCompass(player);
+            }
         }
     }
 }

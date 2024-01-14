@@ -56,7 +56,7 @@ public class MhCompass implements CommandExecutor, Listener {
         return teamManager.isOnTeam(player, "Zombies");
     }
 
-    private void giveRunnerCompass(Player player) {
+    public void giveRunnerCompass(Player player) {
         System.out.println("Gave " + player.getName() + " compass");
         ItemStack compass = new ItemStack(Material.COMPASS);
 
