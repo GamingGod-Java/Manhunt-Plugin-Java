@@ -154,6 +154,8 @@ public class MhCompass implements CommandExecutor, Listener {
         Location runnerLocation = nearestRunner.getEyeLocation();
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
 
+        player.setCompassTarget(nearestRunner.getEyeLocation());
+
         Location particleStartLocation = playerLocation.clone().add(0, 1.3, 0);
         Vector offset = direction.clone().multiply(0.75); // Offset distance
         Location particleLocation = particleStartLocation.clone().add(offset);
