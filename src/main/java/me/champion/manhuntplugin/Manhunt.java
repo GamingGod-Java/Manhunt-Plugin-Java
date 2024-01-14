@@ -25,6 +25,8 @@ public final class Manhunt extends JavaPlugin {
         //Set world border for Overworld and Nether
         setWorldBorder();
 
+        // Create an instance of MhRestart with both dependencies
+        MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
         // Register commands and their executors
         getCommand("MhCreate").setExecutor(new MhCreate(this, teamManager));
@@ -34,7 +36,7 @@ public final class Manhunt extends JavaPlugin {
         getCommand("MhReady").setExecutor(new MhReady(teamManager, this));
         getCommand("MhCompass").setExecutor(new MhCompass(teamManager, this));
         getCommand("MhStart").setExecutor(mhStart);
-        getCommand("MhRestart").setExecutor(new MhRestart(mhStart));
+        getCommand("MhRestart").setExecutor(mhRestart);
 
         // Register TeamSelection listener
         new TeamSelection(this, teamManager);

@@ -1,5 +1,5 @@
 name: Manhunt
-version: '1.2.79-SNAPSHOT'
+version: '1.2.88-SNAPSHOT'
 main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
 authors: [ GamingGod-Java, AndreBinbow ]
@@ -8,9 +8,6 @@ commands:
   MhCreate:
     description: Creates the platforms for team selection
     usage: /MhCreate
-  MhBlock:
-    description: Checks what block is underneath the player
-    usage: /MhBlock
   MhMove:
     description: Moves a player to a team
     usage: /MhMove

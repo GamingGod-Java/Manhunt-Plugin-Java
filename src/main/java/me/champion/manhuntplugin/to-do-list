@@ -37,8 +37,7 @@ Weird logic with saving and restoring teams upon relogging
 If you move an offline player it moves you instead to the team instead of the person you are trying to move,
 disable moving offline players
 
-
-Prefix
+BossBar not counting down properly
 
 Make a toggle team chat
 
@@ -46,6 +45,16 @@ Make the compasses enchanted and unstackable
 
 Disable pause when game is already paused
 
-
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
+
+Zombies frozen on countdown are not invincible, needs fixing
+
+Check if the game is in a state where the BossBar should be visible, and if so, add the player to the BossBar
+
+Fix logic where player doesn't get unpaused if they relog and /MhRestart is typed
+
+Make all error messages red
+
+Save potion state, while paused constantly clear and reapply it until the pause is over, then just apply it once,
+this will give the illusion of potion effects being frozen

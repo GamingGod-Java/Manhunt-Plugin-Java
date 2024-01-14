@@ -7,9 +7,10 @@ import org.bukkit.command.CommandSender;
 public class MhRestart implements CommandExecutor {
 
     private final MhStart mhStart;
-
-    public MhRestart(MhStart mhStart) {
+    private final TeamManager teamManager;
+    public MhRestart(MhStart mhStart,TeamManager teamManager) {
         this.mhStart = mhStart;
+        this.teamManager = teamManager;
     }
 
     @Override
@@ -22,6 +23,7 @@ public class MhRestart implements CommandExecutor {
         if (mhStart.isGameStarted()) {
             mhStart.resetGame();
             sender.sendMessage("Game restarted.");
+            teamManager.unpauseZombies();
         } else {
             sender.sendMessage("There is no game to restart.");
         }
