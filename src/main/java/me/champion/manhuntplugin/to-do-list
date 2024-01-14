@@ -6,8 +6,6 @@ Put Team into folders
 
 Put MhReady, Pause and Unpause into folders
 
-Cleanup
-
 Remove the chat spam from selection a zombie or runner team, maybe by only sending the message to the player,
 if they are switching from runner to zombie and zombie to runner
 
@@ -20,15 +18,6 @@ Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None"
 
 Fix small issues and null pointers
 
-//Still doesn't work because I have not implemented a boss bar
-  MhRestart:
-    description: Resets the /MhStart timer, allows to restart the game
-    usage: /mhrestart
-
-  Mhstart:
-    description: Starts the 10-second countdown in chat and disables team selection
-    usage: /MhStart
-
 MhCreate command displays a white text saying You do not have permission to use this command instead of red (example)
 the /mhready command
 
@@ -39,15 +28,9 @@ disable moving offline players
 
 Remove the "<Player> has joined the <team> because other players can't and shouldn't see it anyway"
 
-Update peoples names in game and in chat with their colour
-
-Prefix
-
 Make a toggle team chat
 
 Make the compasses unstackable (?)
-
-Clear name when moving to none
 
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
