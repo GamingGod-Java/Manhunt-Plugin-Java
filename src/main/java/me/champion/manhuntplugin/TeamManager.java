@@ -117,37 +117,27 @@ public class TeamManager implements Listener {
     }
 
     public void addToTeam(Player player, String team) {
-        System.out.println("adding"+player.getName()+" to "+team);
+        System.out.println("adding " + player.getName() + " to " + team);
         UUID playerUUID = player.getUniqueId();
         String currentTeam = playerTeams.get(playerUUID);
 
+        // If the player is already on the team, no need to add them again
         if (currentTeam != null && currentTeam.equalsIgnoreCase(team)) {
-            if (team.equalsIgnoreCase("Zombies")) {
-                player.setDisplayName("§c" + player.getName());
-                player.setPlayerListName("§c" + player.getName());
-                //sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
-            } else if (team.equalsIgnoreCase("Runners")) {
-                player.setDisplayName("§9" + player.getName());
-                player.setPlayerListName("§9" + player.getName());
-                //sendTitle(player, ChatColor.BLUE + "You have joined the Runners team");
-            }
-            return; // Player is already on the team, no need to add them again
+            return;
         }
 
         playerTeams.put(playerUUID, team);
 
         // Update their display name and nametag based on the team
         if (team.equalsIgnoreCase("Zombies")) {
-            player.setDisplayName("§c" + player.getName());
-            player.setPlayerListName("§c" + player.getName());
+            player.setDisplayName("§cZombie: " + player.getName()); // Red "Zombie" prefix
+            player.setPlayerListName("§cZombie: " + player.getName()); // Red "Zombie" prefix
             sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
         } else if (team.equalsIgnoreCase("Runners")) {
-            player.setDisplayName("§9" + player.getName());
-            player.setPlayerListName("§9" + player.getName());
-            sendTitle(player, ChatColor.BLUE + "You have joined the Runners team");
+            player.setDisplayName("§bRunner: " + player.getName()); // Aqua "Runner" prefix
+            player.setPlayerListName("§bRunner: " + player.getName()); // Aqua "Runner" prefix
+            sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
         }
-
-        // You can add additional logic here if needed
     }
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
