@@ -52,6 +52,18 @@ public class TeamManager implements Listener {
         }
     }
 
+    public List<Player> getRunners() {
+        List<Player> runners = new ArrayList<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (isOnTeam(player, "Runners")) {
+                runners.add(player);
+            }
+        }
+        System.out.println("runners: "+runners);
+        return runners;
+    }
+
 
 
     public void savePotionEffects(Player player) {

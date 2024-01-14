@@ -23,15 +23,15 @@ public class WinCondition implements Listener {
     }
     public static boolean endEntered = false;
     @EventHandler
-    public void onDragonDeath(EntityDeathEvent event) {
+    public void onDragonDeath(EnderDragonChangePhaseEvent event) {
         System.out.println("entity died");
         if (mhstart.isGameStarted()) {
-            if (event.getEntity() instanceof EnderDragon) {
+            if (event.getNewPhase() == EnderDragon.Phase.DYING) {
                 // The Ender Dragon has died
                 Bukkit.broadcastMessage("The Ender Dragon has been defeated!");
                 RunnerWin = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendTitle("Runners win", "Game Over", 10, 10, 10);
+                    player.sendTitle("Runners win", "Game Over", 20, 40, 10);
                 }
             }
         }
@@ -40,13 +40,12 @@ public class WinCondition implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         if (mhstart.isGameStarted()) {
             if (!HunterWin && !RunnerWin) {
-                if (mhstart.timerExpired || teamManager.playerTeams.containsKey("Runners")) {
+                if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
                     System.out.println(teamManager.playerTeams);
-                    System.out.println((teamManager.playerTeams.get("Runners")));
                     System.out.println("Hunter Win");
                     HunterWin = true;
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendTitle("Hunters Win", "Game Over", 10, 10, 10);
+                        player.sendTitle("Hunters Win", "Game Over", 20, 40, 10);
                     }
                 }
             }
