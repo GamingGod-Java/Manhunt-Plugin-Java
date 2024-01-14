@@ -36,7 +36,6 @@ public final class Manhunt extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         System.out.println("Emptied playerdata.yml");
 
         // Initialize TeamManager
@@ -62,6 +61,7 @@ public final class Manhunt extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager), this);
     }
 
     @Override
@@ -97,7 +97,7 @@ public final class Manhunt extends JavaPlugin {
         // Set the Nether world border size
         setWorldBorderSize(nether, netherSize);
 
-        getLogger().info("World border has been set to " + overworldSize + " blocks in Overworld and " + netherSize + " blocks in Nether by Manhunt plugin.");
+        getLogger().info("World border has been set to " + overworldSize + " blocks in the Overworld and " + netherSize + " blocks in the Nether by Manhunt plugin.");
     }
 
     // Set the world border size for a specific world

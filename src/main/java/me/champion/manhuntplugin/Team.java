@@ -40,7 +40,7 @@ public class Team {
         platforms.add(platformLocation);
     }
 
-    // You might want additional methods relatOed to platforms, e.g., clearPlatforms
+    // You might want additional methods related to platforms, e.g., clearPlatforms
 
     public List<Location> getPlatforms() {
         return platforms;

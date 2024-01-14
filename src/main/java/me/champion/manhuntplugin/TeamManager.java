@@ -205,7 +205,6 @@ public class TeamManager implements Listener {
                 player.setInvulnerable(false);
 
                 //Potion restore logic
-                System.out.println("teammanager restored potion effect");
                 restorePotionEffects(player);
                 restoreOriginalAirLevels();
 

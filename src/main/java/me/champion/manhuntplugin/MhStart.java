@@ -92,6 +92,16 @@ public class MhStart implements CommandExecutor {
                     bossBarVisible = true;
                 }
 
+                if (WinCondition.endEntered) {
+                    if (bossBar != null) {
+                        bossBar.setVisible(false);
+                        bossBarVisible = false;
+                        this.cancel();
+                        resetBossBar();
+                    }
+                    return;
+                }
+
                 double progress = (double) secondsLeft / totalSeconds;
                 bossBar.setProgress(progress);
 

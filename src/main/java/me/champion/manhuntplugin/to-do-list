@@ -14,7 +14,7 @@ if they are switching from runner to zombie and zombie to runner
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 
 Make players invincible on pause and save things that could be doing damage, like lava etc. and load that again,
-when the game is being unpaused
+when the game is being unpaused (fixed drowning damage and player is invincible, what else is there???)
 
 Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None"
 

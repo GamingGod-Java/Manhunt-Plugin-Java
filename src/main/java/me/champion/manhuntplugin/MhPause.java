@@ -46,7 +46,7 @@ public class MhPause implements CommandExecutor {
                 return true;
             }
         } else {
-            sender.sendMessage("This command is only for the bourgeoisie");
+            sender.sendMessage("You do not have OP");
             return true;
         }
 
