@@ -40,7 +40,7 @@ public class MhCreate implements CommandExecutor {
         // Check if player has OP
         if (!sender.isOp()) {
 
-            player.sendMessage("You do not have permission to use this command.");
+            player.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
 

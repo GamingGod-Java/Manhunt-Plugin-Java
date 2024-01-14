@@ -18,6 +18,8 @@ public class MhStart implements CommandExecutor {
     public boolean timerExpired = false;
     private BukkitTask countdownTask;
     private BossBar bossBar;
+    private boolean initialCountdownInProgress = false;
+    private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
         this.teamManager = teamManager;
@@ -27,15 +29,36 @@ public class MhStart implements CommandExecutor {
         return gameStarted;
     }
 
+    public void resetGame() {
+        cancelInitialCountdown(); // Cancel initial countdown if in progress
+
+        if (countdownTask != null && !countdownTask.isCancelled()) {
+            countdownTask.cancel();
+        }
+        resetBossBar();
+        gameStarted = false;
+    }
+
+    public boolean isInitialCountdownInProgress() {
+        return initialCountdownInProgress;
+    }
+
+    public void cancelInitialCountdown() {
+        if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
+            initialCountdownTask.cancel();
+            initialCountdownInProgress = false;
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player) || !sender.isOp()) {
-            sender.sendMessage("You do not have permission to use this command.");
+            sender.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
 
         if (gameStarted) {
-            sender.sendMessage("The game has already started. Use /mhrestart to restart.");
+            sender.sendMessage("§cThe game has already started. Use /mhrestart to restart.");
             return true;
         }
 
@@ -43,15 +66,15 @@ public class MhStart implements CommandExecutor {
 
         gameStarted = true;
         teamManager.pauseZombies();
-        startCountdown();
+        startInitialCountdown();
         createAndStartBossBar();
-        sender.sendMessage("Game started. Team selection is disabled.");
-
+        Bukkit.broadcastMessage("§5Starting game, disabling team selection");
         return true;
     }
 
-    private void startCountdown() {
-        BukkitTask initialCountdownTask = new BukkitRunnable() {
+    private void startInitialCountdown() {
+        initialCountdownInProgress = true;
+        initialCountdownTask = new BukkitRunnable() {
             int secondsLeft = 10;
 
             @Override
@@ -59,15 +82,14 @@ public class MhStart implements CommandExecutor {
                 if (secondsLeft > 0) {
                     Bukkit.broadcastMessage("§cZombies " + "§fcan move in " + secondsLeft + " seconds!");
                 } else {
-                    Bukkit.broadcastMessage("The zombies can now move!");
+                    Bukkit.broadcastMessage("The §cZombies " + "§fcan now move!");
                     teamManager.unpauseZombies();
-                    this.cancel(); // Cancel the initial countdown task
+                    this.cancel();
+                    initialCountdownInProgress = false; // Reset the flag
                 }
                 secondsLeft--;
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L); // Update every second (20 ticks = 1 second)
-
-        countdownTask = initialCountdownTask; // Store the initial countdown task
     }
 
     private void createAndStartBossBar() {
@@ -83,7 +105,6 @@ public class MhStart implements CommandExecutor {
             @Override
             public void run() {
                 if (secondsLeft <= 0) {
-                    System.out.println("timer expired");
                     timerExpired = true;
                     bossBar.setVisible(false);
                     this.cancel();
@@ -128,13 +149,5 @@ public class MhStart implements CommandExecutor {
             bossBar.setVisible(false);
             bossBar = null; // Dereference the old boss bar
         }
-    }
-
-    public void resetGame() {
-        if (countdownTask != null && !countdownTask.isCancelled()) {
-            countdownTask.cancel();
-        }
-        resetBossBar();
-        gameStarted = false;
     }
 }
