@@ -35,7 +35,6 @@ public class TeamManager implements Listener {
     private final Plugin plugin;
     private final File playerDataFile;
     private final FileConfiguration playerData;
-
     public TeamManager(Plugin plugin) {
         teams.put(Material.BLUE_WOOL, new Team("Runners"));
         teams.put(Material.RED_WOOL, new Team("Zombies"));
@@ -99,7 +98,6 @@ public class TeamManager implements Listener {
             }
         }.runTaskLater(plugin, 1); // Send the title with a slight delay to ensure it displays correctly
     }
-
     public void removeFromTeam(Player player) {
         playerTeams.remove(player.getUniqueId());
         player.setDisplayName(player.getName()); // Resetting the display name to default

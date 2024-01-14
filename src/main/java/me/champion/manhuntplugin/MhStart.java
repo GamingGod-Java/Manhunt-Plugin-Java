@@ -27,12 +27,13 @@ public class MhStart implements CommandExecutor {
 
         if (gameStarted) {
             sender.sendMessage("The game has already started. Use /mhrestart to restart.");
-            return true;
+        } else {
+            gameStarted = true;
+            teamManager.pauseZombies();
+            startCountdown();
+            sender.sendMessage("Game started. Team selection is disabled.");
         }
 
-        gameStarted = true;
-        teamManager.pauseZombies();
-        startCountdown();
         return true;
     }
 

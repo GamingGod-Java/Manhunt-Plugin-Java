@@ -8,7 +8,8 @@ public class MhRestart implements CommandExecutor {
 
     private final MhStart mhStart;
     private final TeamManager teamManager;
-    public MhRestart(MhStart mhStart,TeamManager teamManager) {
+
+    public MhRestart(MhStart mhStart, TeamManager teamManager) {
         this.mhStart = mhStart;
         this.teamManager = teamManager;
     }

@@ -10,10 +10,12 @@ public class TeamSelection implements Listener {
 
     private final TeamManager teamManager;
     private final Manhunt plugin;
+    private final MhStart mhStart;
 
-    public TeamSelection(Manhunt plugin, TeamManager teamManager) {
+    public TeamSelection(Manhunt plugin, TeamManager teamManager, MhStart mhStart) {
         this.plugin = plugin;
         this.teamManager = teamManager;
+        this.mhStart = mhStart;
 
         // Register the listener
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -21,6 +23,10 @@ public class TeamSelection implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
+        if (mhStart.isGameStarted()) {
+            return; // Game has started, do not change teams
+        }
+
         Material blockType = event.getPlayer().getLocation().subtract(0, 1, 0).getBlock().getType();
 
         // Check if the player stepped on a concrete block
@@ -43,4 +49,3 @@ public class TeamSelection implements Listener {
         teamManager.addToTeam(player, team);
     }
 }
-

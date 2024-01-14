@@ -4,8 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.plugin.java.JavaPlugin;
+
 public final class Manhunt extends JavaPlugin {
     private TeamManager teamManager;
+    private MhStart mhStart; // Add this field
+
     @Override
     public void onLoad() {
         getLogger().info("Manhunt plugin is loading!");
@@ -18,14 +21,12 @@ public final class Manhunt extends JavaPlugin {
         // Initialize TeamManager
         teamManager = new TeamManager(this);
 
-        MhPause mhPause = new MhPause(this, teamManager);
-        // Initialize MhStart as a local variable
-        MhStart mhStart = new MhStart(teamManager);
+        // Initialize MhStart as a local variable and store it in the field
+        mhStart = new MhStart(teamManager);
 
         //Set world border for Overworld and Nether
         setWorldBorder();
 
-        // Create an instance of MhRestart with both dependencies
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
         // Register commands and their executors
@@ -35,16 +36,12 @@ public final class Manhunt extends JavaPlugin {
         getCommand("MhUnpause").setExecutor(new MhUnpause(teamManager));
         getCommand("MhReady").setExecutor(new MhReady(teamManager, this));
         getCommand("MhCompass").setExecutor(new MhCompass(teamManager, this));
-        getCommand("MhStart").setExecutor(mhStart);
-        getCommand("MhRestart").setExecutor(mhRestart);
+        getCommand("MhStart").setExecutor(mhStart); // Use the mhStart instance
+        getCommand("MhRestart").setExecutor(mhRestart); // Use the mhRestart instance
 
-        // Register TeamSelection listener
-        new TeamSelection(this, teamManager);
-
+        Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
-
         Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-
     }
 
     @Override
