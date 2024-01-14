@@ -60,7 +60,7 @@ public class WinCondition implements Listener {
 
         // Check if the player is a runner and has entered the End portal
         if (teamManager.isOnTeam(player, "Runners") && event.getTo().getWorld().getEnvironment() == World.Environment.THE_END) {
-            endEntered = true;  // Set the flag to true
+            endEntered = true;  // Set the flag to false
         }
 
 
