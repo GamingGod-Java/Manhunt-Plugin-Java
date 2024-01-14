@@ -44,6 +44,11 @@ public class TeamSelection implements Listener {
             return; // If it's neither red nor light blue concrete, do nothing
         }
 
+        // Check if the player is already on this team
+        if (teamManager.isOnTeam(player, team)) {
+            return; // Player is already on this team, do nothing
+        }
+
         teamManager.addToTeam(player, team);
     }
 }
