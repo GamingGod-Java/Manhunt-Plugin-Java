@@ -61,7 +61,6 @@ public class TeamManager implements Listener {
                 runners.add(player);
             }
         }
-        System.out.println("runners: "+runners);
         return runners;
     }
 

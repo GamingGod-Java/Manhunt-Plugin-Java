@@ -57,7 +57,7 @@ public class MhStart implements CommandExecutor {
             @Override
             public void run() {
                 if (secondsLeft > 0) {
-                    Bukkit.broadcastMessage("Game starts in " + secondsLeft + " seconds!");
+                    Bukkit.broadcastMessage("§cZombies " + "§fcan move in " + secondsLeft + " seconds!");
                 } else {
                     Bukkit.broadcastMessage("The zombies can now move!");
                     teamManager.unpauseZombies();
