@@ -36,6 +36,23 @@ public class TeamManager implements Listener {
     public Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
 
+    private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
+
+    public void saveFireTicks(Player player) {
+        savedFireTicks.put(player.getUniqueId(), player.getFireTicks());
+    }
+
+    // Restore the player's fire ticks to the saved value
+    public void restoreFireTicks(Player player) {
+        UUID playerUUID = player.getUniqueId();
+        if (savedFireTicks.containsKey(playerUUID)) {
+            int savedTicks = savedFireTicks.get(playerUUID);
+            player.setFireTicks(savedTicks);
+            savedFireTicks.remove(playerUUID);
+        }
+    }
+
+
 
     public void savePotionEffects(Player player) {
         Map<PotionEffect, Integer> effectsMap = new HashMap<>();
@@ -187,8 +204,13 @@ public class TeamManager implements Listener {
                 //Potion saving logic
                 savePotionEffects(player);
 
-                //air buble saving logic apparnetly
+                //Save air bubble progress
                 saveOriginalAirLevels();
+
+                //Save fire ticks
+                saveFireTicks(player);
+
+
             }
         }
     }
@@ -206,7 +228,12 @@ public class TeamManager implements Listener {
 
                 //Potion restore logic
                 restorePotionEffects(player);
+
+                //air bubble restore logic
                 restoreOriginalAirLevels();
+
+                //fire tick restore logic
+                restoreFireTicks(player);
 
             }
         }
