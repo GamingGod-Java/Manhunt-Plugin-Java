@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -35,6 +36,35 @@ public class TeamManager implements Listener {
     private final Plugin plugin;
     private final File playerDataFile;
     private final FileConfiguration playerData;
+    private Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
+
+
+    public void savePotionEffects(Player player) {
+        Map<PotionEffect, Integer> effectsMap = new HashMap<>();
+
+        for (PotionEffect activeEffect : player.getActivePotionEffects()) {
+            effectsMap.put(activeEffect, activeEffect.getDuration());
+        } // save effects and durations of individual player to hashmap
+
+        playerPotionEffects.put(player.getUniqueId(), effectsMap);
+        //save hashmap to hashmap of all players
+        System.out.println(playerPotionEffects);
+    }
+
+    public void restorePotionEffects(Player player) {
+        UUID playerUUID = player.getUniqueId();
+
+        if (playerPotionEffects.containsKey(playerUUID)) {
+            // Clear existing potion effects
+            player.getActivePotionEffects().clear();
+
+            // Restore saved potion effects
+            for (Map.Entry<PotionEffect, Integer> entry : playerPotionEffects.get(playerUUID).entrySet()) {
+                player.addPotionEffect(new PotionEffect(entry.getKey().getType(), entry.getValue(), entry.getKey().getAmplifier()));
+            }
+        }
+    }
+
     public TeamManager(Plugin plugin) {
         teams.put(Material.BLUE_WOOL, new Team("Runners"));
         teams.put(Material.RED_WOOL, new Team("Zombies"));
@@ -66,16 +96,17 @@ public class TeamManager implements Listener {
 
         // Update their display name and nametag based on the team
         if (team.equalsIgnoreCase("Zombies")) {
-            player.setDisplayName("§c[Zombie] " + player.getName()); // Red color
-            player.setPlayerListName("§c[Zombie] " + player.getName());
+            player.setDisplayName("§c" + player.getName());
+            player.setPlayerListName("§c" + player.getName());
             sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
         } else if (team.equalsIgnoreCase("Runners")) {
-            player.setDisplayName("§b[Runner] " + player.getName()); // Light blue color
-            player.setPlayerListName("§b[Runner] " + player.getName());
-            sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
+            player.setDisplayName("§9" + player.getName());
+            player.setPlayerListName("§9" + player.getName());
+            sendTitle(player, ChatColor.BLUE + "You have joined the Runners team");
         }
-    }
 
+        // You can add additional logic here if needed
+    }
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -98,6 +129,7 @@ public class TeamManager implements Listener {
             }
         }.runTaskLater(plugin, 1); // Send the title with a slight delay to ensure it displays correctly
     }
+
     public void removeFromTeam(Player player) {
         playerTeams.remove(player.getUniqueId());
         player.setDisplayName(player.getName()); // Resetting the display name to default
@@ -127,6 +159,9 @@ public class TeamManager implements Listener {
                 //Invulnerability logic
                 player.setInvulnerable(true);
 
+                //Potion saving logic
+                savePotionEffects(player);
+
             }
         }
     }
@@ -141,6 +176,9 @@ public class TeamManager implements Listener {
 
                 //Invulnerability logic
                 player.setInvulnerable(false);
+
+                //Potion restore logic
+                restorePotionEffects(player);
 
             }
         }

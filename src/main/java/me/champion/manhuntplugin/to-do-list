@@ -1,5 +1,16 @@
 ToggleFlight in server.properties
 
+Clean up MhStart countdown cancellation, maybe rewrite the Start sequence to include a cancel from the start
+
+Put Team into folders
+
+Put MhReady, Pause and Unpause into folders
+
+Cleanup
+
+Remove the chat spam from selection a zombie or runner team, maybe by only sending the message to the player,
+if they are switching from runner to zombie and zombie to runner
+
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 
 Make players invincible on pause and save things that could be doing damage, like lava etc. and load that again,
@@ -26,22 +37,21 @@ Weird logic with saving and restoring teams upon relogging
 If you move an offline player it moves you instead to the team instead of the person you are trying to move,
 disable moving offline players
 
+Remove the "<Player> has joined the <team> because other players can't and shouldn't see it anyway"
+
+Update peoples names in game and in chat with their colour
+
+Prefix
+
 Make a toggle team chat
 
 Make the compasses enchanted and unstackable
 
+Disable pause when game is already paused
+
+Clear name when moving to none
+
+Invulnerability (complete)
+
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
-
-Zombies frozen on countdown are not invincible, needs fixing
-
-Check if the game is in a state where the BossBar should be visible, and if so, add the player to the BossBar
-
-Logic for when the boss bar ends
-
-Fix logic where player doesn't get unpaused if they relog and /MhRestart is typed
-
-Make all error messages red
-
-Save potion state, while paused constantly clear and reapply it until the pause is over, then just apply it once,
-this will give the illusion of potion effects being frozen
