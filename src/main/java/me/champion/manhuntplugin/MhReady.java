@@ -56,10 +56,14 @@ public class MhReady implements CommandExecutor, Listener {
                 public void run() {
                     // Check if the game is still paused (prevent race condition)
                     if (teamManager.isGamePaused()) {
+                        // Reset walk speed for all online players
+                        resetWalkSpeedForAllPlayers();
+
                         // Set the player back to survival mode
                         player.setGameMode(GameMode.SURVIVAL);
 
                         player.setWalkSpeed(0.2f); // Reset walk speed to default (0.2)
+
                         // Unpause the game
                         teamManager.unpauseGame(player);
 
@@ -101,6 +105,13 @@ public class MhReady implements CommandExecutor, Listener {
         if (event.getMessage().equalsIgnoreCase("/MhReady") && !event.getPlayer().isOp()) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to use this command.");
+        }
+    }
+
+    // Method to reset walk speed for all online players
+    private void resetWalkSpeedForAllPlayers() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            onlinePlayer.setWalkSpeed(0.2f); // Reset walk speed for each player
         }
     }
 }

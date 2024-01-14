@@ -13,7 +13,6 @@ public class MhUnpause implements CommandExecutor {
 
     public MhUnpause(TeamManager teamManager) {
         this.teamManager = teamManager;
-
     }
 
     @Override
@@ -33,18 +32,26 @@ public class MhUnpause implements CommandExecutor {
             // Reset the player's walk speed to the default Minecraft value (0.2)
             player.setWalkSpeed(0.2f);
 
+            // Reset walk speed for all online players
+            resetWalkSpeedForAllPlayers();
+
             // Switch the player's game mode back to Survival
             player.setGameMode(GameMode.SURVIVAL);
 
             // Execute /tick unfreeze command
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
 
-
-
             return true;
         } else {
             sender.sendMessage("You do not have permission to use this command.");
             return true;
+        }
+    }
+
+    // Method to reset walk speed for all online players
+    private void resetWalkSpeedForAllPlayers() {
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            onlinePlayer.setWalkSpeed(0.2f); // Reset walk speed for each player
         }
     }
 }

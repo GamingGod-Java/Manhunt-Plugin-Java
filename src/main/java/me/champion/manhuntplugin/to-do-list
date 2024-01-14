@@ -37,3 +37,7 @@ Probably the respawn logic inside of TeamManager.java
 (Found and solved issue, logic for respawning was included in mhcompass and team manager, also updated team manager respawn)
 
 Why are compasses created in two different places lmao command and respawn, needs fixing
+
+If player A types /MhPause and player B types /MhUnpause the game only unpauses for player B and player A is stuck (their walk speed is set to 0.0)
+
+Add pause and unpause check when players log in to see if they should be paused or unpaused?
