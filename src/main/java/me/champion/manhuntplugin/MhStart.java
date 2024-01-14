@@ -37,6 +37,7 @@ public class MhStart implements CommandExecutor {
         }
         resetBossBar();
         gameStarted = false;
+        teamManager.unpauseZombies(); // Make sure to reset zombies' state when the game is reset
     }
 
     public boolean isInitialCountdownInProgress() {
@@ -47,6 +48,7 @@ public class MhStart implements CommandExecutor {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
             initialCountdownTask.cancel();
             initialCountdownInProgress = false;
+            teamManager.unpauseZombies(); // Make zombies vulnerable as countdown is canceled
         }
     }
 
@@ -65,10 +67,10 @@ public class MhStart implements CommandExecutor {
         resetBossBar(); // Reset any existing boss bar
 
         gameStarted = true;
-        teamManager.pauseZombies();
+        teamManager.pauseZombies(); // Make zombies invincible for the countdown duration
         startInitialCountdown();
         createAndStartBossBar();
-        Bukkit.broadcastMessage("§5Starting game, disabling team selection");
+        Bukkit.broadcastMessage("Starting game, disabling team selection");
         return true;
     }
 
@@ -83,13 +85,13 @@ public class MhStart implements CommandExecutor {
                     Bukkit.broadcastMessage("§cZombies " + "§fcan move in " + secondsLeft + " seconds!");
                 } else {
                     Bukkit.broadcastMessage("The §cZombies " + "§fcan now move!");
-                    teamManager.unpauseZombies();
+                    teamManager.unpauseZombies(); // Make zombies vulnerable again
                     this.cancel();
-                    initialCountdownInProgress = false; // Reset the flag
+                    initialCountdownInProgress = false;
                 }
                 secondsLeft--;
             }
-        }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L); // Update every second (20 ticks = 1 second)
+        }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
     }
 
     private void createAndStartBossBar() {

@@ -28,7 +28,7 @@ public class WinCondition implements Listener {
         if (mhstart.isGameStarted()) {
             if (event.getNewPhase() == EnderDragon.Phase.DYING) {
                 // The Ender Dragon has died
-                Bukkit.broadcastMessage("The Ender Dragon has been defeated!");
+                Bukkit.broadcastMessage("The §5Ender Dragon " + "§fhas been defeated!");
                 RunnerWin = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendTitle("§bRunners win", "Game Over", 20, 40, 10);
