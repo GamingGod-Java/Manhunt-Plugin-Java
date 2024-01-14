@@ -34,6 +34,7 @@ public class TeamManager implements Listener {
     private final File playerDataFile;
     private final FileConfiguration playerData;
     public Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
+    private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
 
 
     public void savePotionEffects(Player player) {
@@ -60,6 +61,23 @@ public class TeamManager implements Listener {
                 player.addPotionEffect(new PotionEffect(entry.getKey().getType(), entry.getValue(), entry.getKey().getAmplifier()));
             }
         }
+    }
+
+    private void saveOriginalAirLevels() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            originalAirLevels.put(player.getUniqueId(), player.getRemainingAir());
+        }
+    }
+
+    private void restoreOriginalAirLevels() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            UUID playerId = player.getUniqueId();
+            if (originalAirLevels.containsKey(playerId)) {
+                int originalAir = originalAirLevels.get(playerId);
+                player.setRemainingAir(originalAir);
+            }
+        }
+        originalAirLevels.clear();
     }
 
     public TeamManager(Plugin plugin) {
@@ -169,6 +187,8 @@ public class TeamManager implements Listener {
                 //Potion saving logic
                 savePotionEffects(player);
 
+                //air buble saving logic apparnetly
+                saveOriginalAirLevels();
             }
         }
     }
@@ -187,6 +207,7 @@ public class TeamManager implements Listener {
                 //Potion restore logic
                 System.out.println("teammanager restored potion effect");
                 restorePotionEffects(player);
+                restoreOriginalAirLevels();
 
             }
         }
