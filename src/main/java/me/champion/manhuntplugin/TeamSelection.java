@@ -9,11 +9,9 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public class TeamSelection implements Listener {
 
     private final TeamManager teamManager;
-    private final Manhunt plugin;
     private final MhStart mhStart;
 
     public TeamSelection(Manhunt plugin, TeamManager teamManager, MhStart mhStart) {
-        this.plugin = plugin;
         this.teamManager = teamManager;
         this.mhStart = mhStart;
 

@@ -1,16 +1,5 @@
 ToggleFlight in server.properties
 
-Clean up MhStart countdown cancellation, maybe rewrite the Start sequence to include a cancel from the start
-
-Put Team into folders
-
-Put MhReady, Pause and Unpause into folders
-
-Cleanup
-
-Remove the chat spam from selection a zombie or runner team, maybe by only sending the message to the player,
-if they are switching from runner to zombie and zombie to runner
-
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 
 Make players invincible on pause and save things that could be doing damage, like lava etc. and load that again,
@@ -42,8 +31,6 @@ BossBar not counting down properly
 Make a toggle team chat
 
 Make the compasses enchanted and unstackable
-
-Disable pause when game is already paused
 
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
