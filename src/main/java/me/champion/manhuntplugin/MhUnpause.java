@@ -13,6 +13,7 @@ public class MhUnpause implements CommandExecutor {
 
     public MhUnpause(TeamManager teamManager) {
         this.teamManager = teamManager;
+
     }
 
     @Override
@@ -37,6 +38,8 @@ public class MhUnpause implements CommandExecutor {
 
             // Execute /tick unfreeze command
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+
+
 
             return true;
         } else {

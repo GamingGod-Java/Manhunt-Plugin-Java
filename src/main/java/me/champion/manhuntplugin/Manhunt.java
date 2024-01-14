@@ -3,11 +3,19 @@ package me.champion.manhuntplugin;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
 
 public final class Manhunt extends JavaPlugin {
     private TeamManager teamManager;
     private MhStart mhStart; // Add this field
+
+    File configFile = new File(getDataFolder(), "playerdata.yml");
+    FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
     @Override
     public void onLoad() {
@@ -18,9 +26,20 @@ public final class Manhunt extends JavaPlugin {
     public void onEnable() {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
+        // Clear the configuration
+        config = new YamlConfiguration();
+
+        // Save the empty configuration to the file
+        try {
+            config.save(configFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Emptied playerdata.yml");
+
         // Initialize TeamManager
         teamManager = new TeamManager(this);
-
         // Initialize MhStart as a local variable and store it in the field
         mhStart = new MhStart(teamManager);
 

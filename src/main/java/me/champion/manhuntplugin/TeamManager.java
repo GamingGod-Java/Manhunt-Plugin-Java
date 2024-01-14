@@ -36,7 +36,7 @@ public class TeamManager implements Listener {
     private final Plugin plugin;
     private final File playerDataFile;
     private final FileConfiguration playerData;
-    private Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
+    public Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
 
 
     public void savePotionEffects(Player player) {
@@ -85,10 +85,20 @@ public class TeamManager implements Listener {
     }
 
     public void addToTeam(Player player, String team) {
+        System.out.println("adding"+player.getName()+" to "+team);
         UUID playerUUID = player.getUniqueId();
         String currentTeam = playerTeams.get(playerUUID);
 
         if (currentTeam != null && currentTeam.equalsIgnoreCase(team)) {
+            if (team.equalsIgnoreCase("Zombies")) {
+                player.setDisplayName("§c" + player.getName());
+                player.setPlayerListName("§c" + player.getName());
+                //sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
+            } else if (team.equalsIgnoreCase("Runners")) {
+                player.setDisplayName("§9" + player.getName());
+                player.setPlayerListName("§9" + player.getName());
+                //sendTitle(player, ChatColor.BLUE + "You have joined the Runners team");
+            }
             return; // Player is already on the team, no need to add them again
         }
 
@@ -178,6 +188,7 @@ public class TeamManager implements Listener {
                 player.setInvulnerable(false);
 
                 //Potion restore logic
+                System.out.println("teammanager restored potion effect");
                 restorePotionEffects(player);
 
             }
@@ -277,7 +288,9 @@ public class TeamManager implements Listener {
         UUID playerUUID = player.getUniqueId();
 
         if (playerData.contains(playerUUID.toString())) {
+
             String team = playerData.getString(playerUUID.toString());
+            System.out.println("Added "+ playerUUID +"to" +team);
             addToTeam(player, team);
         }
     }

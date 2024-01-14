@@ -63,6 +63,8 @@ public class MhReady implements CommandExecutor, Listener {
                         // Unpause the game
                         teamManager.unpauseGame(player);
 
+                        //teamManager.restorePotionEffects(player);
+
                         // Execute /tick unfreeze
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
                     }

@@ -11,6 +11,7 @@ public class MhPause implements CommandExecutor {
 
     private final TeamManager teamManager;
     private final Manhunt plugin; // Add a reference to the Manhunt plugin
+    public int continuousLookingTaskId = -1;
 
     public MhPause(Manhunt plugin, TeamManager teamManager) {
         this.plugin = plugin;
@@ -37,6 +38,11 @@ public class MhPause implements CommandExecutor {
             // Start continuous looking behavior
             startContinuousLooking(player);
 
+
+
+
+
+
             return true;
         }
 
@@ -44,17 +50,18 @@ public class MhPause implements CommandExecutor {
     }
 
     // Method to start continuous looking
-    private void startContinuousLooking(Player player) {
-        // Define yaw and pitch angles (you can set them as needed)
-        float yaw = 0.0f;  // Replace with the desired yaw angle
-        float pitch = 0.0f;  // Replace with the desired pitch angle
+    private int startContinuousLooking(Player player) {
+        float yaw = 0.0f;
+        float pitch = 0.0f;
 
-        // Schedule a task to continuously set the player's view direction
-        int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+        continuousLookingTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             player.getLocation().setYaw(yaw);
             player.getLocation().setPitch(pitch);
-        }, 0L, 1L); // Adjust the delay and interval as needed
+            //System.out.println("mhpause restored potion effect");
+            //teamManager.restorePotionEffects(player);
+        }, 0L, 1L);
 
-        // Store the task ID somewhere (e.g., in a Map) if you need to cancel it later
+        return continuousLookingTaskId;
     }
+
 }
