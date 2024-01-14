@@ -15,6 +15,7 @@ public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
     private boolean gameStarted = false;
+    public boolean timerExpired = false;
     private BukkitTask countdownTask;
     private BossBar bossBar;
 
@@ -82,6 +83,8 @@ public class MhStart implements CommandExecutor {
             @Override
             public void run() {
                 if (secondsLeft <= 0) {
+                    System.out.println("timer expired");
+                    timerExpired = true;
                     bossBar.setVisible(false);
                     this.cancel();
                     return;

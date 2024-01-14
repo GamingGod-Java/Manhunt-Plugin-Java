@@ -28,7 +28,7 @@ import java.util.*;
 
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
-    private final Map<UUID, String> playerTeams = new HashMap<>();
+    public final Map<UUID, String> playerTeams = new HashMap<>();
     private final Set<UUID> frozenPlayers = new HashSet<>();
     private final Plugin plugin;
     private final File playerDataFile;

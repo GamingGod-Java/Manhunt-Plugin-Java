@@ -61,7 +61,7 @@ public final class Manhunt extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
     }
 
     @Override
