@@ -130,12 +130,12 @@ public class TeamManager implements Listener {
 
         // Update their display name and nametag based on the team
         if (team.equalsIgnoreCase("Zombies")) {
-            player.setDisplayName("§cZombie: " + player.getName()); // Red "Zombie" prefix
-            player.setPlayerListName("§cZombie: " + player.getName()); // Red "Zombie" prefix
+            player.setDisplayName("§c" + player.getName()); // Red "Zombie" prefix
+            player.setPlayerListName("§cZ " + player.getName()); // Red "Zombie" prefix
             sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
         } else if (team.equalsIgnoreCase("Runners")) {
-            player.setDisplayName("§bRunner: " + player.getName()); // Aqua "Runner" prefix
-            player.setPlayerListName("§bRunner: " + player.getName()); // Aqua "Runner" prefix
+            player.setDisplayName("§b" + player.getName()); // Aqua "Runner" prefix
+            player.setPlayerListName("§bR " + player.getName()); // Aqua "Runner" prefix
             sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
         }
     }
