@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.bukkit.Particle;
+import org.bukkit.inventory.ItemFlag;
 
 import java.util.*;
 
@@ -56,28 +57,30 @@ public class MhCompass implements CommandExecutor, Listener {
     }
 
     private void giveRunnerCompass(Player player) {
-        System.out.println("Gave "+player.getName()+"compass");
+        System.out.println("Gave " + player.getName() + " compass");
         ItemStack compass = new ItemStack(Material.COMPASS);
 
+        // Add a dummy enchantment
         compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
 
+        // Retrieve and modify the item meta for the compass
+        ItemMeta meta = compass.getItemMeta();
+        if (meta != null) {
+            // Hide the enchantment information
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-        // Set unstackable flag
-        ItemMeta compassMeta = compass.getItemMeta();
-        compassMeta.setUnbreakable(true);
-        compass.setItemMeta(compassMeta);
+            // Set the display name of the compass
+            meta.setDisplayName("§cTrack Runners");
 
-        // Add custom lore
-        List<String> lore = new ArrayList<>();
-        lore.add("This enchanted compass points to the nearest runner.");
-        lore.add("Use it wisely!");
-        compassMeta.setLore(lore);
+            // Apply the modified meta back to the compass
+            compass.setItemMeta(meta);
+        }
 
-        compassMeta.setDisplayName("§cTrack Runners");
-        compass.setItemMeta(compassMeta);
+        // Give the compass to the player
         player.getInventory().addItem(compass);
         player.sendMessage("You have been given a compass to track runners.");
     }
+
 
     @EventHandler
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
