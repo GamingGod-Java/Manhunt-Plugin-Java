@@ -35,3 +35,5 @@ Make the compasses unstackable (?)
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
 (Found and solved issue, logic for respawning was included in mhcompass and team manager, also updated team manager respawn)
+
+Why are compasses created in two different places lmao command and respawn, needs fixing

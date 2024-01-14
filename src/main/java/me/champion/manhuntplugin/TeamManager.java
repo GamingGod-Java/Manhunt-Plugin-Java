@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Location;
@@ -50,6 +51,18 @@ public class TeamManager implements Listener {
             player.setFireTicks(savedTicks);
             savedFireTicks.remove(playerUUID);
         }
+    }
+
+    public List<Player> getRunners() {
+        List<Player> runners = new ArrayList<>();
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (isOnTeam(player, "Runners")) {
+                runners.add(player);
+            }
+        }
+        System.out.println("runners: "+runners);
+        return runners;
     }
 
 
@@ -292,25 +305,26 @@ public class TeamManager implements Listener {
         String team = playerTeams.get(player.getUniqueId());
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            System.out.println("Gave "+player.getName()+"compass");
+            System.out.println("Gave " + player.getName() + "compass");
             ItemStack compass = new ItemStack(Material.COMPASS);
 
+            // Add a dummy enchantment
             compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
 
+            // Retrieve and modify the item meta for the compass
+            ItemMeta meta = compass.getItemMeta();
+            if (meta != null) {
+                // Hide the enchantment information
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-            // Set unstackable flag
-            ItemMeta compassMeta = compass.getItemMeta();
-            compassMeta.setUnbreakable(true);
-            compass.setItemMeta(compassMeta);
+                // Set the display name of the compass
+                meta.setDisplayName("§cTrack Runners");
 
-            // Add custom lore
-            List<String> lore = new ArrayList<>();
-            lore.add("This enchanted compass points to the nearest runner.");
-            lore.add("Use it wisely!");
-            compassMeta.setLore(lore);
+                // Apply the modified meta back to the compass
+                compass.setItemMeta(meta);
+            }
 
-            compassMeta.setDisplayName("§cTrack Runners");
-            compass.setItemMeta(compassMeta);
+            // Give the compass to the player
             player.getInventory().addItem(compass);
             player.sendMessage("You have been given a compass to track runners.");
         }
