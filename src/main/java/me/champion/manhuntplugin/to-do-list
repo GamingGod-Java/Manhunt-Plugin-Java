@@ -37,6 +37,8 @@ Zombies frozen on countdown are not invincible, needs fixing
 
 Check if the game is in a state where the BossBar should be visible, and if so, add the player to the BossBar
 
+Logic for when the boss bar ends
+
 Fix logic where player doesn't get unpaused if they relog and /MhRestart is typed
 
 Make all error messages red
