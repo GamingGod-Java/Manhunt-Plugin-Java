@@ -15,7 +15,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 public class WinCondition implements Listener {
     private final TeamManager teamManager;
     private final MhStart mhstart;
-    private boolean HunterWin = false;
+    private boolean ZombieWin = false;
     private boolean RunnerWin = false;
     public WinCondition(TeamManager teamManager, MhStart mhstart) {
         this.teamManager = teamManager;
@@ -31,7 +31,7 @@ public class WinCondition implements Listener {
                 Bukkit.broadcastMessage("The Ender Dragon has been defeated!");
                 RunnerWin = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendTitle("Runners win", "Game Over", 20, 40, 10);
+                    player.sendTitle("§bRunners win", "Game Over", 20, 40, 10);
                 }
             }
         }
@@ -39,16 +39,20 @@ public class WinCondition implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         if (mhstart.isGameStarted()) {
-            if (!HunterWin && !RunnerWin) {
+            if (!ZombieWin && !RunnerWin) {
                 if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
                     System.out.println(teamManager.playerTeams);
-                    System.out.println("Hunter Win");
-                    HunterWin = true;
+                    System.out.println("Zombie Win");
+                    ZombieWin = true;
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendTitle("Hunters Win", "Game Over", 20, 40, 10);
+                        player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
                     }
                 }
             }
+        }
+        if (!mhstart.isGameStarted()) {
+            ZombieWin = false;
+            RunnerWin = false;
         }
     }
 
