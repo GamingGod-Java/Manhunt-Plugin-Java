@@ -1,5 +1,7 @@
 package me.champion.manhuntplugin;
 
+import org.bukkit.enchantments.Enchantment;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -18,9 +20,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.bukkit.Particle;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+
+import java.util.*;
 
 public class MhCompass implements CommandExecutor, Listener {
     private final TeamManager teamManager;
@@ -56,7 +57,21 @@ public class MhCompass implements CommandExecutor, Listener {
 
     private void giveRunnerCompass(Player player) {
         ItemStack compass = new ItemStack(Material.COMPASS);
+
+        compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+
+
+        // Set unstackable flag
         ItemMeta compassMeta = compass.getItemMeta();
+        compassMeta.setUnbreakable(true);
+        compass.setItemMeta(compassMeta);
+
+        // Add custom lore
+        List<String> lore = new ArrayList<>();
+        lore.add("This enchanted compass points to the nearest runner.");
+        lore.add("Use it wisely!");
+        compassMeta.setLore(lore);
+
         compassMeta.setDisplayName("§cTrack Runners");
         compass.setItemMeta(compassMeta);
         player.getInventory().addItem(compass);

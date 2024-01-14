@@ -32,7 +32,7 @@ Fix small issues and null pointers
 MhCreate command displays a white text saying You do not have permission to use this command instead of red (example)
 the /mhready command
 
-Weird logic with saving and restoring teams upon relogging
+Weird logic with saving and restoring teams upon relogging (fixed)
 
 If you move an offline player it moves you instead to the team instead of the person you are trying to move,
 disable moving offline players
