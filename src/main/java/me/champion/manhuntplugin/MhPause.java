@@ -20,31 +20,36 @@ public class MhPause implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
+        if (sender instanceof Player && sender.isOp()) {
+            if (!teamManager.isGamePaused()) {
+                Player player = (Player) sender;
 
-            // Call the pauseGame method in the TeamManager
-            teamManager.pauseGame(player);
+                // Call the pauseGame method in the TeamManager
+                teamManager.pauseGame(player);
 
-            // Set the player to Adventure mode
-            player.setGameMode(GameMode.ADVENTURE);
+                // Set the player to Adventure mode
+                player.setGameMode(GameMode.ADVENTURE);
 
-            // Set the walk speed to 0 - this makes the player unable to walk
-            player.setWalkSpeed(0.0f);
+                // Set the walk speed to 0 - this makes the player unable to walk
+                player.setWalkSpeed(0.0f);
 
-            // Execute /tick freeze command
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
+                // Execute /tick freeze command
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
 
-            // Start continuous looking behavior
-            startContinuousLooking(player);
-
-
-
+                // Start continuous looking behavior
+                startContinuousLooking(player);
 
 
-
+                return true;
+            } if (teamManager.isGamePaused()) {
+                sender.sendMessage("Game is already paused");
+                return true;
+            }
+        } else {
+            sender.sendMessage("This command is only for the bourgeoisie");
             return true;
         }
+
 
         return false;
     }

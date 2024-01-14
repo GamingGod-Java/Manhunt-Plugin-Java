@@ -47,9 +47,8 @@ Make a toggle team chat
 
 Make the compasses enchanted and unstackable
 
-Disable pause when game is already paused
-
 Clear name when moving to none
 
 Tells runner 3 times upon respawn that they have been given a compass, see what's causing this issue?
 Probably the respawn logic inside of TeamManager.java
+Found and solved issue, logic for respawning was included in mhcompass and team manager, also updated team manager respawn

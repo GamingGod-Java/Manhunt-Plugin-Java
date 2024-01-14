@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 public final class Manhunt extends JavaPlugin {
+
     private TeamManager teamManager;
     private MhStart mhStart; // Add this field
 
