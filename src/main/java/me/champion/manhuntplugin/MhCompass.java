@@ -56,6 +56,7 @@ public class MhCompass implements CommandExecutor, Listener {
     }
 
     private void giveRunnerCompass(Player player) {
+        System.out.println("Gave "+player.getName()+"compass");
         ItemStack compass = new ItemStack(Material.COMPASS);
 
         compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);

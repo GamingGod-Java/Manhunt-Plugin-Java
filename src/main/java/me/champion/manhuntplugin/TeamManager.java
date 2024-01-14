@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,11 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
@@ -250,17 +247,26 @@ public class TeamManager implements Listener {
         String team = playerTeams.get(player.getUniqueId());
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            // Give the compass to the player upon respawn
+            System.out.println("Gave "+player.getName()+"compass");
             ItemStack compass = new ItemStack(Material.COMPASS);
-            ItemMeta compassMeta = compass.getItemMeta();
 
-            // Set the display name to "Track Runners" in red color
-            compassMeta.setDisplayName("§cTrack Runners"); // §c represents red color in Minecraft
+            compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+
+
+            // Set unstackable flag
+            ItemMeta compassMeta = compass.getItemMeta();
+            compassMeta.setUnbreakable(true);
             compass.setItemMeta(compassMeta);
 
-            player.getInventory().setItemInMainHand(compass);
+            // Add custom lore
+            List<String> lore = new ArrayList<>();
+            lore.add("This enchanted compass points to the nearest runner.");
+            lore.add("Use it wisely!");
+            compassMeta.setLore(lore);
 
-            // You can add the tracking logic here once it's implemented
+            compassMeta.setDisplayName("§cTrack Runners");
+            compass.setItemMeta(compassMeta);
+            player.getInventory().addItem(compass);
             player.sendMessage("You have been given a compass to track runners.");
         }
     }
