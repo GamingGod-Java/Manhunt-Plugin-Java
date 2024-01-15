@@ -18,6 +18,4 @@ Make the compasses unstackable (?)
 
 Add pause and unpause check when players log in to see if they should be paused or unpaused?
 
-Zombies can interact during countdown phase, prevent this behaviour
-
-Create new commands to allow anyone to do /MhJoin <team> and /MhLeave to leave teams
+Fix boat riding while in pause state
