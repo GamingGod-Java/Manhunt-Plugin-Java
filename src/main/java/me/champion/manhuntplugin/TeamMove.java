@@ -4,9 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-public class TeamMove implements CommandExecutor {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TeamMove implements CommandExecutor, TabCompleter {
 
     private final TeamManager teamManager;
 
@@ -38,8 +42,8 @@ public class TeamMove implements CommandExecutor {
         }
 
         // Check if the provided team name is valid
-        if (!teamName.equalsIgnoreCase("zombies") && !teamName.equalsIgnoreCase("runners") && !teamName.equalsIgnoreCase("none")) {
-            sender.sendMessage("Invalid team name! Valid team names are: zombies, runners, none");
+        if (!teamName.equalsIgnoreCase("zombies") && !teamName.equalsIgnoreCase("runners") && !teamName.equalsIgnoreCase("zombie") && !teamName.equalsIgnoreCase("runner")&& !teamName.equalsIgnoreCase("none")) {
+            sender.sendMessage("Invalid team name! Valid team names are: zombies, runners, zombie, runner, none");
             return true;
         }
 
@@ -47,11 +51,36 @@ public class TeamMove implements CommandExecutor {
         if (teamName.equalsIgnoreCase("none")) {
             teamManager.removeFromTeam(targetPlayer);
         } else {
+            if  (teamName.equalsIgnoreCase("zombie")) {
+                teamName = "zombies";
+
+            } if  (teamName.equalsIgnoreCase("runner")) {
+                teamName = "runners";
+
+            }
             teamManager.addToTeam(targetPlayer, teamName);
         }
 
         sender.sendMessage("Player " + playerName + " moved to team " + teamName);
 
         return true;
+    }
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        List<String> completions = new ArrayList<>();
+
+        if (args.length == 1 && sender instanceof Player) {
+            // Autofill player names
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                completions.add(player.getName());
+            }
+        } else if (args.length == 2) {
+            // Autofill team names
+            completions.add("zombies");
+            completions.add("runners");
+            completions.add("none");
+        }
+
+        return completions;
     }
 }
