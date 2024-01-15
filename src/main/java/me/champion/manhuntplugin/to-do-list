@@ -5,7 +5,7 @@ if they are switching from runner to zombie and zombie to runner
 
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 
-Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None"
+Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None" (done)
 
 Fix small issues and null pointers
 
