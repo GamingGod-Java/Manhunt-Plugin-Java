@@ -36,12 +36,9 @@ public class MhPause implements CommandExecutor {
                 // Execute /tick freeze command
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
 
-                // Start continuous looking behavior
-                startContinuousLooking(player);
-
-
                 return true;
-            } if (teamManager.isGamePaused()) {
+            }
+            if (teamManager.isGamePaused()) {
                 sender.sendMessage("Game is already paused");
                 return true;
             }
@@ -53,20 +50,4 @@ public class MhPause implements CommandExecutor {
 
         return false;
     }
-
-    // Method to start continuous looking
-    private int startContinuousLooking(Player player) {
-        float yaw = 0.0f;
-        float pitch = 0.0f;
-
-        continuousLookingTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            player.getLocation().setYaw(yaw);
-            player.getLocation().setPitch(pitch);
-            //System.out.println("mhpause restored potion effect");
-            //teamManager.restorePotionEffects(player);
-        }, 0L, 1L);
-
-        return continuousLookingTaskId;
-    }
-
 }
