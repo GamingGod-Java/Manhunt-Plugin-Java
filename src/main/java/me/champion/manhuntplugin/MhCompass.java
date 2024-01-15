@@ -24,6 +24,8 @@ import org.bukkit.inventory.ItemFlag;
 
 import java.util.*;
 
+//Important giveRunnerCompass in MhCompass.java and onPlayerRespawn in TeamManager.java both create the same compass, but with different code.
+//If you make changes to either compass, make sure you update it for both.
 public class MhCompass implements CommandExecutor, Listener {
     private final TeamManager teamManager;
     private final Plugin plugin;
@@ -78,7 +80,6 @@ public class MhCompass implements CommandExecutor, Listener {
 
         // Give the compass to the player
         player.getInventory().addItem(compass);
-        player.sendMessage("You have been given a compass to track runners.");
     }
 
 

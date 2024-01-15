@@ -12,6 +12,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.Location;
@@ -26,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+//Important giveRunnerCompass in MhCompass.java and onPlayerRespawn in TeamManager.java both create the same compass, but with different code.
+//If you make changes to either compass, make sure you update it for both.
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
     public final Map<UUID, String> playerTeams = new HashMap<>();
@@ -307,24 +310,24 @@ public class TeamManager implements Listener {
             System.out.println("Gave "+player.getName()+"compass");
             ItemStack compass = new ItemStack(Material.COMPASS);
 
+            // Add a dummy enchantment
             compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
 
+            // Retrieve and modify the item meta for the compass
+            ItemMeta meta = compass.getItemMeta();
+            if (meta != null) {
+                // Hide the enchantment information
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-            // Set unstackable flag
-            ItemMeta compassMeta = compass.getItemMeta();
-            compassMeta.setUnbreakable(true);
-            compass.setItemMeta(compassMeta);
+                // Set the display name of the compass
+                meta.setDisplayName("§cTrack Runners");
 
-            // Add custom lore
-            List<String> lore = new ArrayList<>();
-            lore.add("This enchanted compass points to the nearest runner.");
-            lore.add("Use it wisely!");
-            compassMeta.setLore(lore);
+                // Apply the modified meta back to the compass
+                compass.setItemMeta(meta);
+            }
 
-            compassMeta.setDisplayName("§cTrack Runners");
-            compass.setItemMeta(compassMeta);
+            // Give the compass to the player
             player.getInventory().addItem(compass);
-            player.sendMessage("You have been given a compass to track runners.");
         }
     }
 
@@ -355,9 +358,23 @@ public class TeamManager implements Listener {
             String team = playerData.getString(playerUUID.toString());
             System.out.println("Added "+ playerUUID +"to" +team);
             addToTeam(player, team);
+            // Reapply display name and prefix
+            updatePlayerDisplayName(player, team);
         }
     }
-
+    private void updatePlayerDisplayName(Player player, String team) {
+        if (team.equalsIgnoreCase("Zombies")) {
+            player.setDisplayName("§c" + player.getName());
+            player.setPlayerListName("§cZ " + player.getName());
+        } else if (team.equalsIgnoreCase("Runners")) {
+            player.setDisplayName("§b" + player.getName());
+            player.setPlayerListName("§bR " + player.getName());
+        } else {
+            // Default display name if the team is not recognized
+            player.setDisplayName(player.getName());
+            player.setPlayerListName(player.getName());
+        }
+    }
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();

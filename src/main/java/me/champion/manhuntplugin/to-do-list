@@ -9,16 +9,12 @@ Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None"
 
 Fix small issues and null pointers
 
-Weird logic with saving and restoring teams upon relogging (fixed) //not fixed for some reason
-
 If you move an offline player it moves you instead to the team instead of the person you are trying to move,
 disable moving offline players
 
 Make a toggle team chat
 
 Make the compasses unstackable (?)
-
-Why are compasses created in two different places lmao command and respawn, needs fixing
 
 Add pause and unpause check when players log in to see if they should be paused or unpaused?
 
