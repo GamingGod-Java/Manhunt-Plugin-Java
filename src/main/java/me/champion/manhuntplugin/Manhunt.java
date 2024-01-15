@@ -9,11 +9,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public final class Manhunt extends JavaPlugin {
 
     private TeamManager teamManager;
-    private MhStart mhStart; // Add this field
+    private MhStart mhStart; // Your existing field
 
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -27,6 +29,9 @@ public final class Manhunt extends JavaPlugin {
     public void onEnable() {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
+        // Modify server.properties to enable flight
+        enableFlightInServerProperties();
+
         // Clear the configuration
         config = new YamlConfiguration();
 
@@ -36,14 +41,14 @@ public final class Manhunt extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Emptied playerdata.yml");
+        getLogger().info("Emptied playerdata.yml");
 
         // Initialize TeamManager
         teamManager = new TeamManager(this);
         // Initialize MhStart as a local variable and store it in the field
         mhStart = new MhStart(teamManager);
 
-        //Set world border for Overworld and Nether
+        // Set world border for Overworld and Nether
         setWorldBorder();
 
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
@@ -105,4 +110,34 @@ public final class Manhunt extends JavaPlugin {
         WorldBorder worldBorder = world.getWorldBorder();
         worldBorder.setSize(size);
     }
+
+    // Method to modify server.properties to enable flight
+    private void enableFlightInServerProperties() {
+        try {
+            File propFile = new File("server.properties");
+            if (!propFile.exists()) {
+                this.getLogger().warning("server.properties not found!");
+                return;
+            }
+
+            String content = new String(Files.readAllBytes(Paths.get(propFile.toURI())));
+            if (!content.contains("allow-flight=false")) {
+                this.getLogger().info("Flight already enabled or property not found.");
+                return;
+            }
+
+            content = content.replaceAll("allow-flight=false", "allow-flight=true");
+            Files.write(Paths.get(propFile.toURI()), content.getBytes());
+            this.getLogger().info("Flight has been enabled. Server will restart shortly.");
+
+            // Schedule a server restart
+            Bukkit.getScheduler().runTaskLater(this, () -> {
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart");
+            }, 100L); // 100L = 5 seconds later, adjust as needed
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
