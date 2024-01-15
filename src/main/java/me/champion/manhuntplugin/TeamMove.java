@@ -16,7 +16,7 @@ public class TeamMove implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player) || !sender.isOp()) {
             sender.sendMessage("Only players can use this command!");
             return true;
         }
