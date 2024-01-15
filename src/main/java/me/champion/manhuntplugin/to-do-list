@@ -20,4 +20,4 @@ Add pause and unpause check when players log in to see if they should be paused 
 
 Zombies can interact during countdown phase, prevent this behaviour
 
-Make it so only OP's can move people with /MhMove, but create new commands to allow anyone to do /MhJoin <team> and /MhLeave to leave teams
+Create new commands to allow anyone to do /MhJoin <team> and /MhLeave to leave teams
