@@ -5,6 +5,15 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Boat;
+import org.bukkit.Location;
+import org.bukkit.event.*;
+import org.bukkit.util.Vector;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.vehicle.VehicleExitEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -40,6 +49,67 @@ public class TeamManager implements Listener {
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
 
     private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
+
+    private final Map<UUID, BoatData> playerBoats = new HashMap<>();
+    private static class BoatData {
+        private final Boat boat;
+        private final Location location;
+
+        public BoatData(Boat boat) {
+            this.boat = boat;
+            this.location = boat.getLocation();
+        }
+
+        public Boat getBoat() {
+            return boat;
+        }
+
+        public Location getLocation() {
+            return location;
+        }
+    }
+    public void saveBoat(Player player, Boat boat) {
+        playerBoats.put(player.getUniqueId(), new BoatData(boat));
+    }
+
+    public void restoreBoat(Player player) {
+        UUID playerUUID = player.getUniqueId();
+
+        if (playerBoats.containsKey(playerUUID)) {
+            BoatData boatData = playerBoats.get(playerUUID);
+            Location boatLocation = boatData.getLocation();
+
+            Boat existingBoat = boatData.getBoat();
+            existingBoat.teleport(boatLocation);
+
+            // Set the player as a passenger in the existing boat
+            existingBoat.setPassenger(player);
+        }
+    }
+
+    @EventHandler
+    public void onVehicleExit(VehicleExitEvent event) {
+        if (isGamePaused() && event.getVehicle() instanceof Boat && event.getExited() instanceof Player) {
+            Player player = (Player) event.getExited();
+            Boat boat = (Boat) event.getVehicle();
+            System.out.println(playerBoats);
+            System.out.println("put player in boat");
+            restoreBoat(player);
+            event.setCancelled(true);
+        }
+
+    }
+
+
+    // Helper method to get the boat a player is currently riding
+    private Boat getOccupiedBoat(Player player) {
+        for (Boat boat : player.getWorld().getEntitiesByClass(Boat.class)) {
+            if (boat.getPassengers().contains(player)) {
+                return boat;
+            }
+        }
+        return null;
+    }
 
     public void saveFireTicks(Player player) {
         savedFireTicks.put(player.getUniqueId(), player.getFireTicks());
@@ -154,6 +224,27 @@ public class TeamManager implements Listener {
             sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
         }
     }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onVehicleMove(VehicleMoveEvent event) {
+        if (isGamePaused() && event.getVehicle() instanceof Boat) {
+            Boat boat = (Boat) event.getVehicle();
+            boat.setVelocity(new Vector(0,0 ,0 ));
+
+            // Check if the boat has a passenger and the passenger is a player
+            if (!boat.getPassengers().isEmpty() && boat.getPassengers().get(0) instanceof Player) {
+                Player player = (Player) boat.getPassengers().get(0);
+
+                // Cancel the movement update for boats
+
+
+                // Restore the boat location for the player
+                restoreBoat(player);
+            }
+        }
+    }
+
+
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -215,6 +306,10 @@ public class TeamManager implements Listener {
                 //Save fire ticks
                 saveFireTicks(player);
 
+                //Save boat locations
+                if (getOccupiedBoat(player) != null) {
+                    saveBoat(player, getOccupiedBoat(player));
+                }
 
             }
         }
@@ -239,6 +334,9 @@ public class TeamManager implements Listener {
 
                 //fire tick restore logic
                 restoreFireTicks(player);
+
+                //boat restore
+                //restoreBoat(player);
 
             }
         }
@@ -352,9 +450,14 @@ public class TeamManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
+        if (isGamePaused()) {
+            player.setWalkSpeed(0);
+        }
+        if (!isGamePaused()) {
+            player.setWalkSpeed(0.2f);
+        }
 
         if (playerData.contains(playerUUID.toString())) {
-
             String team = playerData.getString(playerUUID.toString());
             System.out.println("Added "+ playerUUID +"to" +team);
             addToTeam(player, team);

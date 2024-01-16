@@ -1,6 +1,8 @@
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 //This is related to the tick freeze/unfreeze command the server executes
 
+Logging out during a pause, on rejoin, still makes your walk speed 0? (andre)
+
 Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None" (done)
 
 Fix small issues and null pointers
@@ -14,4 +16,4 @@ Make the compasses unstackable (?)
 
 Add pause and unpause check when players log in to see if they should be paused or unpaused?
 
-Fix boat riding while in pause state
+Players in boats are now frozen but the boat can move without them? (this is the best fix i could get, they cant get out of boat, i can try more later but ive spent like 2 hours straight on this and i want to save something)
