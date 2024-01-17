@@ -8,6 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
@@ -45,10 +46,10 @@ public class TeamManager implements Listener {
     private final Map<UUID, BoatData> savedBoats = new HashMap<>();
 
     private static class BoatData {
-        private final Boat boat;
+        private final Vehicle boat;
         private final List<UUID> passengers;
 
-        public BoatData(Boat boat) {
+        public BoatData(Vehicle boat) {
             this.boat = boat;
             this.passengers = boat.getPassengers().stream()
                     .filter(e -> e instanceof Player)
@@ -56,7 +57,7 @@ public class TeamManager implements Listener {
                     .collect(Collectors.toList());
         }
 
-        public Boat getBoat() {
+        public Vehicle getBoat() {
             return boat;
         }
 
@@ -239,11 +240,11 @@ public class TeamManager implements Listener {
                 //Save fire ticks
                 saveFireTicks(player);
 
-                if (player.getVehicle() instanceof Boat) {
-                    Boat boat = (Boat) player.getVehicle();
-                    savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat with passengers
+                if (player.getVehicle() instanceof Vehicle) {
+                    Vehicle boat = (Vehicle) player.getVehicle();
+                    savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
                     boat.eject(); // Eject all passengers
-                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a boat and will be remounted when the game resumes.");
+                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and will be remounted when the game resumes.");
                 }
             }
         }
@@ -266,7 +267,7 @@ public class TeamManager implements Listener {
 
             // Restoring boats and their passengers
             for (BoatData boatData : savedBoats.values()) {
-                Boat boat = boatData.getBoat();
+                Vehicle boat = boatData.getBoat();
                 List<UUID> passengers = boatData.getPassengers();
 
                 if (!passengers.isEmpty()) {
@@ -467,7 +468,7 @@ public class TeamManager implements Listener {
     }
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
-        if (isGamePaused() && event.getEntity() instanceof Boat) {
+        if (isGamePaused() && event.getEntity() instanceof Vehicle) {
             // Cancel the event if the game is paused and a boat is being damaged
             event.setCancelled(true);
         }
@@ -475,7 +476,7 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
-        if (isGamePaused() && event.getVehicle() instanceof Boat) {
+        if (isGamePaused() && event.getVehicle() instanceof Vehicle) {
             // If the game is paused and a player tries to enter a boat, cancel the event
             event.setCancelled(true);
             if (event.getEntered() instanceof Player) {
