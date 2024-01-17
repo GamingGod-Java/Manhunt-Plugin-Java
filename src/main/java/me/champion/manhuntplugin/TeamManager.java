@@ -102,7 +102,6 @@ public class TeamManager implements Listener {
 
         playerPotionEffects.put(player.getUniqueId(), effectsMap);
         //save hashmap to hashmap of all players
-        System.out.println(playerPotionEffects);
     }
 
     public void restorePotionEffects(Player player) {

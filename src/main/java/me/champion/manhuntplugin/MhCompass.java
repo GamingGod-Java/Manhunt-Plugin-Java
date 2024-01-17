@@ -156,6 +156,13 @@ public class MhCompass implements CommandExecutor, Listener {
         }
 
         Location runnerLocation = nearestRunner.getEyeLocation();
+
+        // Check if the zombie and runner are in the same dimension
+        if (!playerLocation.getWorld().equals(runnerLocation.getWorld())) {
+            return;
+        }
+
+
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
 
         player.setCompassTarget(nearestRunner.getEyeLocation());
