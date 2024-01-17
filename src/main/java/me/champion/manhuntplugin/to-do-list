@@ -1,19 +1,28 @@
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+//
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+//
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 //This is related to the tick freeze/unfreeze command the server executes
 
 Logging out during a pause, on rejoin, still makes your walk speed 0? (andre)
-
-Make the /MhMove command autocomplete teams "Zombies", "Runners" and "None" (done)
+This can be fixed with a playeronjoin event checking checking if game is paused, if not set walk speed to 0.2f (default)
 
 Fix small issues and null pointers
 
-If you move an offline player it moves you instead to the team instead of the person you are trying to move,
-disable moving offline players
-
 Make a toggle team chat
 
-Make the compasses unstackable (?)
+Compass tracking across dimensions, it works gameplay wise, however the console doesn't like it. Maybe add some logic
+for the compass to ignore players in other dimensions?
 
-Add pause and unpause check when players log in to see if they should be paused or unpaused?
+Prevent boat breaking in pause state, just any entity breaking in general
 
-Players in boats are now frozen but the boat can move without them? (this is the best fix i could get, they cant get out of boat, i can try more later but ive spent like 2 hours straight on this and i want to save something)
+Create some kind of debuff/buff
+
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+//
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+//
+Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT

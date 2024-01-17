@@ -3,6 +3,7 @@ me\champion\manhuntplugin\MhCreate.class
 me\champion\manhuntplugin\TeamManager.class
 me\champion\manhuntplugin\TeamSelection.class
 me\champion\manhuntplugin\MhPause.class
+me\champion\manhuntplugin\TeamManager$BoatData.class
 me\champion\manhuntplugin\WinCondition.class
 me\champion\manhuntplugin\Manhunt.class
 me\champion\manhuntplugin\Team.class

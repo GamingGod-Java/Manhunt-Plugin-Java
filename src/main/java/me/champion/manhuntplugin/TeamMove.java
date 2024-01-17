@@ -42,29 +42,38 @@ public class TeamMove implements CommandExecutor, TabCompleter {
         }
 
         // Check if the provided team name is valid
-        if (!teamName.equalsIgnoreCase("zombies") && !teamName.equalsIgnoreCase("runners") && !teamName.equalsIgnoreCase("zombie") && !teamName.equalsIgnoreCase("runner")&& !teamName.equalsIgnoreCase("none")) {
-            sender.sendMessage("Invalid team name! Valid team names are: zombies, runners, zombie, runner, none");
+        if (!teamName.equalsIgnoreCase("zombies") && !teamName.equalsIgnoreCase("runners") && !teamName.equalsIgnoreCase("zombie") && !teamName.equalsIgnoreCase("runner") && !teamName.equalsIgnoreCase("none")) {
+            sender.sendMessage("Valid team names are: Zombies, Runners, none");
             return true;
         }
 
+        // Convert teamName to lowercase for internal logic
+        String teamNameLower = teamName.toLowerCase();
+
         // Assign the player to the specified team or remove them from any team
-        if (teamName.equalsIgnoreCase("none")) {
+        if (teamNameLower.equals("none")) {
             teamManager.removeFromTeam(targetPlayer);
+            sender.sendMessage("Player " + playerName + " removed from all teams");
         } else {
-            if  (teamName.equalsIgnoreCase("zombie")) {
-                teamName = "zombies";
-
-            } if  (teamName.equalsIgnoreCase("runner")) {
-                teamName = "runners";
-
+            if (teamNameLower.equalsIgnoreCase("zombie")) {
+                teamNameLower = "zombies";
+            } else if (teamNameLower.equalsIgnoreCase("runner")) {
+                teamNameLower = "runners";
             }
-            teamManager.addToTeam(targetPlayer, teamName);
-        }
 
-        sender.sendMessage("Player " + playerName + " moved to team " + teamName);
+            teamManager.addToTeam(targetPlayer, teamNameLower);
+
+            // Capitalize the first letter for display in the chat message
+            String displayTeamName = teamNameLower.substring(0, 1).toUpperCase() + teamNameLower.substring(1);
+
+            // Apply color codes to team names
+            String coloredTeamName = displayTeamName.equalsIgnoreCase("Zombies") ? "§c" + displayTeamName : "§b" + displayTeamName;
+            sender.sendMessage("Player " + playerName + " moved to team " + coloredTeamName);
+        }
 
         return true;
     }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
@@ -75,10 +84,10 @@ public class TeamMove implements CommandExecutor, TabCompleter {
                 completions.add(player.getName());
             }
         } else if (args.length == 2) {
-            // Autofill team names
-            completions.add("zombies");
-            completions.add("runners");
-            completions.add("none");
+            // Autofill team names with the first letter in uppercase
+            completions.add("Zombies");
+            completions.add("Runners");
+            completions.add("None");
         }
 
         return completions;

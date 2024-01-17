@@ -7,37 +7,31 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Boat;
 import org.bukkit.Location;
-import org.bukkit.event.*;
-import org.bukkit.util.Vector;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.vehicle.VehicleExitEvent;
-import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.Location;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.vehicle.VehicleEnterEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import java.util.stream.Collectors;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-//Important giveRunnerCompass in MhCompass.java and onPlayerRespawn in TeamManager.java both create the same compass, but with different code.
-//If you make changes to either compass, make sure you update it for both.
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
     public final Map<UUID, String> playerTeams = new HashMap<>();
@@ -47,68 +41,28 @@ public class TeamManager implements Listener {
     private final FileConfiguration playerData;
     public Map<UUID, Map<PotionEffect, Integer>> playerPotionEffects = new HashMap<>();
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
-
     private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
+    private final Map<UUID, BoatData> savedBoats = new HashMap<>();
 
-    private final Map<UUID, BoatData> playerBoats = new HashMap<>();
     private static class BoatData {
         private final Boat boat;
-        private final Location location;
+        private final List<UUID> passengers;
 
         public BoatData(Boat boat) {
             this.boat = boat;
-            this.location = boat.getLocation();
+            this.passengers = boat.getPassengers().stream()
+                    .filter(e -> e instanceof Player)
+                    .map(e -> e.getUniqueId())
+                    .collect(Collectors.toList());
         }
 
         public Boat getBoat() {
             return boat;
         }
 
-        public Location getLocation() {
-            return location;
+        public List<UUID> getPassengers() {
+            return passengers;
         }
-    }
-    public void saveBoat(Player player, Boat boat) {
-        playerBoats.put(player.getUniqueId(), new BoatData(boat));
-    }
-
-    public void restoreBoat(Player player) {
-        UUID playerUUID = player.getUniqueId();
-
-        if (playerBoats.containsKey(playerUUID)) {
-            BoatData boatData = playerBoats.get(playerUUID);
-            Location boatLocation = boatData.getLocation();
-
-            Boat existingBoat = boatData.getBoat();
-            existingBoat.teleport(boatLocation);
-
-            // Set the player as a passenger in the existing boat
-            existingBoat.setPassenger(player);
-        }
-    }
-
-    @EventHandler
-    public void onVehicleExit(VehicleExitEvent event) {
-        if (isGamePaused() && event.getVehicle() instanceof Boat && event.getExited() instanceof Player) {
-            Player player = (Player) event.getExited();
-            Boat boat = (Boat) event.getVehicle();
-            System.out.println(playerBoats);
-            System.out.println("put player in boat");
-            restoreBoat(player);
-            event.setCancelled(true);
-        }
-
-    }
-
-
-    // Helper method to get the boat a player is currently riding
-    private Boat getOccupiedBoat(Player player) {
-        for (Boat boat : player.getWorld().getEntitiesByClass(Boat.class)) {
-            if (boat.getPassengers().contains(player)) {
-                return boat;
-            }
-        }
-        return null;
     }
 
     public void saveFireTicks(Player player) {
@@ -136,7 +90,6 @@ public class TeamManager implements Listener {
         //System.out.println("runners: "+runners);
         return runners;
     }
-
 
 
     public void savePotionEffects(Player player) {
@@ -225,26 +178,6 @@ public class TeamManager implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onVehicleMove(VehicleMoveEvent event) {
-        if (isGamePaused() && event.getVehicle() instanceof Boat) {
-            Boat boat = (Boat) event.getVehicle();
-            boat.setVelocity(new Vector(0,0 ,0 ));
-
-            // Check if the boat has a passenger and the passenger is a player
-            if (!boat.getPassengers().isEmpty() && boat.getPassengers().get(0) instanceof Player) {
-                Player player = (Player) boat.getPassengers().get(0);
-
-                // Cancel the movement update for boats
-
-
-                // Restore the boat location for the player
-                restoreBoat(player);
-            }
-        }
-    }
-
-
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -306,11 +239,12 @@ public class TeamManager implements Listener {
                 //Save fire ticks
                 saveFireTicks(player);
 
-                //Save boat locations
-                if (getOccupiedBoat(player) != null) {
-                    saveBoat(player, getOccupiedBoat(player));
+                if (player.getVehicle() instanceof Boat) {
+                    Boat boat = (Boat) player.getVehicle();
+                    savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat with passengers
+                    boat.eject(); // Eject all passengers
+                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a boat and will be remounted when the game resumes.");
                 }
-
             }
         }
     }
@@ -323,22 +257,33 @@ public class TeamManager implements Listener {
                 frozenPlayers.remove(player.getUniqueId());
                 player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
 
-                //Invulnerability logic
-                player.setInvulnerable(false);
-
-                //Potion restore logic
+                // Invulnerability, potion, air levels, and fire ticks logic...
                 restorePotionEffects(player);
-
-                //air bubble restore logic
                 restoreOriginalAirLevels();
-
-                //fire tick restore logic
                 restoreFireTicks(player);
-
-                //boat restore
-                //restoreBoat(player);
-
+                player.setInvulnerable(false);
             }
+
+            // Restoring boats and their passengers
+            for (BoatData boatData : savedBoats.values()) {
+                Boat boat = boatData.getBoat();
+                List<UUID> passengers = boatData.getPassengers();
+
+                if (!passengers.isEmpty()) {
+                    Player firstPassenger = Bukkit.getPlayer(passengers.get(0));
+                    if (firstPassenger != null) {
+                        boat.teleport(firstPassenger.getLocation());
+                        for (UUID passengerId : passengers) {
+                            Player passenger = Bukkit.getPlayer(passengerId);
+                            if (passenger != null && passenger.isOnline()) {
+                                boat.addPassenger(passenger);
+                            }
+                        }
+                    }
+                }
+            }
+
+            savedBoats.clear(); // Clear the saved boats map after restoring them
         }
     }
 
@@ -360,6 +305,7 @@ public class TeamManager implements Listener {
         }
         return null;
     }
+
     public void pauseZombies() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (isOnTeam(player, "Zombies")) {
@@ -383,12 +329,18 @@ public class TeamManager implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        String team = playerTeams.get(player.getUniqueId());
+        UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
+        String team = playerTeams.get(playerUUID);
 
         if (team != null && team.equalsIgnoreCase("Runners")) {
             addToTeam(player, "Zombies");
             player.sendMessage("Better luck next time! You've become a zombie!");
             pauseGame(player);
+        }
+
+        // Remove the player from the saved boat data if they die while in a boat
+        for (BoatData boatData : savedBoats.values()) {
+            boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
         }
     }
 
@@ -399,13 +351,14 @@ public class TeamManager implements Listener {
             event.setCancelled(true);
         }
     }
+
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            System.out.println("Gave "+player.getName()+"compass");
+            System.out.println("Gave " + player.getName() + "compass");
             ItemStack compass = new ItemStack(Material.COMPASS);
 
             // Add a dummy enchantment
@@ -459,12 +412,20 @@ public class TeamManager implements Listener {
 
         if (playerData.contains(playerUUID.toString())) {
             String team = playerData.getString(playerUUID.toString());
-            System.out.println("Added "+ playerUUID +"to" +team);
-            addToTeam(player, team);
-            // Reapply display name and prefix
-            updatePlayerDisplayName(player, team);
+            System.out.println("Added " + playerUUID + " to " + team);
+
+            // Check if 'team' is not null before performing operations
+            if (team != null) {
+                addToTeam(player, team);
+                // Reapply display name and prefix
+                updatePlayerDisplayName(player, team);
+            } else {
+                // Handle the case where 'team' is null (e.g., provide a default behavior or log a message)
+                player.sendMessage("No team found");
+            }
         }
     }
+
     private void updatePlayerDisplayName(Player player, String team) {
         if (team.equalsIgnoreCase("Zombies")) {
             player.setDisplayName("§c" + player.getName());
@@ -478,6 +439,7 @@ public class TeamManager implements Listener {
             player.setPlayerListName(player.getName());
         }
     }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -503,4 +465,24 @@ public class TeamManager implements Listener {
             event.setCancelled(true);
         }
     }
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (isGamePaused() && event.getEntity() instanceof Boat) {
+            // Cancel the event if the game is paused and a boat is being damaged
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onVehicleEnter(VehicleEnterEvent event) {
+        if (isGamePaused() && event.getVehicle() instanceof Boat) {
+            // If the game is paused and a player tries to enter a boat, cancel the event
+            event.setCancelled(true);
+            if (event.getEntered() instanceof Player) {
+                Player player = (Player) event.getEntered();
+                player.sendMessage(ChatColor.RED + "Nice try Andre, you can not enter a boat while the game is paused.");
+            }
+        }
+    }
 }
+
