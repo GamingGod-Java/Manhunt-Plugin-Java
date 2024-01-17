@@ -138,9 +138,10 @@ public class MhStart implements CommandExecutor {
                 int seconds = (int) secondsLeft % 60;
                 String timeFormatted = String.format("%dh %dm %ds", hours, minutes, seconds);
                 bossBar.setTitle(timeFormatted);
-
-                secondsLeft--;
-                initialDelay--;
+                if (!teamManager.isGamePaused()) { //only count down if game isnt paused
+                    secondsLeft--;
+                    initialDelay--;
+                }
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L); // Update every second
 

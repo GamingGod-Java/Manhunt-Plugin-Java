@@ -1,8 +1,4 @@
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
-//
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
-//
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+Pause now stops the countdown (it will still finish the current second)
 
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 //This is related to the tick freeze/unfreeze command the server executes
@@ -21,8 +17,4 @@ Prevent boat breaking in pause state, just any entity breaking in general
 
 Create some kind of debuff/buff
 
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
-//
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
-//
-Pause is supposed to pause the bossbar countdown temporarily //IMPORTANT
+
