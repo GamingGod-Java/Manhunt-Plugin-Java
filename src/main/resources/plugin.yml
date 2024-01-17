@@ -31,3 +31,9 @@ commands:
   MhRestart:
     description: Restarts the game so /MhStart can be done all over again
     usage: /MhStart
+  MhTeamChat:
+    description: Enables or disables team chat (player has to be on a team)
+    usage: /MhTeamChat
+    aliases:
+      - teamchat
+      - tc

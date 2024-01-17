@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Boat;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -28,6 +27,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
+import org.bukkit.event.vehicle.VehicleDamageEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -358,36 +358,39 @@ public class TeamManager implements Listener {
         String team = playerTeams.get(player.getUniqueId());
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            System.out.println("Gave " + player.getName() + "compass");
+            System.out.println("Gave " + player.getName() + " compass and tools");
+
+            // Give 1 stone axe
+            ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
+            player.getInventory().addItem(stoneAxe);
+
+            // Give 1 stone pickaxe
+            ItemStack stonePickaxe = new ItemStack(Material.STONE_PICKAXE, 1);
+            player.getInventory().addItem(stonePickaxe);
+
+            // Give 20 bread
+            ItemStack bread = new ItemStack(Material.BREAD, 20);
+            player.getInventory().addItem(bread);
+
+            // Create and give the compass
             ItemStack compass = new ItemStack(Material.COMPASS);
-
-            // Add a dummy enchantment
             compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-
-            // Retrieve and modify the item meta for the compass
-            ItemMeta meta = compass.getItemMeta();
-            if (meta != null) {
-                // Hide the enchantment information
-                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-                // Set the display name of the compass
-                meta.setDisplayName("§cTrack Runners");
-
-                // Apply the modified meta back to the compass
-                compass.setItemMeta(meta);
+            ItemMeta compassMeta = compass.getItemMeta();
+            if (compassMeta != null) {
+                compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                compassMeta.setDisplayName("§cTrack Runners");
+                compass.setItemMeta(compassMeta);
             }
-
-            // Give the compass to the player
             player.getInventory().addItem(compass);
         }
     }
-
     public Player findNearestRunner(Location zombieLocation) {
         Player nearestRunner = null;
         double minDistance = Double.MAX_VALUE;
 
         for (Player runner : Bukkit.getOnlinePlayers()) {
-            if (isOnTeam(runner, "Runners")) {
+            // Check if the player is a runner and in the same world as the zombie
+            if (isOnTeam(runner, "Runners") && runner.getWorld().equals(zombieLocation.getWorld())) {
                 double distance = zombieLocation.distance(runner.getLocation());
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -472,7 +475,12 @@ public class TeamManager implements Listener {
             event.setCancelled(true);
         }
     }
-
+    @EventHandler
+    public void onVehicleDamage(VehicleDamageEvent event) {
+        if (isGamePaused()) {
+            event.setCancelled(true);
+        }
+    }
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
         if (isGamePaused() && event.getVehicle() instanceof Vehicle) {

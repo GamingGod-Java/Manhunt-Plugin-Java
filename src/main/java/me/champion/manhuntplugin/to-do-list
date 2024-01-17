@@ -1,23 +1,6 @@
-Pause now stops the countdown (it will still finish the current second)
-
 Remove "The game runs normally" server announcements from pausing and unpausing the game
 //This is related to the tick freeze/unfreeze command the server executes
 
-Logging out during a pause, on rejoin, still makes your walk speed 0? (andre)
-This can be fixed with a playeronjoin event checking checking if game is paused, if not set walk speed to 0.2f (default)
-Fixed I believe? I think the issue was actually a server restart during game pause which still stored my walk speed
-
 Fix small issues and null pointers
 
-Make a toggle team chat
-
-Compass tracking across dimensions, it works gameplay wise, however the console doesn't like it. Maybe add some logic
-for the compass to ignore players in other dimensions?
-//I've chatGPT'd in a line, but i dont have any way to test it, so can you test it and see if it works?
-
-Prevent boat breaking in pause state, just any entity breaking in general
-Gaming God's fix for boats has been pushed to every vehicle, (i just replaced every relevant instance of "boat" with "vehicle" lmao just hope and pray)
-
 Create some kind of debuff/buff
-
-

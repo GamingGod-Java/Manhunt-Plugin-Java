@@ -103,8 +103,7 @@ public class MhStart implements CommandExecutor {
 
         countdownTask = new BukkitRunnable() {
             long secondsLeft = totalSeconds;
-            boolean bossBarVisible = false;
-            int initialDelay = 10; // 10 seconds delay
+            int initialDelay = 11; // 11 seconds delay before showing the boss bar
 
             @Override
             public void run() {
@@ -115,15 +114,9 @@ public class MhStart implements CommandExecutor {
                     return;
                 }
 
-                if (!bossBarVisible && initialDelay <= 0) {
-                    bossBar.setVisible(true);
-                    bossBarVisible = true;
-                }
-
                 if (WinCondition.endEntered) {
                     if (bossBar != null) {
                         bossBar.setVisible(false);
-                        bossBarVisible = false;
                         this.cancel();
                         resetBossBar();
                     }
@@ -138,15 +131,21 @@ public class MhStart implements CommandExecutor {
                 int seconds = (int) secondsLeft % 60;
                 String timeFormatted = String.format("%dh %dm %ds", hours, minutes, seconds);
                 bossBar.setTitle(timeFormatted);
-                if (!teamManager.isGamePaused()) { //only count down if game isnt paused
+
+                if (!teamManager.isGamePaused()) { // Only count down if game isn't paused
                     secondsLeft--;
                     initialDelay--;
+                }
+
+                if (initialDelay <= 0 && !bossBar.isVisible()) {
+                    bossBar.setVisible(true);
                 }
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L); // Update every second
 
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
     }
+
 
     private void resetBossBar() {
         if (bossBar != null) {

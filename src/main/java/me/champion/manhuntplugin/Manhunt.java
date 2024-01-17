@@ -16,7 +16,7 @@ public final class Manhunt extends JavaPlugin {
 
     private TeamManager teamManager;
     private MhStart mhStart; // Your existing field
-
+    private TeamChat teamChat; // Add this line
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -47,7 +47,7 @@ public final class Manhunt extends JavaPlugin {
         teamManager = new TeamManager(this);
         // Initialize MhStart as a local variable and store it in the field
         mhStart = new MhStart(teamManager);
-
+        teamChat = new TeamChat(teamManager); // Initialize TeamChat
         // Set world border for Overworld and Nether
         setWorldBorder();
 
@@ -60,13 +60,15 @@ public final class Manhunt extends JavaPlugin {
         getCommand("MhUnpause").setExecutor(new MhUnpause(teamManager));
         getCommand("MhReady").setExecutor(new MhReady(teamManager, this));
         getCommand("MhCompass").setExecutor(new MhCompass(teamManager, this));
-        getCommand("MhStart").setExecutor(mhStart); // Use the mhStart instance
-        getCommand("MhRestart").setExecutor(mhRestart); // Use the mhRestart instance
+        getCommand("MhStart").setExecutor(mhStart);
+        getCommand("MhRestart").setExecutor(mhRestart);
+        getCommand("MhTeamChat").setExecutor(teamChat);
 
         Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
+        getServer().getPluginManager().registerEvents(teamChat, this);
     }
 
     @Override
