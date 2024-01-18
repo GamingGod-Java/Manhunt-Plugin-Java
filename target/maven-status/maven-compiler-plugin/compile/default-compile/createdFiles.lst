@@ -7,6 +7,7 @@ me\champion\manhuntplugin\TeamManager$BoatData.class
 me\champion\manhuntplugin\WinCondition.class
 me\champion\manhuntplugin\Manhunt.class
 me\champion\manhuntplugin\Team.class
+me\champion\manhuntplugin\MhBook.class
 me\champion\manhuntplugin\MhCompass$1.class
 me\champion\manhuntplugin\MhUnpause.class
 me\champion\manhuntplugin\TeamMove.class

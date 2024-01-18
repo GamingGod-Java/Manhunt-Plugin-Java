@@ -43,11 +43,10 @@ public final class Manhunt extends JavaPlugin {
         }
         getLogger().info("Emptied playerdata.yml");
 
-        // Initialize TeamManager
         teamManager = new TeamManager(this);
-        // Initialize MhStart as a local variable and store it in the field
         mhStart = new MhStart(teamManager);
-        teamChat = new TeamChat(teamManager); // Initialize TeamChat
+        teamChat = new TeamChat(teamManager);
+
         // Set world border for Overworld and Nether
         setWorldBorder();
 
@@ -68,7 +67,7 @@ public final class Manhunt extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
         Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
-        getServer().getPluginManager().registerEvents(teamChat, this);
+        getServer().getPluginManager().registerEvents(teamChat, this);;
     }
 
     @Override

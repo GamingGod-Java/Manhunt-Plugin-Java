@@ -75,7 +75,6 @@ public class MhStart implements CommandExecutor {
         giveCompassesToZombies();
         return true;
     }
-
     private void startInitialCountdown() {
         initialCountdownInProgress = true;
         initialCountdownTask = new BukkitRunnable() {
@@ -83,69 +82,61 @@ public class MhStart implements CommandExecutor {
 
             @Override
             public void run() {
-                if (secondsLeft > 0) {
-                    Bukkit.broadcastMessage("§cZombies " + "§fcan move in " + secondsLeft + " seconds!");
-                } else {
-                    Bukkit.broadcastMessage("The §cZombies " + "§fcan now move!");
-                    teamManager.unpauseZombies(); // Make zombies vulnerable again
+                if (secondsLeft <= 0) {
+                    Bukkit.broadcastMessage("The §cZombies §fcan now move!");
+                    teamManager.unpauseZombies();
                     this.cancel();
                     initialCountdownInProgress = false;
+                    createAndStartBossBar(); // Create and start boss bar countdown here
+                    if (bossBar != null) {
+                        bossBar.setVisible(true); // Make boss bar visible
+                    }
+                } else {
+                    Bukkit.broadcastMessage("§cZombies §fcan move in " + secondsLeft + " seconds!");
                 }
                 secondsLeft--;
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
     }
-
     private void createAndStartBossBar() {
         long totalSeconds = 2 * 3600 + 30 * 60; // 2 hours and 30 minutes
+        long initialOffset = 10; // 10 seconds for the initial countdown
         bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
         bossBar.setVisible(false); // Initially hide the boss bar
 
         countdownTask = new BukkitRunnable() {
-            long secondsLeft = totalSeconds;
-            int initialDelay = 11; // 11 seconds delay before showing the boss bar
+            long secondsLeft = totalSeconds - initialOffset; // Start from 2h 29m 50s
 
             @Override
             public void run() {
                 if (secondsLeft <= 0) {
-                    timerExpired = true;
                     bossBar.setVisible(false);
                     this.cancel();
-                    return;
-                }
-
-                if (WinCondition.endEntered) {
-                    if (bossBar != null) {
-                        bossBar.setVisible(false);
-                        this.cancel();
-                        resetBossBar();
-                    }
                     return;
                 }
 
                 double progress = (double) secondsLeft / totalSeconds;
                 bossBar.setProgress(progress);
 
-                int hours = (int) secondsLeft / 3600;
-                int minutes = (int) (secondsLeft % 3600) / 60;
-                int seconds = (int) secondsLeft % 60;
-                String timeFormatted = String.format("%dh %dm %ds", hours, minutes, seconds);
+                String timeFormatted = formatTime(secondsLeft);
                 bossBar.setTitle(timeFormatted);
 
-                if (!teamManager.isGamePaused()) { // Only count down if game isn't paused
+                if (!teamManager.isGamePaused()) {
                     secondsLeft--;
-                    initialDelay--;
-                }
-
-                if (initialDelay <= 0 && !bossBar.isVisible()) {
-                    bossBar.setVisible(true);
                 }
             }
-        }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L); // Update every second
+        }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
 
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
     }
 
+    // Helper method to format time
+    private String formatTime(long totalSeconds) {
+        int hours = (int) totalSeconds / 3600;
+        int minutes = (int) (totalSeconds % 3600) / 60;
+        int seconds = (int) totalSeconds % 60;
+        return String.format("%dh %dm %ds", hours, minutes, seconds);
+    }
 
     private void resetBossBar() {
         if (bossBar != null) {
