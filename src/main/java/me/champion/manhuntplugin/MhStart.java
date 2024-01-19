@@ -15,14 +15,14 @@ public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
     private boolean gameStarted = false;
-    public boolean timerExpired = false;
     private BukkitTask countdownTask;
     private BossBar bossBar;
+    public boolean timerExpired = false;
     private boolean initialCountdownInProgress = false;
     private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
-        this.teamManager = teamManager; // Store the TeamManager instance
+        this.teamManager = teamManager;
     }
 
     public boolean isGameStarted() {
@@ -30,25 +30,29 @@ public class MhStart implements CommandExecutor {
     }
 
     public void resetGame() {
-        cancelInitialCountdown(); // Cancel initial countdown if in progress
+        cancelInitialCountdown();
 
         if (countdownTask != null && !countdownTask.isCancelled()) {
             countdownTask.cancel();
+            countdownTask = null;
         }
-        resetBossBar();
+
+        hideBossBar();
         gameStarted = false;
-        teamManager.unpauseZombies(); // Make sure to reset zombies' state when the game is reset
+        teamManager.unpauseZombies();
     }
 
-    public boolean isInitialCountdownInProgress() {
-        return initialCountdownInProgress;
+    private void hideBossBar() {
+        if (bossBar != null) {
+            bossBar.setVisible(false);
+            bossBar.removeAll();
+        }
     }
 
     public void cancelInitialCountdown() {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
             initialCountdownTask.cancel();
             initialCountdownInProgress = false;
-            teamManager.unpauseZombies(); // Make zombies vulnerable as countdown is canceled
         }
     }
 
@@ -64,22 +68,21 @@ public class MhStart implements CommandExecutor {
             return true;
         }
 
-        // Remove the glass sphere
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
         mhCreate.removeGlassSphere((Player) sender);
 
-        resetBossBar(); // Reset any existing boss bar
-
+        //resetBossBar();
         gameStarted = true;
-        teamManager.pauseZombies(); // Make zombies invincible for the countdown duration
+        teamManager.pauseZombies();
         startInitialCountdown();
-        createAndStartBossBar();
-        Bukkit.broadcastMessage("Starting game, disabling team selection");
-        // Give compasses to all players on the Zombies team
-        giveCompassesToZombies();
         return true;
     }
+
     private void startInitialCountdown() {
+        if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
+            initialCountdownTask.cancel();
+        }
+
         initialCountdownInProgress = true;
         initialCountdownTask = new BukkitRunnable() {
             int secondsLeft = 10;
@@ -91,10 +94,7 @@ public class MhStart implements CommandExecutor {
                     teamManager.unpauseZombies();
                     this.cancel();
                     initialCountdownInProgress = false;
-                    createAndStartBossBar(); // Create and start boss bar countdown here
-                    if (bossBar != null) {
-                        bossBar.setVisible(true); // Make boss bar visible
-                    }
+                    createAndStartBossBar(); // Start the boss bar timer after the initial countdown
                 } else {
                     Bukkit.broadcastMessage("§cZombies §fcan move in " + secondsLeft + " seconds!");
                 }
@@ -102,14 +102,18 @@ public class MhStart implements CommandExecutor {
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
     }
-    private void createAndStartBossBar() {
-        long totalSeconds = 2 * 3600 + 30 * 60; // 2 hours and 30 minutes
-        long initialOffset = 10; // 10 seconds for the initial countdown
-        bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
-        bossBar.setVisible(false); // Initially hide the boss bar
 
+    private void createAndStartBossBar() {
+        if (bossBar != null) {
+            bossBar.removeAll(); // Reset the boss bar for a new game
+        }
+
+        bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
+        bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+
+        long totalSeconds = 2 * 3600 + 29 * 60 + 50; // 2 hours, 29 minutes, and 50 seconds
         countdownTask = new BukkitRunnable() {
-            long secondsLeft = totalSeconds - initialOffset; // Start from 2h 29m 50s
+            long secondsLeft = totalSeconds;
 
             @Override
             public void run() {
@@ -121,20 +125,15 @@ public class MhStart implements CommandExecutor {
 
                 double progress = (double) secondsLeft / totalSeconds;
                 bossBar.setProgress(progress);
+                bossBar.setTitle(formatTime(secondsLeft));
 
-                String timeFormatted = formatTime(secondsLeft);
-                bossBar.setTitle(timeFormatted);
-
-                if (!teamManager.isGamePaused()) {
-                    secondsLeft--;
-                }
+                secondsLeft--;
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
 
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
     }
 
-    // Helper method to format time
     private String formatTime(long totalSeconds) {
         int hours = (int) totalSeconds / 3600;
         int minutes = (int) (totalSeconds % 3600) / 60;
@@ -142,15 +141,6 @@ public class MhStart implements CommandExecutor {
         return String.format("%dh %dm %ds", hours, minutes, seconds);
     }
 
-    private void resetBossBar() {
-        if (bossBar != null) {
-            bossBar.removeAll();
-            bossBar.setVisible(false);
-            bossBar = null; // Dereference the old boss bar
-        }
-    }
-
-    // Give compasses to all players on the Zombies team
     public void giveCompassesToZombies() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (teamManager.isOnTeam(player, "Zombies")) {
