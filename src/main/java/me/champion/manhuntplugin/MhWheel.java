@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.SkullType;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.*;
@@ -23,6 +22,7 @@ import java.util.*;
 public class MhWheel implements CommandExecutor, Listener {
     private final Manhunt plugin;
     private final TeamManager teamManager;
+    private final Map<UUID, String> selectedTeams = new HashMap<>();
     private final Map<UUID, PotionEffectType> selectedEffects = new HashMap<>();
     private final Set<String> teamMessageSent = new HashSet<>();
 
@@ -49,26 +49,23 @@ public class MhWheel implements CommandExecutor, Listener {
     }
 
     private void openBuffsDebuffsGui(Player player, String team) {
-        List<Player> teamPlayers = teamManager.getPlayersOnTeam(team);
-        if (teamPlayers.isEmpty() && !teamMessageSent.contains(team)) {
-            player.sendMessage("There are no players on the " + team + " team.");
-            teamMessageSent.add(team); // Add the team to the set to avoid spamming the message
-            return;
-        } else if (!teamPlayers.isEmpty()) {
-            // Remove the team from the set if there are players on it
-            teamMessageSent.remove(team);
-        }
-        Inventory gui = Bukkit.createInventory(null, 27, "Select Buff/Debuff for " + team);
+        Inventory gui = Bukkit.createInventory(null, 18, "Select Buff/Debuff for " + team);
 
         // Buffs
-        gui.setItem(11, createPotionItem(PotionEffectType.SPEED, "Speed Buff", team));
-        gui.setItem(12, createPotionItem(PotionEffectType.INCREASE_DAMAGE, "Strength Buff", team));
+        gui.setItem(10, createPotionItem(PotionEffectType.SPEED, "Speed Buff"));
+        gui.setItem(11, createPotionItem(PotionEffectType.INCREASE_DAMAGE, "Strength Buff"));
 
         // Debuffs
-        gui.setItem(14, createPotionItem(PotionEffectType.SLOW, "Slowness Debuff", team));
-        gui.setItem(15, createPotionItem(PotionEffectType.WEAKNESS, "Weakness Debuff", team));
+        gui.setItem(13, createPotionItem(PotionEffectType.SLOW, "Slowness Debuff"));
+        gui.setItem(14, createPotionItem(PotionEffectType.WEAKNESS, "Weakness Debuff"));
 
-        gui.setItem(22, createItem(Material.ARROW, ChatColor.GRAY + "Back"));
+        // Show the selected effect if one is already selected
+        PotionEffectType selectedEffect = selectedEffects.get(player.getUniqueId());
+        if (selectedEffect != null) {
+            gui.setItem(16, createPotionItem(selectedEffect, "Selected Effect"));
+        }
+
+        gui.setItem(17, createItem(Material.ARROW, ChatColor.GRAY + "Back"));
         player.openInventory(gui);
     }
 
@@ -77,7 +74,13 @@ public class MhWheel implements CommandExecutor, Listener {
         List<Player> players = teamManager.getPlayersOnTeam(team);
         for (int i = 0; i < players.size() && i < 53; i++) {
             Player p = players.get(i);
-            gui.setItem(i, createPlayerItem(p));
+            ItemStack playerHead = createPlayerItem(p);
+            ItemMeta playerMeta = playerHead.getItemMeta();
+            if (playerMeta != null) {
+                playerMeta.setDisplayName(p.getName());
+                playerHead.setItemMeta(playerMeta);
+            }
+            gui.setItem(i, playerHead);
         }
         gui.setItem(53, createItem(Material.ARROW, ChatColor.GRAY + "Back"));
         player.openInventory(gui);
@@ -93,20 +96,22 @@ public class MhWheel implements CommandExecutor, Listener {
         return item;
     }
 
-    private ItemStack createPotionItem(PotionEffectType effectType, String name, String team) {
+    private ItemStack createPotionItem(PotionEffectType effectType, String name) {
         Material material = getPotionMaterial(effectType);
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             // Set potion effect names to white color
-            meta.setDisplayName(ChatColor.WHITE + name + " - " + team);
+            meta.setDisplayName(ChatColor.WHITE + name);
             item.setItemMeta(meta);
         }
         return item;
     }
 
     private Material getPotionMaterial(PotionEffectType effectType) {
-        switch (effectType.getName()) {
+        String effectName = effectType.toString();
+
+        switch (effectName) {
             case "SPEED":
                 return Material.SUGAR;
             case "SLOW":
@@ -121,12 +126,11 @@ public class MhWheel implements CommandExecutor, Listener {
     }
 
     private ItemStack createPlayerItem(Player player) {
-        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1, (short) SkullType.PLAYER.ordinal());
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skullMeta = (SkullMeta) item.getItemMeta();
 
         if (skullMeta != null) {
             skullMeta.setOwningPlayer(player);
-            skullMeta.setDisplayName(player.getName());
             item.setItemMeta(skullMeta);
         }
 
@@ -147,26 +151,25 @@ public class MhWheel implements CommandExecutor, Listener {
 
             if (guiTitle.equals("Select a Team")) {
                 if (clickedItem.getType() == Material.RED_CONCRETE || clickedItem.getType() == Material.LIGHT_BLUE_CONCRETE) {
-                    String team = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName()); // Remove color codes
-                    openBuffsDebuffsGui(player, team);
+                    ItemMeta itemMeta = clickedItem.getItemMeta();
+                    if (itemMeta != null && itemMeta.hasDisplayName()) {
+                        String team = ChatColor.stripColor(itemMeta.getDisplayName()); // Remove color codes
+                        selectedTeams.put(player.getUniqueId(), team);
+                        openBuffsDebuffsGui(player, team);
+                    }
                 }
             } else if (guiTitle.startsWith("Select Buff/Debuff for ")) {
-                String[] titleParts = guiTitle.split(" ");
-                if (titleParts.length > 3) {
-                    String team = titleParts[titleParts.length - 1]; // Get the last part of the title
-                    if (clickedItem.getType() == Material.ARROW) {
-                        openMainGui(player);
-                    } else {
-                        PotionEffectType effectType = getPotionEffectFromItem(clickedItem);
-                        if (effectType != null) {
-                            selectedEffects.put(player.getUniqueId(), effectType);
-                            openPlayerListGui(player, team);
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Please select a valid buff or debuff.");
-                        }
-                    }
+                if (clickedItem.getType() == Material.ARROW) {
+                    openMainGui(player);
                 } else {
-                    player.sendMessage(ChatColor.RED + "An error occurred. Please try again.");
+                    PotionEffectType effectType = getPotionEffectFromItem(clickedItem);
+                    if (effectType != null) {
+                        selectedEffects.put(player.getUniqueId(), effectType);
+                        String team = selectedTeams.get(player.getUniqueId());
+                        openPlayerListGui(player, team);
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Please select a valid buff or debuff.");
+                    }
                 }
             } else if (guiTitle.startsWith("Players in ")) {
                 if (clickedItem.getType() == Material.ARROW) {
@@ -180,49 +183,50 @@ public class MhWheel implements CommandExecutor, Listener {
     }
 
     private PotionEffectType getPotionEffectFromItem(ItemStack item) {
-        if (item != null) {
-            Material material = item.getType();
-            if (material == Material.SUGAR) return PotionEffectType.SPEED;
-            if (material == Material.BLAZE_POWDER) return PotionEffectType.INCREASE_DAMAGE;
-            if (material == Material.SOUL_SAND) return PotionEffectType.SLOW;
-            if (material == Material.FERMENTED_SPIDER_EYE) return PotionEffectType.WEAKNESS;
+        if (item != null && item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null && meta.hasDisplayName()) {
+                String displayName = ChatColor.stripColor(meta.getDisplayName()); // Remove color codes
+                if (displayName.endsWith(" - " + ChatColor.WHITE + "Speed Buff")) {
+                    return PotionEffectType.SPEED;
+                } else if (displayName.endsWith(" - " + ChatColor.WHITE + "Strength Buff")) {
+                    return PotionEffectType.INCREASE_DAMAGE;
+                } else if (displayName.endsWith(" - " + ChatColor.WHITE + "Slowness Debuff")) {
+                    return PotionEffectType.SLOW;
+                } else if (displayName.endsWith(" - " + ChatColor.WHITE + "Weakness Debuff")) {
+                    return PotionEffectType.WEAKNESS;
+                }
+            }
         }
         return null;
     }
+
     private void applyEffectToPlayer(ItemStack item, Player operator) {
         UUID operatorUUID = operator.getUniqueId();
-        PotionEffectType effectType = selectedEffects.get(operatorUUID);
+        PotionEffectType effectType = getPotionEffectFromItem(item);
         if (effectType != null) {
             ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                String itemName = ChatColor.stripColor(meta.getDisplayName()); // Remove color codes
-                String[] parts = itemName.split(" - ");
-                if (parts.length == 2) {
-                    String playerName = parts[1]; // Extract player name
-                    Player target = Bukkit.getServer().getPlayerExact(playerName);
-                    if (target != null) {
-                        PotionEffect effect = new PotionEffect(effectType, 600, 1); // 30 seconds duration, amplifier 1
-                        target.addPotionEffect(effect);
-                        String message = ChatColor.LIGHT_PURPLE + "Applied " + formatEffectName(effectType) + " to " + ChatColor.WHITE + playerName;
-                        Bukkit.getServer().broadcastMessage(message);
-
-                        // Debug messages
-                        operator.sendMessage("Applied " + effectType.getName() + " to " + playerName);
-                    } else {
-                        // Debug message if target is null
-                        operator.sendMessage("Target player is null.");
-                    }
+            if (meta != null && meta.hasDisplayName()) {
+                String displayName = ChatColor.stripColor(meta.getDisplayName()); // Remove color codes
+                // Parse the player name from the display name
+                String playerName = displayName.replace(" - " + ChatColor.WHITE + "Speed Buff", "")
+                        .replace(" - " + ChatColor.WHITE + "Strength Buff", "")
+                        .replace(" - " + ChatColor.WHITE + "Slowness Debuff", "")
+                        .replace(" - " + ChatColor.WHITE + "Weakness Debuff", "");
+                Player target = Bukkit.getServer().getPlayerExact(playerName);
+                if (target != null) {
+                    PotionEffect effect = new PotionEffect(effectType, 600, 1); // 30 seconds duration, amplifier 1
+                    target.addPotionEffect(effect);
+                    String message = ChatColor.LIGHT_PURPLE + "Applied " + formatEffectName(effectType) + " to " + ChatColor.WHITE + playerName;
+                    Bukkit.getServer().broadcastMessage(message);
                 } else {
-                    // Debug message if parts.length is not 2
-                    operator.sendMessage("Invalid item name format.");
+                    operator.sendMessage("Target player is null.");
                 }
             } else {
-                // Debug message if meta is null
                 operator.sendMessage("ItemMeta is null.");
             }
             selectedEffects.remove(operatorUUID);
         } else {
-            // Debug message if effectType is null
             operator.sendMessage("EffectType is null.");
         }
     }
