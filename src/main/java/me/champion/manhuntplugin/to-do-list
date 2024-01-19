@@ -12,8 +12,6 @@ Create an inventory with a /MhSettings that allows you to choose particles, boss
 
 Found an issue with /MhRestart spamming console, issue is probably related to the bossBar
 
-Runner death doesnt do tick freeze
-
 Needle points to last known location if not updated
 
 No freeze if a team wins
@@ -21,8 +19,6 @@ No freeze if a team wins
 /mhrestart spams console
 
 Colours in chat on death
-
-team chat colour change from gray.
 
 chat message deletion upon reentering boats?
 

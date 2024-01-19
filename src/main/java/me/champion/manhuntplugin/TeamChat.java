@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -60,7 +61,6 @@ public class TeamChat implements Listener, CommandExecutor {
         }
     }
 
-
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
@@ -70,22 +70,30 @@ public class TeamChat implements Listener, CommandExecutor {
             event.setCancelled(true);
 
             String team = null;
+            ChatColor teamChatColor = ChatColor.GRAY; // Default color
+
             for (String t : Arrays.asList("Zombies", "Runners")) {
                 if (teamManager.isOnTeam(player, t)) {
                     team = t;
+                    // Set the color based on the team
+                    teamChatColor = (team.equalsIgnoreCase("Runners")) ? ChatColor.AQUA : ChatColor.RED;
                     break;
                 }
             }
 
             if (team != null) {
-                String message = ChatColor.GRAY + "[" + team + " Chat] " + player.getName() + ": " + event.getMessage();
-                sendTeamMessage(team, message);
+                // Split the message into parts for color formatting
+                String playerName = player.getName();
+                String message = event.getMessage();
+                String formattedMessage = teamChatColor + "[" + team + " Chat] " + playerName + ": " + ChatColor.WHITE + message;
+                sendTeamMessage(team, formattedMessage);
             } else {
                 player.sendMessage(ChatColor.RED + "You are not on a team. Cannot send message in team chat.");
             }
         }
         // If not in team chat, the message will go to all chat by default
     }
+
     // Send a message to all players in the specified team
     private void sendTeamMessage(String team, String message) {
         for (Player p : Bukkit.getServer().getOnlinePlayers()) {
