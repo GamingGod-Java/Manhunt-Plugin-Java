@@ -16,7 +16,9 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.OfflinePlayer;
 
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,8 @@ public class MhWheel implements CommandExecutor, Listener {
     private final TeamManager teamManager;
     private final String zombiesTeamName = "Zombies";
     private final String runnersTeamName = "Runners";
-    private final String[] buffNames = {"Speed", "Jump Boost", "Strength"}; // Add more buffs if needed
-    private final String[] debuffNames = {"Slowness", "Weakness"}; // Add more debuffs if needed
+    private final String[] buffNames = {"Speed", "Jump Boost", "Strength"};
+    private final String[] debuffNames = {"Slowness", "Weakness"};
     private String selectedTeam = "";
     private String selectedBuffDebuff = "";
 
@@ -81,25 +83,20 @@ public class MhWheel implements CommandExecutor, Listener {
                 event.setCancelled(true);
 
                 if (slot >= 2 && slot <= 4) {
-                    // Buffs were clicked, open the Buffs list
                     selectedBuffDebuff = buffNames[slot - 2];
                     openTeamMembersGUI(player, selectedTeam);
                 } else if (slot >= 6 && slot <= 7) {
-                    // Debuffs were clicked, open the Debuffs list
                     selectedBuffDebuff = debuffNames[slot - 6];
                     openTeamMembersGUI(player, selectedTeam);
                 } else if (slot == 9) {
-                    // Go back to the Main Menu
                     openMainMenu(player);
                 }
             } else if (title.startsWith(selectedTeam + " Team Members")) {
                 event.setCancelled(true);
 
                 if (slot == event.getInventory().getSize() - 1) {
-                    // Back button was clicked, go back to Buffs/Debuffs Menu
                     openBuffsDebuffsMenu(player);
                 } else {
-                    // Apply the selected buff or debuff to the player
                     applyBuffDebuff(player, slot);
                 }
             }
@@ -140,6 +137,11 @@ public class MhWheel implements CommandExecutor, Listener {
     public void openTeamMembersGUI(Player player, String teamName) {
         List<Player> teamPlayers = getPlayersOnTeam(teamName);
 
+        if (teamPlayers.isEmpty()) {
+            player.sendMessage("There are no players on the " + teamName + " team.");
+            return;
+        }
+
         int inventorySize = (int) Math.ceil((double) teamPlayers.size() / 9) * 9;
         Inventory teamMembersGUI = Bukkit.createInventory(player, inventorySize, teamName + " Team Members");
 
@@ -153,61 +155,70 @@ public class MhWheel implements CommandExecutor, Listener {
 
         player.openInventory(teamMembersGUI);
     }
+
     public void applyBuffDebuff(Player player, int slot) {
-        String message = "You have applied " + selectedBuffDebuff + " to " + player.getName();
-        ItemStack buffItem = null;
-
-        if (selectedBuffDebuff.startsWith("Buff:")) {
-            int buffIndex = slot - 2;
-            if (buffIndex >= 0 && buffIndex < buffNames.length) {
-                String buffName = buffNames[buffIndex];
-                message += " with " + buffName;
-                buffItem = createBuffItem(buffName);
-                // Apply the buff here
-                applyPotionEffect(player, buffName);
-            }
-        } else if (selectedBuffDebuff.startsWith("Debuff:")) {
-            int debuffIndex = slot - 6;
-            if (debuffIndex >= 0 && debuffIndex < debuffNames.length) {
-                String debuffName = debuffNames[debuffIndex];
-                message += " with " + debuffName;
-                buffItem = createDebuffItem(debuffName);
-                // Apply the debuff here
-                applyPotionEffect(player, debuffName);
-            }
+        if (slot < 0 || slot >= player.getOpenInventory().getTopInventory().getSize()) {
+            return; // Invalid slot, return early
         }
 
-        player.sendMessage(message);
-
-        if (buffItem != null) {
-            player.getInventory().removeItem(buffItem);
+        Player targetPlayer = getSelectedPlayer(player, slot);
+        if (targetPlayer == null) {
+            player.sendMessage("Invalid target player.");
+            return;
         }
 
-        player.sendMessage("You have applied " + selectedBuffDebuff + " to " + player.getName() + ".");
-        openTeamMembersGUI(player, selectedTeam);
-    }
-
-    // Method to apply a PotionEffect to a player
-    public void applyPotionEffect(Player player, String effectName) {
-        PotionEffectType effectType = null;
-        int duration = 1200; // 1200 ticks = 60 seconds = 2 minutes (adjust as needed)
-
-        if (effectName.equals("Speed")) {
-            effectType = PotionEffectType.SPEED;
-        } else if (effectName.equals("Jump Boost")) {
-            effectType = PotionEffectType.JUMP;
-        } else if (effectName.equals("Strength")) {
-            effectType = PotionEffectType.INCREASE_DAMAGE;
-        } else if (effectName.equals("Slowness")) {
-            effectType = PotionEffectType.SLOW;
-        } else if (effectName.equals("Weakness")) {
-            effectType = PotionEffectType.WEAKNESS;
-        }
+        PotionEffectType effectType = getEffectType(selectedBuffDebuff);
 
         if (effectType != null) {
-            player.addPotionEffect(new PotionEffect(effectType, duration, 1));
+            int duration = 20 * 20; // 20 seconds
+            int amplifier = 1;
+
+            targetPlayer.addPotionEffect(new PotionEffect(effectType, duration, amplifier));
+
+            // Crafting the broadcast message
+            String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b"; // Example: Red for Zombies, Blue for Runners
+            String message = teamColor + targetPlayer.getName() + "§f has received " + selectedBuffDebuff;
+            Bukkit.broadcastMessage(message);
+        } else {
+            player.sendMessage("Unknown effect: " + selectedBuffDebuff);
         }
     }
+
+    public Player getSelectedPlayer(Player player, int slot) {
+        ItemStack clickedItem = player.getOpenInventory().getTopInventory().getItem(slot);
+        if (clickedItem != null && clickedItem.getType() == Material.PLAYER_HEAD) {
+            SkullMeta meta = (SkullMeta) clickedItem.getItemMeta();
+
+            if (meta != null && meta.getOwningPlayer() != null) {
+                OfflinePlayer offlinePlayer = meta.getOwningPlayer();
+                if (offlinePlayer.isOnline()) {
+                    return offlinePlayer.getPlayer();
+                } else {
+                    player.sendMessage(offlinePlayer.getName() + " is not currently online.");
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public PotionEffectType getEffectType(String effectName) {
+        switch (effectName) {
+            case "Speed":
+                return PotionEffectType.SPEED;
+            case "Jump Boost":
+                return PotionEffectType.JUMP;
+            case "Strength":
+                return PotionEffectType.INCREASE_DAMAGE;
+            case "Slowness":
+                return PotionEffectType.SLOW;
+            case "Weakness":
+                return PotionEffectType.WEAKNESS;
+            default:
+                return null;
+        }
+    }
+
     public List<Player> getPlayersOnTeam(String teamName) {
         List<Player> teamPlayers = new ArrayList<>();
 
@@ -223,37 +234,45 @@ public class MhWheel implements CommandExecutor, Listener {
     public ItemStack createMenuItem(String name, Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        item.setItemMeta(meta);
+
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(material);
+        }
+
+        if (meta != null) {
+            meta.setDisplayName(name);
+            item.setItemMeta(meta);
+        }
+
         return item;
     }
 
     public ItemStack createTeamItem(String teamName, Material material) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(teamName);
-        item.setItemMeta(meta);
+
+        if (meta == null) {
+            meta = Bukkit.getItemFactory().getItemMeta(material);
+        }
+
+        if (meta != null) {
+            meta.setDisplayName(teamName);
+            item.setItemMeta(meta);
+        }
+
         return item;
     }
 
     public ItemStack createPlayerHeadItem(Player player) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwningPlayer(player);
-        meta.setDisplayName(player.getName());
-        item.setItemMeta(meta);
+
+        if (meta != null) {
+            meta.setOwningPlayer(player);
+            meta.setDisplayName(player.getName());
+            item.setItemMeta(meta);
+        }
+
         return item;
-    }
-
-    public ItemStack createBuffItem(String buffName) {
-        // Implement how you want to create a buff item
-        // For example, you can create custom items or use specific materials
-        return createMenuItem("Buff: " + buffName, Material.DIAMOND_SWORD);
-    }
-
-    public ItemStack createDebuffItem(String debuffName) {
-        // Implement how you want to create a debuff item
-        // For example, you can create custom items or use specific materials
-        return createMenuItem("Debuff: " + debuffName, Material.IRON_SWORD);
     }
 }
