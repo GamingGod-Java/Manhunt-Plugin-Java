@@ -64,6 +64,10 @@ public class MhStart implements CommandExecutor {
             return true;
         }
 
+        // Remove the glass sphere
+        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
+        mhCreate.removeGlassSphere((Player) sender);
+
         resetBossBar(); // Reset any existing boss bar
 
         gameStarted = true;

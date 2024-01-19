@@ -7,7 +7,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.block.Block;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +50,7 @@ public class MhCreate implements CommandExecutor {
 
         // Teleport the player to the exact center of the block they're standing on
         teleportPlayerToCenter(player);
-
+        createGlassSphere(player);
         // Generate a 5x5x1 light blue concrete platform north of the player
         Location bluePlatformLocation = generatePlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
                 Material.LIGHT_BLUE_CONCRETE, -4); // North
@@ -86,5 +90,79 @@ public class MhCreate implements CommandExecutor {
 
         // Return the center location of the generated platform
         return centerLocation.clone().add(0, 1, 0);
+    }
+    public void createGlassSphere(Player player) {
+        int createRadius = 15; // Radius for creation
+        int sphereHeight = -2; // Height below the player
+        World world = player.getWorld();
+        Location center = player.getLocation().add(0, sphereHeight, 0);
+
+        Set<Material> flowers = new HashSet<>(Arrays.asList(
+                Material.DANDELION, // Dandelion
+                Material.POPPY, // Poppy
+                Material.BLUE_ORCHID, // Blue Orchid
+                Material.ALLIUM, // Allium
+                Material.AZURE_BLUET, // Azure Bluet
+                Material.RED_TULIP, // Red Tulip
+                Material.ORANGE_TULIP, // Orange Tulip
+                Material.WHITE_TULIP, // White Tulip
+                Material.PINK_TULIP, // Pink Tulip
+                Material.OXEYE_DAISY, // Oxeye Daisy
+                Material.CORNFLOWER, // Cornflower
+                Material.LILY_OF_THE_VALLEY, // Lily of the Valley
+                Material.SUNFLOWER, // Sunflower
+                Material.LILAC, // Lilac
+                Material.ROSE_BUSH, // Rose Bush
+                Material.PEONY // Peony
+        ));
+
+        for (int x = -createRadius; x <= createRadius; x++) {
+            for (int y = -createRadius; y <= createRadius; y++) {
+                for (int z = -createRadius; z <= createRadius; z++) {
+                    double distance = Math.sqrt(x * x + y * y + z * z);
+                    if (distance <= createRadius && distance >= createRadius - 1) {
+                        Location blockLocation = center.clone().add(x, y, z);
+                        Block block = world.getBlockAt(blockLocation);
+                        Material blockType = block.getType();
+
+                        if (blockType == Material.AIR ||
+                                flowers.contains(blockType) || // Treat all flowers as air
+                                blockType == Material.TALL_GRASS ||
+                                blockType == Material.SEAGRASS ||
+                                blockType == Material.TALL_SEAGRASS ||
+                                blockType == Material.FERN ||
+                                blockType == Material.LARGE_FERN ||
+                                blockType == Material.VINE) {
+                            blockLocation.getBlock().setType(Material.GLASS, false);
+                        } else if (blockType == Material.WATER) {
+                            blockLocation.getBlock().setType(Material.LIGHT_BLUE_STAINED_GLASS, false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeGlassSphere(Player player) {
+        int removeRadius = 35; // Radius for removal
+        World world = player.getWorld();
+        Location center = player.getLocation().subtract(0, 2, 0); // Adjusted to be 2 blocks below the player
+
+        for (int x = -removeRadius; x <= removeRadius; x++) {
+            for (int y = -removeRadius; y <= removeRadius; y++) {
+                for (int z = -removeRadius; z <= removeRadius; z++) {
+                    double distance = Math.sqrt(x * x + y * y + z * z);
+                    if (distance <= removeRadius) {
+                        Location blockLocation = center.clone().add(x, y, z);
+                        Block block = world.getBlockAt(blockLocation);
+                        if (block.getType() == Material.GLASS) {
+                            blockLocation.getBlock().setType(Material.AIR, false);
+                        } else if (block.getType() == Material.LIGHT_BLUE_STAINED_GLASS) {
+                            blockLocation.getBlock().setType(Material.WATER, false);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
