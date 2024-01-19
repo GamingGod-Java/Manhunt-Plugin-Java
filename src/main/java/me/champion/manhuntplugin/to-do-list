@@ -1,0 +1,13 @@
+Remove "The game runs normally" server announcements from pausing and unpausing the game
+//This is related to the tick freeze/unfreeze command the server executes
+
+Fix small issues and null pointers
+
+Create some kind of debuff/buff
+
+Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup
+and then restart the server, unless there already is one
+
+Update Zombie join message upon respawn
+
+Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
