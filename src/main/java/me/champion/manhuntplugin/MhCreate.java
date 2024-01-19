@@ -132,7 +132,8 @@ public class MhCreate implements CommandExecutor {
                                 blockType == Material.TALL_SEAGRASS ||
                                 blockType == Material.FERN ||
                                 blockType == Material.LARGE_FERN ||
-                                blockType == Material.VINE) {
+                                blockType == Material.VINE ||
+                                blockType == Material.SNOW) { // Turn snow layers into regular glass
                             blockLocation.getBlock().setType(Material.GLASS, false);
                         } else if (blockType == Material.WATER) {
                             blockLocation.getBlock().setType(Material.LIGHT_BLUE_STAINED_GLASS, false);
@@ -142,6 +143,7 @@ public class MhCreate implements CommandExecutor {
             }
         }
     }
+
 
     public void removeGlassSphere(Player player) {
         int removeRadius = 35; // Radius for removal

@@ -38,6 +38,9 @@ public class MhUnpause implements CommandExecutor {
             // Switch the player's game mode back to Survival
             player.setGameMode(GameMode.SURVIVAL);
 
+            //Does this fix it?
+            player.setInvulnerable(false);
+
             // Execute /tick unfreeze command
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
 

@@ -33,8 +33,7 @@ public class MhPause implements CommandExecutor {
                 // Set the walk speed to 0 - this makes the player unable to walk
                 player.setWalkSpeed(0.0f);
 
-                // Execute /tick freeze command
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
+                player.setInvulnerable(true);
 
                 return true;
             }

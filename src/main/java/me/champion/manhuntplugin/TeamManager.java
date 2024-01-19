@@ -227,18 +227,19 @@ public class TeamManager implements Listener {
                 frozenPlayers.add(player.getUniqueId());
                 player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
 
-                //Invulnerability logic
+                // Invulnerability logic
                 player.setInvulnerable(true);
 
-                //Potion saving logic
+                // Potion saving logic
                 savePotionEffects(player);
 
-                //Save air bubble progress
+                // Save air bubble progress
                 saveOriginalAirLevels();
 
-                //Save fire ticks
+                // Save fire ticks
                 saveFireTicks(player);
-
+                // Execute /tick freeze command
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
                 if (player.getVehicle() instanceof Vehicle) {
                     Vehicle boat = (Vehicle) player.getVehicle();
                     savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
@@ -248,6 +249,7 @@ public class TeamManager implements Listener {
             }
         }
     }
+
 
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {

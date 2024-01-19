@@ -63,7 +63,8 @@ public class MhReady implements CommandExecutor, Listener {
                         player.setGameMode(GameMode.SURVIVAL);
 
                         player.setWalkSpeed(0.2f); // Reset walk speed to default (0.2)
-
+                        //Does this fix it?
+                        player.setInvulnerable(false);
                         // Unpause the game
                         teamManager.unpauseGame(player);
 
