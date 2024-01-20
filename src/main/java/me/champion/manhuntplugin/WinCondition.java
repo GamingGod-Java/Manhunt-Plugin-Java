@@ -28,7 +28,6 @@ public class WinCondition implements Listener {
     public static boolean endEntered = false;
     @EventHandler
     public void onDragonDeath(EnderDragonChangePhaseEvent event) {
-        System.out.println("entity died");
         if (mhstart.isGameStarted()) {
             if (event.getNewPhase() == EnderDragon.Phase.DYING) {
                 // The Ender Dragon has died

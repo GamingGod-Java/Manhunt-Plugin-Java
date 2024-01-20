@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
@@ -389,12 +390,31 @@ public class TeamManager implements Listener {
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
+        EntityDamageEvent lastDamageCause = player.getLastDamageCause();
+
         UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
         String team = playerTeams.get(playerUUID);
 
+
+
         if (team != null && team.equalsIgnoreCase("Runners")) {
+            // Check if the player was killed by another entity
+            if (lastDamageCause instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
+
+                // Check if the killer is a player
+                if (damageByEntityEvent.getDamager() instanceof Player) {
+                    Player killer = (Player) damageByEntityEvent.getDamager();
+
+                    // Custom logic for when a player is killed by another player
+                    event.setDeathMessage("§b"+player.getName()+"§f has been infected by §c"+killer.getName());
+                } else {
+                    event.setDeathMessage("§b"+player.getName()+" §fhas been infected by the environment");
+                }
+            } else {
+                event.setDeathMessage("§b"+player.getName()+" §fas been infected by the environment");
+            }
             addToTeam(player, "Zombies");
-            player.sendMessage("Better luck next time! You've become a zombie!");
             pauseGame(player);
         }
 

@@ -126,8 +126,9 @@ public class MhStart implements CommandExecutor {
                 double progress = (double) secondsLeft / totalSeconds;
                 bossBar.setProgress(progress);
                 bossBar.setTitle(formatTime(secondsLeft));
-
-                secondsLeft--;
+                if (!teamManager.isGamePaused()) {
+                    secondsLeft--;
+                }
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
 
