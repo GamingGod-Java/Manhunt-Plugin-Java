@@ -246,7 +246,7 @@ public class TeamManager implements Listener {
     }
 
     public void pauseGame(Player pausingPlayer) {
-        if (!isGamePaused() && !GameOver) {
+        if (!isGamePaused()) {
             setGamePaused(true);
 
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -295,7 +295,11 @@ public class TeamManager implements Listener {
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
-                player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
+                if (unpausingPlayer != null) {
+                    player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
+                } else {
+                    player.sendMessage("Game unpaused by server!");
+                }
 
                 // Invulnerability, potion, air levels, and fire ticks logic...
                 restorePotionEffects(player);
@@ -303,7 +307,20 @@ public class TeamManager implements Listener {
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
 
+                // Reset the player's walk speed to the default Minecraft value (0.2)
+                player.setWalkSpeed(0.2f);
+
+
+                // Switch the player's game mode back to Survival
+                player.setGameMode(GameMode.SURVIVAL);
+
+                //Does this fix it?
+                player.setInvulnerable(false);
+
+                // Execute /tick unfreeze command
+
             }
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
             //Stop reapplying potion effects
             stopPotionEffectLoop();
 

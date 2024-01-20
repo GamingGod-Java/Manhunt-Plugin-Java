@@ -52,6 +52,7 @@ public class WinCondition implements Listener {
                     System.out.println(teamManager.playerTeams);
                     System.out.println("Zombie Win");
                     teamManager.GameOver = true;
+                    teamManager.unpauseGame(null);
                     ZombieWin = true;
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);

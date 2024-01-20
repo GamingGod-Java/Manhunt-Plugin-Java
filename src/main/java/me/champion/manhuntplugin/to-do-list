@@ -1,25 +1,33 @@
-Remove "The game runs normally" server announcements from pausing and unpausing the game
-//This is related to the tick freeze/unfreeze command the server executes
+Unfixed:
 
-Fix small issues and null pointers
+    Remove "The game runs normally" server announcements from pausing and unpausing the game
 
-Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup
-and then restart the server, unless there already is one
+    //This is related to the tick freeze/unfreeze command the server executes
 
-Update Zombie join message upon respawn
+    Fix small issues and null pointers
 
-Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
+    Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup
+    and then restart the server, unless there already is one
 
-Found an issue with /MhRestart spamming console, issue is probably related to the bossBar
+    Update Zombie join message upon respawn
 
-Needle points to last known location if not updated
+    Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
-No freeze if a team wins
+    Colours in chat on death
 
-Colours in chat on death
+    Chat message deletion upon reentering boats?
 
-Chat message deletion upon reentering boats?
+Fixed:
+    No freeze if a team wins (jank fix)
 
-Make potion effects stop counting down
+    Make potion effects stop counting down (fixed)
 
-Make lava turn into red glass, turn water and sea related things into blue stained glass (darker)
+    Make lava turn into red glass, turn water and sea related things into blue stained glass (darker)
+    //Done, but you cant really see the glass under lava lol
+
+???:
+       Found an issue with /MhRestart spamming console, issue is probably related to the bossBar
+       //I was unable to reproduce this error, have you fixed it?
+
+       Needle points to last known location if not updated
+       (needle removed, unsure how to "unset" location, additionally, needly working in overworld but not nether may cause confusion)
