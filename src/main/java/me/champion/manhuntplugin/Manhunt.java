@@ -24,6 +24,9 @@ public final class Manhunt extends JavaPlugin {
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
+    File statisticsFile = new File(getDataFolder(), "statistics.yml");
+    FileConfiguration statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
+
     @Override
     public void onLoad() {
         getLogger().info("Manhunt plugin is loading!");
@@ -34,6 +37,13 @@ public final class Manhunt extends JavaPlugin {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
         enableFlightInServerProperties();
+
+        try {
+            statisticsConfig.save(statisticsFile);
+            getLogger().info("Created and saved statistics.yml");
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Failed to save statistics.yml: " + e.getMessage(), e);
+        }
 
         config = new YamlConfiguration();
         try {

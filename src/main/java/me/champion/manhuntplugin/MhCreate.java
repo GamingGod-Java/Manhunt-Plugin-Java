@@ -129,16 +129,20 @@ public class MhCreate implements CommandExecutor {
                                 flowers.contains(blockType) || // Treat all flowers as air
                                 blockType == Material.TALL_GRASS ||
                                 blockType == Material.SHORT_GRASS ||
-                                blockType == Material.SEAGRASS ||
-                                blockType == Material.TALL_SEAGRASS ||
+
                                 blockType == Material.FERN ||
                                 blockType == Material.LARGE_FERN ||
                                 blockType == Material.VINE ||
                                 blockType == Material.SCUTE ||
                                 blockType == Material.SNOW) { // Turn snow layers into regular glass
                             blockLocation.getBlock().setType(Material.GLASS, false);
-                        } else if (blockType == Material.WATER) {
-                            blockLocation.getBlock().setType(Material.LIGHT_BLUE_STAINED_GLASS, false);
+                        } else if ( //Water based blocks
+                                blockType == Material.WATER
+                                        || blockType == Material.TALL_SEAGRASS
+                                        || blockType == Material.SEAGRASS
+                                        || blockType == Material.KELP
+                        ) {
+                            blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
                         } else if (blockType == Material.LAVA) {
                             blockLocation.getBlock().setType(Material.RED_STAINED_GLASS, false);
                         }

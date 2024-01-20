@@ -31,6 +31,8 @@ import org.bukkit.scheduler.BukkitTask;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
@@ -47,6 +49,11 @@ public class TeamManager implements Listener {
     private final Map<UUID, BoatData> savedBoats = new HashMap<>();
 
     private BukkitTask potionEffectTask;
+
+
+
+    private File statisticsFile;
+    private FileConfiguration statisticsConfig;
 
     public void startPotionEffectLoop() {
         potionEffectTask = new BukkitRunnable() {
@@ -163,6 +170,21 @@ public class TeamManager implements Listener {
     }
 
     public TeamManager(Plugin plugin) {
+
+
+
+        statisticsFile = new File(plugin.getDataFolder(), "statistics.yml");
+        statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
+
+        if (!statisticsFile.exists()) {
+            try {
+                statisticsConfig.save(statisticsFile);
+                System.out.println("Created statistics.yml");
+            } catch (IOException e) {
+                System.out.println("FAILED to create statistics.yml");
+            }
+        }
+
         teams.put(Material.BLUE_WOOL, new Team("Runners"));
         teams.put(Material.RED_WOOL, new Team("Zombies"));
 
@@ -261,7 +283,7 @@ public class TeamManager implements Listener {
 
                 player.setInvulnerable(true);
 
-                player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
+                //player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
 
                 // Invulnerability logic
                 player.setInvulnerable(true);
@@ -296,11 +318,11 @@ public class TeamManager implements Listener {
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
-                if (unpausingPlayer != null) {
+                /*if (unpausingPlayer != null) {
                     player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
                 } else {
                     player.sendMessage("Game unpaused by server!");
-                }
+                }*/
 
                 // Invulnerability, potion, air levels, and fire ticks logic...
                 restorePotionEffects(player);
@@ -398,6 +420,7 @@ public class TeamManager implements Listener {
 
 
         if (team != null && team.equalsIgnoreCase("Runners")) {
+
             // Check if the player was killed by another entity
             if (lastDamageCause instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
@@ -408,11 +431,17 @@ public class TeamManager implements Listener {
 
                     // Custom logic for when a player is killed by another player
                     event.setDeathMessage("§b"+player.getName()+"§f has been infected by §c"+killer.getName());
+                    updatePlayerStatistics(player.getName(), "player_deaths");
+                    updatePlayerStatistics(killer.getName(), "player_kills");
+
                 } else {
                     event.setDeathMessage("§b"+player.getName()+" §fhas been infected by the environment");
+                    updatePlayerStatistics(player.getName(), "environment_deaths");
+                    updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
                 }
             } else {
-                event.setDeathMessage("§b"+player.getName()+" §fas been infected by the environment");
+                event.setDeathMessage("§b"+player.getName()+" §fhas been infected by the environment");
+                updatePlayerStatistics(player.getName(), "environment_deaths");
             }
             addToTeam(player, "Zombies");
             pauseGame(player);
@@ -421,6 +450,18 @@ public class TeamManager implements Listener {
         // Remove the player from the saved boat data if they die while in a boat
         for (BoatData boatData : savedBoats.values()) {
             boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
+        }
+    }
+
+    private void updatePlayerStatistics(String player, String statistic) {
+
+        int currentStatistic = statisticsConfig.getInt(player + "." + statistic, 0);
+        statisticsConfig.set(player + "." + statistic, currentStatistic + 1);
+
+        try {
+            statisticsConfig.save(statisticsFile);
+        } catch (IOException e) {
+            System.out.println("FAILED to save statistics.yml");
         }
     }
 

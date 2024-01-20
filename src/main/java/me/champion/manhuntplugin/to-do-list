@@ -1,10 +1,4 @@
 Unfixed:
-
-    Remove "The game runs normally" server announcements from pausing and unpausing the game
-    //This is related to the tick freeze/unfreeze command the server executes
-
-    Fix small issues and null pointers
-
     Update Zombie join message upon respawn
 
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
@@ -21,17 +15,19 @@ Fixed:
     Make lava turn into red glass, turn water and sea related things into blue stained glass (darker)
     //Done, but you cant really see the glass under lava lol
 
-    Made timer countdown during pause
+    Made timer stop countdown during pause
 
     Colours in chat on death
     //Created new chat message to override vanilla message on death
 
+    Remove "The game runs normally" server announcements from pausing and unpausing the game
+        //This is related to the tick freeze/unfreeze command the server executes
+        //ChatGPT: "...which may or may not be feasible depending on the plugin's licensing and your programming skills," throwing shade lol.
+
 ???:
-       Found an issue with /MhRestart spamming console, issue is probably related to the bossBar
-       //I was unable to reproduce this error, have you fixed it?
+    Needle points to last known location if not updated
+    (needle removed, unsure how to "unset" location, additionally, needle working in overworld but not nether may cause confusion)
 
-       Needle points to last known location if not updated
-       (needle removed, unsure how to "unset" location, additionally, needle working in overworld but not nether may cause confusion)
+    Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup and then restart the server, unless there already is one
+    //Does it not already do this?
 
-       Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup and then restart the server, unless there already is one
-       //Does it not already do this?
