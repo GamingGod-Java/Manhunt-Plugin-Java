@@ -1,11 +1,9 @@
 package me.champion.manhuntplugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -22,12 +20,12 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +33,8 @@ import java.util.*;
 
 public class TeamManager implements Listener {
     private final Map<Material, Team> teams = new HashMap<>();
+
+    public boolean GameOver = false;
     public final Map<UUID, String> playerTeams = new HashMap<>();
     private final Set<UUID> frozenPlayers = new HashSet<>();
     private final Plugin plugin;
@@ -44,6 +44,32 @@ public class TeamManager implements Listener {
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
     private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
     private final Map<UUID, BoatData> savedBoats = new HashMap<>();
+
+    private BukkitTask potionEffectTask;
+
+    public void startPotionEffectLoop() {
+        potionEffectTask = new BukkitRunnable() {
+            @Override
+            public void run() {
+                applyPotionEffectsDuringPause();
+            }
+        }.runTaskTimer(plugin, 0, 20); // The second parameter (delay) is in ticks, so 20 ticks = 1 second
+    }
+
+    public void stopPotionEffectLoop() {
+        if (potionEffectTask != null) {
+            potionEffectTask.cancel();
+            potionEffectTask = null;
+        }
+    }
+
+    private void applyPotionEffectsDuringPause() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (isGamePaused()) {
+                restorePotionEffects(player);
+            }
+        }
+    }
 
     private static class BoatData {
         private final Vehicle boat;
@@ -220,11 +246,20 @@ public class TeamManager implements Listener {
     }
 
     public void pauseGame(Player pausingPlayer) {
-        if (!isGamePaused()) {
+        if (!isGamePaused() && !GameOver) {
             setGamePaused(true);
 
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
+
+                // Set the player to Adventure mode
+                player.setGameMode(GameMode.ADVENTURE);
+
+                // Set the walk speed to 0 - this makes the player unable to walk
+                player.setWalkSpeed(0.0f);
+
+                player.setInvulnerable(true);
+
                 player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
 
                 // Invulnerability logic
@@ -238,6 +273,9 @@ public class TeamManager implements Listener {
 
                 // Save fire ticks
                 saveFireTicks(player);
+
+                //Start reapplying potion effects
+                startPotionEffectLoop();
                 // Execute /tick freeze command
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
                 if (player.getVehicle() instanceof Vehicle) {
@@ -264,7 +302,10 @@ public class TeamManager implements Listener {
                 restoreOriginalAirLevels();
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
+
             }
+            //Stop reapplying potion effects
+            stopPotionEffectLoop();
 
             // Restoring boats and their passengers
             for (BoatData boatData : savedBoats.values()) {

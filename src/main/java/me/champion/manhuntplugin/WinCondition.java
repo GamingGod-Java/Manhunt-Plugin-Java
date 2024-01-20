@@ -34,9 +34,12 @@ public class WinCondition implements Listener {
                 // The Ender Dragon has died
                 Bukkit.broadcastMessage("The §5Ender Dragon " + "§fhas been defeated!");
                 RunnerWin = true;
+                teamManager.GameOver = true;
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendTitle("§bRunners win", "Game Over", 20, 40, 10);
+
                     spawnFirework(player, Color.AQUA);
+
                 }
             }
         }
@@ -48,6 +51,7 @@ public class WinCondition implements Listener {
                 if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
                     System.out.println(teamManager.playerTeams);
                     System.out.println("Zombie Win");
+                    teamManager.GameOver = true;
                     ZombieWin = true;
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
@@ -59,6 +63,7 @@ public class WinCondition implements Listener {
         if (!mhstart.isGameStarted()) {
             ZombieWin = false;
             RunnerWin = false;
+            teamManager.GameOver = false;
         }
     }
 

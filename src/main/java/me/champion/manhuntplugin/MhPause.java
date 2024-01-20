@@ -27,13 +27,7 @@ public class MhPause implements CommandExecutor {
                 // Call the pauseGame method in the TeamManager
                 teamManager.pauseGame(player);
 
-                // Set the player to Adventure mode
-                player.setGameMode(GameMode.ADVENTURE);
 
-                // Set the walk speed to 0 - this makes the player unable to walk
-                player.setWalkSpeed(0.0f);
-
-                player.setInvulnerable(true);
 
                 return true;
             }

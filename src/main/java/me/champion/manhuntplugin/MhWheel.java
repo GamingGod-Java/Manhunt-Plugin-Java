@@ -18,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.OfflinePlayer;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,8 @@ public class MhWheel implements CommandExecutor, Listener {
     private final TeamManager teamManager;
     private final String zombiesTeamName = "Zombies";
     private final String runnersTeamName = "Runners";
-    private final String[] buffNames = {"Speed", "Jump Boost", "Strength"};
-    private final String[] debuffNames = {"Slowness", "Weakness"};
+    private final String[] buffNames = {"Speed 1 inf", "Speed 2 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
+    private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     private String selectedTeam = "";
     private String selectedBuffDebuff = "";
 
@@ -82,11 +83,11 @@ public class MhWheel implements CommandExecutor, Listener {
             } else if (title.equals("Buffs/Debuffs Menu")) {
                 event.setCancelled(true);
 
-                if (slot >= 2 && slot <= 4) {
-                    selectedBuffDebuff = buffNames[slot - 2];
+                if (slot >= 0 && slot <= 8) {
+                    selectedBuffDebuff = buffNames[slot];
                     openTeamMembersGUI(player, selectedTeam);
-                } else if (slot >= 6 && slot <= 7) {
-                    selectedBuffDebuff = debuffNames[slot - 6];
+                } else if (slot >= 10 && slot <= 13) {
+                    selectedBuffDebuff = debuffNames[slot - 11];
                     openTeamMembersGUI(player, selectedTeam);
                 } else if (slot == 9) {
                     openMainMenu(player);
@@ -114,18 +115,28 @@ public class MhWheel implements CommandExecutor, Listener {
 
         player.openInventory(inventory);
     }
-
+    //private final String[] buffNames = {"Speed 1 inf", "Speed 2 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
+    //private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     public void openBuffsDebuffsMenu(Player player) {
+        List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE);
+        List<Material> debuffMaterials = Arrays.asList(Material.LEATHER_BOOTS, Material.WOODEN_SWORD, Material.BARRIER);
         Inventory menu = Bukkit.createInventory(player, 27, "Buffs/Debuffs Menu");
-
+        for (String buff: buffNames) {
+            System.out.println(buff);
+        }
         for (int i = 0; i < buffNames.length; i++) {
-            ItemStack buffsItem = createMenuItem("Buff: " + buffNames[i], Material.DIAMOND_SWORD);
-            menu.setItem(2 + i, buffsItem);
+            ItemStack buffsItem = createMenuItem("Buff: " + buffNames[i], buffMaterials.get(i));
+            if (i == 1 || i == 3) {
+                buffsItem.setAmount(2);
+            } else {
+                buffsItem.setAmount(1);
+            }
+            menu.setItem(i, buffsItem);
         }
 
         for (int i = 0; i < debuffNames.length; i++) {
-            ItemStack debuffsItem = createMenuItem("Debuff: " + debuffNames[i], Material.IRON_SWORD);
-            menu.setItem(6 + i, debuffsItem);
+            ItemStack debuffsItem = createMenuItem("Debuff: " + debuffNames[i], debuffMaterials.get(i));
+            menu.setItem(11 + i, debuffsItem);
         }
 
         ItemStack backButton = createMenuItem("Back", Material.ARROW);
@@ -156,31 +167,100 @@ public class MhWheel implements CommandExecutor, Listener {
         player.openInventory(teamMembersGUI);
     }
 
+
+
     public void applyBuffDebuff(Player player, int slot) {
-        if (slot < 0 || slot >= player.getOpenInventory().getTopInventory().getSize()) {
+        /*if (slot < 0 || slot >= player.getOpenInventory().getTopInventory().getSize()) {
             return; // Invalid slot, return early
-        }
+        }*/
 
         Player targetPlayer = getSelectedPlayer(player, slot);
         if (targetPlayer == null) {
             player.sendMessage("Invalid target player.");
             return;
         }
+        String[] parts = selectedBuffDebuff.split(" ");
 
-        PotionEffectType effectType = getEffectType(selectedBuffDebuff);
+        String effectName = parts[0];
+        if (effectName.equalsIgnoreCase("clear")) {
+            //clearEffects(targetPlayer);
+            player.getInventory().clear();
+            player.sendMessage("Cleared inventory from " + targetPlayer.getName() + ".");
+            return;
+        }
+
+        if (effectName.equalsIgnoreCase("give")) {
+            if (isInventoryFull(player)) {
+                targetPlayer.sendMessage("§cYour inventory is too full to receive an item!");
+                player.sendMessage("§c" + player.getName()+" could not receive item as their inventory was full");
+                return;
+            }
+            ItemStack itemtogive = null;
+            if (parts[1].equalsIgnoreCase("totem")) {
+                itemtogive = new ItemStack(Material.TOTEM_OF_UNDYING, 1);
+                targetPlayer.sendMessage("You've received a totem!");
+                player.sendMessage(player.getName()+" receieved totem");
+            } if (parts[1].equalsIgnoreCase("diamond")) {
+                itemtogive = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
+                targetPlayer.sendMessage("You've received diamond leggings!");
+                player.sendMessage(player.getName()+" receieved diamonds leggings");
+            }  if (parts[1].equalsIgnoreCase("god")) {
+            itemtogive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
+            targetPlayer.sendMessage("You've received a god apple!");
+            player.sendMessage(player.getName()+" receieved god apple");
+        }
+            if (itemtogive != null) {
+                player.getInventory().addItem(itemtogive);
+            }
+            return;
+        }
+
+
+        if (parts.length < 3) {
+            System.out.println(("Invalid effect format: " + selectedBuffDebuff));
+            return;
+        }
+
+
+
+
+
+
+        int amplifier;
+
+        try {
+            amplifier = Integer.parseInt(parts[1])-1;
+        } catch (NumberFormatException e) {
+            player.sendMessage("Invalid amplifier format: " + parts[1]);
+            return;
+        }
+
+        PotionEffectType effectType = getEffectType(effectName);
 
         if (effectType != null) {
-            int duration = 20 * 20; // 20 seconds
-            int amplifier = 1;
+            String durationString = parts[2];
+            int duration;
+            if ("inf".equalsIgnoreCase(durationString)) {
+                duration = Integer.MAX_VALUE;
+            } else {
+                try {
+                    duration = Integer.parseInt(durationString)*20*60;
+                } catch (NumberFormatException e) {
+                    player.sendMessage("Invalid duration format: " + durationString);
+                    return;
+                }
+            }
+
 
             targetPlayer.addPotionEffect(new PotionEffect(effectType, duration, amplifier));
+            targetPlayer.sendMessage("You got "+effectName);
 
             // Crafting the broadcast message
             String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b"; // Example: Red for Zombies, Blue for Runners
             String message = teamColor + targetPlayer.getName() + "§f has received " + selectedBuffDebuff;
             Bukkit.broadcastMessage(message);
         } else {
-            player.sendMessage("Unknown effect: " + selectedBuffDebuff);
+            player.sendMessage("Unknown effect: " + effectName);
         }
     }
 
@@ -206,10 +286,14 @@ public class MhWheel implements CommandExecutor, Listener {
         switch (effectName) {
             case "Speed":
                 return PotionEffectType.SPEED;
-            case "Jump Boost":
-                return PotionEffectType.JUMP;
+            case "Resistance":
+                return PotionEffectType.DAMAGE_RESISTANCE; // Change this to the appropriate Resistance effect*/
+            case "FireResistance":
+                return PotionEffectType.FIRE_RESISTANCE;
             case "Strength":
                 return PotionEffectType.INCREASE_DAMAGE;
+            case "Jump Boost":
+                return PotionEffectType.JUMP;
             case "Slowness":
                 return PotionEffectType.SLOW;
             case "Weakness":
@@ -274,5 +358,28 @@ public class MhWheel implements CommandExecutor, Listener {
         }
 
         return item;
+    }
+
+    public boolean isInventoryFull(Player player) {
+        int emptySlots = 0;
+
+        // Get the player's inventory
+        Inventory playerInventory = player.getInventory();
+
+        // Count the number of empty slots in the inventory
+        for (int slot = 0; slot < playerInventory.getSize() - 5; slot++) {
+            ItemStack item = playerInventory.getItem(slot);
+
+            // Check if the slot is empty
+            if (item == null || item.getType() == Material.AIR) {
+                emptySlots++;
+                System.out.println("free inv slot");
+            }
+        }
+        if (emptySlots == 0) {
+            System.out.println("no free inv slots");
+        }
+        // Check if there are no empty slots (inventory is full)
+        return emptySlots == 0;
     }
 }
