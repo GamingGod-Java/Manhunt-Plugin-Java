@@ -167,7 +167,7 @@ public class MhCreate implements CommandExecutor {
                         Block block = world.getBlockAt(blockLocation);
                         if (block.getType() == Material.GLASS) {
                             blockLocation.getBlock().setType(Material.AIR, false);
-                        } else if (block.getType() == Material.LIGHT_BLUE_STAINED_GLASS) {
+                        } else if (block.getType() == Material.BLUE_STAINED_GLASS) {
                             blockLocation.getBlock().setType(Material.WATER, false);
                         } else if (block.getType() == Material.RED_STAINED_GLASS) {
                             blockLocation.getBlock().setType(Material.LAVA, false);

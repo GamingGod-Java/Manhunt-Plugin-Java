@@ -5,29 +5,24 @@ Unfixed:
 
     Chat message deletion upon reentering boats?
 
+    /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
+
+    /MhRestart doesn't restart win condition but we'll fix that later
+
+    When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
+
+    Remove speed 2 and add last man standing icon (maybe a beacon)
+
+    Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
+
+    Colours in chat on Zombie death
 Fixed:
-    No freeze if a team wins
-    //Fixed with jank, freeze then unfreeze
-
-    Make potion effects stop counting down
-    //Restore constantly
-
-    Make lava turn into red glass, turn water and sea related things into blue stained glass (darker)
-    //Done, but you cant really see the glass under lava lol
-
-    Made timer stop countdown during pause
-
     Colours in chat on death
     //Created new chat message to override vanilla message on death
+        // -Thank you
 
     Remove "The game runs normally" server announcements from pausing and unpausing the game
         //This is related to the tick freeze/unfreeze command the server executes
         //ChatGPT: "...which may or may not be feasible depending on the plugin's licensing and your programming skills," throwing shade lol.
-
+            // - "your programming skills, damn.. thank you ChatGPT..."
 ???:
-    Needle points to last known location if not updated
-    (needle removed, unsure how to "unset" location, additionally, needle working in overworld but not nether may cause confusion)
-
-    Make the plugin create a Manhunt folder with an empty playersdate.yml file if there is none on the first startup and then restart the server, unless there already is one
-    //Does it not already do this?
-

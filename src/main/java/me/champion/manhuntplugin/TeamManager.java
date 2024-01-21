@@ -621,4 +621,3 @@ public class TeamManager implements Listener {
         return teamPlayers;
     }
 }
-
