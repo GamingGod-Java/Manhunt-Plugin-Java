@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -148,6 +150,24 @@ public class TeamManager implements Listener {
             // Restore saved potion effects
             for (Map.Entry<PotionEffect, Integer> entry : playerPotionEffects.get(playerUUID).entrySet()) {
                 player.addPotionEffect(new PotionEffect(entry.getKey().getType(), entry.getValue(), entry.getKey().getAmplifier()));
+            }
+        }
+    }
+
+    public void restoreDebuffEffects(Player player) {
+        UUID playerUUID = player.getUniqueId();
+        System.out.println("restoring debuffs");
+        if (playerPotionEffects.containsKey(playerUUID)) {
+            // Clear existing potion effects
+            player.getActivePotionEffects().clear();
+
+            // Restore saved potion effects
+            for (PotionEffect savedEffect : playerPotionEffects.get(playerUUID).keySet()) {
+                if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW) {
+                    int amplifier = playerPotionEffects.get(playerUUID).get(savedEffect);
+                    player.addPotionEffect(new PotionEffect(savedEffect.getType(), Integer.MAX_VALUE, amplifier));
+                    System.out.println("applied "+savedEffect.toString());
+                }
             }
         }
     }
@@ -409,47 +429,51 @@ public class TeamManager implements Listener {
         }
     }
 
+
+
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        Player player = event.getEntity();
-        EntityDamageEvent lastDamageCause = player.getLastDamageCause();
+        if (!GameOver) {
+            savePotionEffects(event.getEntity());
+            Player player = event.getEntity();
+            EntityDamageEvent lastDamageCause = player.getLastDamageCause();
 
-        UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
-        String team = playerTeams.get(playerUUID);
+            UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
+            String team = playerTeams.get(playerUUID);
 
 
+            if (team != null && team.equalsIgnoreCase("Runners")) {
 
-        if (team != null && team.equalsIgnoreCase("Runners")) {
+                // Check if the player was killed by another entity
+                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
+                    EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
 
-            // Check if the player was killed by another entity
-            if (lastDamageCause instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
+                    // Check if the killer is a player
+                    if (damageByEntityEvent.getDamager() instanceof Player) {
+                        Player killer = (Player) damageByEntityEvent.getDamager();
 
-                // Check if the killer is a player
-                if (damageByEntityEvent.getDamager() instanceof Player) {
-                    Player killer = (Player) damageByEntityEvent.getDamager();
+                        // Custom logic for when a player is killed by another player
+                        event.setDeathMessage("§b" + player.getName() + "§f has been infected by §c" + killer.getName());
+                        updatePlayerStatistics(player.getName(), "player_deaths");
+                        updatePlayerStatistics(killer.getName(), "player_kills");
 
-                    // Custom logic for when a player is killed by another player
-                    event.setDeathMessage("§b"+player.getName()+"§f has been infected by §c"+killer.getName());
-                    updatePlayerStatistics(player.getName(), "player_deaths");
-                    updatePlayerStatistics(killer.getName(), "player_kills");
-
+                    } else {
+                        event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
+                        updatePlayerStatistics(player.getName(), "environment_deaths");
+                        updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
+                    }
                 } else {
-                    event.setDeathMessage("§b"+player.getName()+" §fhas been infected by the environment");
+                    event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
                     updatePlayerStatistics(player.getName(), "environment_deaths");
-                    updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
                 }
-            } else {
-                event.setDeathMessage("§b"+player.getName()+" §fhas been infected by the environment");
-                updatePlayerStatistics(player.getName(), "environment_deaths");
+                addToTeam(player, "Zombies");
+                pauseGame(player);
             }
-            addToTeam(player, "Zombies");
-            pauseGame(player);
-        }
 
-        // Remove the player from the saved boat data if they die while in a boat
-        for (BoatData boatData : savedBoats.values()) {
-            boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
+            // Remove the player from the saved boat data if they die while in a boat
+            for (BoatData boatData : savedBoats.values()) {
+                boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
+            }
         }
     }
 
@@ -477,6 +501,8 @@ public class TeamManager implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
+        restoreDebuffEffects(player);
+
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
             System.out.println("Gave " + player.getName() + " compass and tools");
@@ -606,6 +632,7 @@ public class TeamManager implements Listener {
             if (event.getEntered() instanceof Player) {
                 Player player = (Player) event.getEntered();
                 player.sendMessage(ChatColor.RED + "Nice try Andre, you can not enter a boat while the game is paused.");
+
             }
         }
     }

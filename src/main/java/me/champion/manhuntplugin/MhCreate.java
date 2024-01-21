@@ -141,6 +141,7 @@ public class MhCreate implements CommandExecutor {
                                         || blockType == Material.TALL_SEAGRASS
                                         || blockType == Material.SEAGRASS
                                         || blockType == Material.KELP
+                                        || blockType == Material.KELP_PLANT
                         ) {
                             blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
                         } else if (blockType == Material.LAVA) {

@@ -4,8 +4,10 @@ Unfixed:
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
     Chat message deletion upon reentering boats?
+    //
 
     /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
+    //and now it does
 
     /MhRestart doesn't restart win condition but we'll fix that later
 

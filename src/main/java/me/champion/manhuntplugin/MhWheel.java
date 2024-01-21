@@ -8,7 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -18,10 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.OfflinePlayer;
 
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class MhWheel implements CommandExecutor, Listener {
 
@@ -29,15 +28,53 @@ public class MhWheel implements CommandExecutor, Listener {
     private final TeamManager teamManager;
     private final String zombiesTeamName = "Zombies";
     private final String runnersTeamName = "Runners";
-    private final String[] buffNames = {"Speed 1 inf", "Speed 2 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
+    private final String[] buffNames = {"Speed 1 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple", "LAST MAN STANDING"};
     private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     private String selectedTeam = "";
     private String selectedBuffDebuff = "";
+
+    private final Map<UUID, Map<PotionEffectType, Integer>> playerDebuffs = new HashMap<>();
+
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+
+        // Save debuffs before death
+        //saveDebuffs(player);
+
+        // Remove all potion effects on death (optional)
+        //clearEffects(player);
+    }
+
+    // Method to save the debuffs of a player
+
+
+    // Method to clear all potion effects from a player
+    private void clearEffects(Player player) {
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            player.removePotionEffect(effect.getType());
+        }
+    }
+
+    // ... (rest of the class)
+
+    // Method to restore debuffs on respawn
+    private void restoreDebuffs(Player player) {
+        Map<PotionEffectType, Integer> debuffs = playerDebuffs.get(player.getUniqueId());
+        if (debuffs != null) {
+            for (Map.Entry<PotionEffectType, Integer> entry : debuffs.entrySet()) {
+                player.addPotionEffect(new PotionEffect(entry.getKey(), Integer.MAX_VALUE, entry.getValue()));
+            }
+        }
+    }
 
     public MhWheel(JavaPlugin plugin, TeamManager teamManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;
     }
+
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -118,7 +155,7 @@ public class MhWheel implements CommandExecutor, Listener {
     //private final String[] buffNames = {"Speed 1 inf", "Speed 2 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
     //private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     public void openBuffsDebuffsMenu(Player player) {
-        List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE);
+        List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE, Material.BEACON);
         List<Material> debuffMaterials = Arrays.asList(Material.LEATHER_BOOTS, Material.WOODEN_SWORD, Material.BARRIER);
         Inventory menu = Bukkit.createInventory(player, 27, "Buffs/Debuffs Menu");
         for (String buff: buffNames) {
@@ -126,7 +163,7 @@ public class MhWheel implements CommandExecutor, Listener {
         }
         for (int i = 0; i < buffNames.length; i++) {
             ItemStack buffsItem = createMenuItem("Buff: " + buffNames[i], buffMaterials.get(i));
-            if (i == 1 || i == 3) {
+            if (i == 2) {
                 buffsItem.setAmount(2);
             } else {
                 buffsItem.setAmount(1);
@@ -182,6 +219,13 @@ public class MhWheel implements CommandExecutor, Listener {
         String[] parts = selectedBuffDebuff.split(" ");
 
         String effectName = parts[0];
+        
+        if (effectName.equalsIgnoreCase("last")) {
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+            
+        }
         if (effectName.equalsIgnoreCase("clear")) {
             //clearEffects(targetPlayer);
             player.getInventory().clear();
