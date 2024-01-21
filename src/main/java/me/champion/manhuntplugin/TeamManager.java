@@ -253,6 +253,8 @@ public class TeamManager implements Listener {
         String message = event.getMessage();
         String name = player.getDisplayName(); // This retains the colored name
 
+        message = message.replace("%", "%%"); //jank fix but it was all chatgpt had
+
         // Format the chat message so that the player's name is colored but the message is default
         event.setFormat(name + ChatColor.WHITE + ": " + message);
     }
@@ -363,7 +365,7 @@ public class TeamManager implements Listener {
                 // Execute /tick unfreeze command
 
             }
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+            //Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
             //Stop reapplying potion effects
             stopPotionEffectLoop();
 
@@ -468,7 +470,10 @@ public class TeamManager implements Listener {
                 }
                 addToTeam(player, "Zombies");
                 pauseGame(player);
+            } else {
+                event.setDeathMessage("§c" + event.getEntity() + " §f" +event.getDeathMessage());
             }
+
 
             // Remove the player from the saved boat data if they die while in a boat
             for (BoatData boatData : savedBoats.values()) {

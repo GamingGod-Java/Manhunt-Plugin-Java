@@ -14,7 +14,8 @@ import org.bukkit.scheduler.BukkitTask;
 public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
-    private boolean gameStarted = false;
+
+    public boolean gameStarted = false;
     private BukkitTask countdownTask;
     private BossBar bossBar;
     public boolean timerExpired = false;
@@ -22,6 +23,7 @@ public class MhStart implements CommandExecutor {
     private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
+
         this.teamManager = teamManager;
     }
 
@@ -39,6 +41,7 @@ public class MhStart implements CommandExecutor {
 
         hideBossBar();
         gameStarted = false;
+        timerExpired = false;
         teamManager.unpauseZombies();
     }
 
@@ -48,6 +51,9 @@ public class MhStart implements CommandExecutor {
             bossBar.removeAll();
         }
     }
+
+
+
 
     public void cancelInitialCountdown() {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
@@ -94,6 +100,7 @@ public class MhStart implements CommandExecutor {
                     teamManager.unpauseZombies();
                     this.cancel();
                     initialCountdownInProgress = false;
+
                     createAndStartBossBar(); // Start the boss bar timer after the initial countdown
                 } else {
                     Bukkit.broadcastMessage("§cZombies §fcan move in " + secondsLeft + " seconds!");
@@ -112,6 +119,7 @@ public class MhStart implements CommandExecutor {
         bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
 
         long totalSeconds = 2 * 3600 + 29 * 60 + 50; // 2 hours, 29 minutes, and 50 seconds
+        //long totalSeconds = 5;
         countdownTask = new BukkitRunnable() {
             long secondsLeft = totalSeconds;
 
@@ -119,6 +127,7 @@ public class MhStart implements CommandExecutor {
             public void run() {
                 if (secondsLeft <= 0) {
                     bossBar.setVisible(false);
+                    timerExpired = true;
                     this.cancel();
                     return;
                 }

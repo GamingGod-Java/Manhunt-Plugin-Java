@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 public class MhRestart implements CommandExecutor {
 
@@ -20,12 +21,16 @@ public class MhRestart implements CommandExecutor {
         if (!sender.isOp()) {
             sender.sendMessage("§cYou do not have permission to use this command.");
             return true;
+        } else {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.getInventory().clear();
+            }
+            mhStart.resetGame(); // Reset game, including both countdowns and boss bar
+            // Broadcast message to all players
+            Bukkit.broadcastMessage("The game has been reset.");
+            teamManager.unpauseZombies();
         }
 
-        mhStart.resetGame(); // Reset game, including both countdowns and boss bar
-        // Broadcast message to all players
-        Bukkit.broadcastMessage("The game has been reset.");
-        teamManager.unpauseZombies();
 
         return true;
     }

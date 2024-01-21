@@ -152,9 +152,10 @@ public class MhWheel implements CommandExecutor, Listener {
 
         player.openInventory(inventory);
     }
-    //private final String[] buffNames = {"Speed 1 inf", "Speed 2 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
+    //private final String[] buffNames = {"Speed 1 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
     //private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     public void openBuffsDebuffsMenu(Player player) {
+
         List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE, Material.BEACON);
         List<Material> debuffMaterials = Arrays.asList(Material.LEATHER_BOOTS, Material.WOODEN_SWORD, Material.BARRIER);
         Inventory menu = Bukkit.createInventory(player, 27, "Buffs/Debuffs Menu");
@@ -207,6 +208,7 @@ public class MhWheel implements CommandExecutor, Listener {
 
 
     public void applyBuffDebuff(Player player, int slot) {
+        System.out.println("applying buff");
         /*if (slot < 0 || slot >= player.getOpenInventory().getTopInventory().getSize()) {
             return; // Invalid slot, return early
         }*/
@@ -221,9 +223,9 @@ public class MhWheel implements CommandExecutor, Listener {
         String effectName = parts[0];
         
         if (effectName.equalsIgnoreCase("last")) {
-            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1));
-            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 1));
-            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0));
+            targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
             
         }
         if (effectName.equalsIgnoreCase("clear")) {

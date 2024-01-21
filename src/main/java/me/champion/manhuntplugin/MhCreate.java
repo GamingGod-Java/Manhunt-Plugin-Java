@@ -66,7 +66,19 @@ public class MhCreate implements CommandExecutor {
         teamManager.registerPlatform("Zombies", redPlatformLocation);
 
         player.sendMessage("Runners and Zombies platforms spawned around you! Type /mhstart to start the countdown.");
+
+        setWorldSpawn(player);
+
         return true;
+    }
+
+    private void setWorldSpawn(Player player) {
+        Location location = player.getLocation();
+        World world = location.getWorld();
+        world.setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        player.sendMessage("World spawn set to your location.");
+        // Add debug statement
+        System.out.println("World spawn set: " + location);
     }
 
     private void teleportPlayerToCenter(Player player) {

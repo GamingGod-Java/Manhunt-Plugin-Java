@@ -13,35 +13,48 @@ ideas:
         Random time to unpause
 
 Unfixed:
-    Add fire res buff
+    Make waiting players unable to break glass
+    //Could set all to adventure on join and set to survival on start?
+    //Could add a listener but thats work
+
+    mhcreate should set world spawn
+    //chatgpts suggested code doenst work help
+
 
     Save zombie debuffs on death
 
-    mhcreate should set world spawn
-
     % sign breaks custom chat
 
-    Clear players on restart
+
 
     Make giving items work
 
     Update Zombie join message upon respawn
 
-    Chat message deletion upon reentering boats?
-    //
 
-    /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
-    //and now it does
-
-    MhRestart doesn't restart win condition but we'll fix that later
-    //tiemr no work if restart
 
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
 
     Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
 
     Colours in chat on Zombie death
+
 Fixed:
+
+    MhRestart doesn't restart win condition but we'll fix that later
+    //Apparently we are  dumb and winning on time was always impossible/broken? fixed now
+
+    Clear players on restart
+    //done
+
+    /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
+    //and now it does
+
+    Add fire res buff
+    //Added
+
+
+
     Colours in chat on death
     //Created new chat message to override vanilla message on death
         // -Thank you
