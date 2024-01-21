@@ -7,7 +7,14 @@ ideas:
 
     Rewrite in Kotlin (pain)
 
+    Cursed manhunt:
+        Lower tickrate
+        Slow pause/unpause
+        Random time to unpause
+
 Unfixed:
+    Add fire res buff
+
     Save zombie debuffs on death
 
     mhcreate should set world spawn
@@ -26,7 +33,8 @@ Unfixed:
     /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
     //and now it does
 
-    /MhRestart doesn't restart win condition but we'll fix that later
+    MhRestart doesn't restart win condition but we'll fix that later
+    //tiemr no work if restart
 
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
 
