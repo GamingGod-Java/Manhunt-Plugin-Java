@@ -1,6 +1,17 @@
 Plugin: FastChunkPregenerator
 
+ideas:
+    Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
+
+    Anti combat log
+
+    Rewrite in Kotlin (pain)
+
 Unfixed:
+    Save zombie debuffs on death
+
+    mhcreate should set world spawn
+
     % sign breaks custom chat
 
     Clear players on restart
@@ -8,8 +19,6 @@ Unfixed:
     Make giving items work
 
     Update Zombie join message upon respawn
-
-    Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
     Chat message deletion upon reentering boats?
     //
@@ -20,8 +29,6 @@ Unfixed:
     /MhRestart doesn't restart win condition but we'll fix that later
 
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
-
-    Remove speed 2 and add last man standing icon (maybe a beacon)
 
     Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
 

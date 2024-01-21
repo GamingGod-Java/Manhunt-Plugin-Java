@@ -90,8 +90,11 @@ public class MhReady implements CommandExecutor, Listener {
 
             @Override
             public void run() {
-                if (count > 0) {
+                if (count > 1) {
                     Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Game unpausing in " + count + " seconds...");
+                    count--;
+                } if (count == 1) {
+                    Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Game unpausing in " + count + " second...");
                     count--;
                 } else {
                     cancel(); // Stop the countdown
