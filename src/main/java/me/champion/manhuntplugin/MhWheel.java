@@ -254,7 +254,7 @@ public class MhWheel implements CommandExecutor, Listener {
             player.sendMessage(player.getName()+" receieved god apple");
         }
             if (itemtogive != null) {
-                player.getInventory().addItem(itemtogive);
+                targetPlayer.getInventory().addItem(itemtogive);
             }
             return;
         }
