@@ -1,4 +1,12 @@
+Plugin: FastChunkPregenerator
+
 Unfixed:
+    % sign breaks custom chat
+
+    Clear players on restart
+
+    Make giving items work
+
     Update Zombie join message upon respawn
 
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
