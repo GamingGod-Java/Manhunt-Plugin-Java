@@ -33,6 +33,9 @@ public class MhWheel implements CommandExecutor, Listener {
     private String selectedTeam = "";
     private String selectedBuffDebuff = "";
 
+    private final Map<UUID, Long> clickCooldowns = new HashMap<>();
+    private static final long COOLDOWN_TIME_MS = 10;
+
     private final Map<UUID, Map<PotionEffectType, Integer>> playerDebuffs = new HashMap<>();
 
 
@@ -101,6 +104,17 @@ public class MhWheel implements CommandExecutor, Listener {
         }
 
         Player player = (Player) event.getWhoClicked();
+        long currentTime = System.currentTimeMillis();
+
+        // Check if the player is in the cooldown period
+        if (clickCooldowns.containsKey(player.getUniqueId()) && currentTime - clickCooldowns.get(player.getUniqueId()) < COOLDOWN_TIME_MS) {
+            return;
+        }
+
+        // Set the cooldown for the player
+        clickCooldowns.put(player.getUniqueId(), currentTime);
+
+
         Inventory clickedInventory = event.getClickedInventory();
 
         if (clickedInventory != null) {
@@ -135,7 +149,10 @@ public class MhWheel implements CommandExecutor, Listener {
                 if (slot == event.getInventory().getSize() - 1) {
                     openBuffsDebuffsMenu(player);
                 } else {
-                    applyBuffDebuff(player, slot);
+                    if (slot < getPlayersOnTeam(selectedTeam).size()) {
+                        applyBuffDebuff(player, slot);
+                    }
+
                 }
             }
         }
@@ -214,6 +231,7 @@ public class MhWheel implements CommandExecutor, Listener {
         }*/
 
         Player targetPlayer = getSelectedPlayer(player, slot);
+
         if (targetPlayer == null) {
             player.sendMessage("Invalid target player.");
             return;
@@ -246,6 +264,7 @@ public class MhWheel implements CommandExecutor, Listener {
                 itemtogive = new ItemStack(Material.TOTEM_OF_UNDYING, 1);
                 targetPlayer.sendMessage("You've received a totem!");
                 player.sendMessage(player.getName()+" receieved totem");
+
             } if (parts[1].equalsIgnoreCase("diamond")) {
                 itemtogive = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
                 targetPlayer.sendMessage("You've received diamond leggings!");

@@ -92,13 +92,14 @@ public class MhReady implements CommandExecutor, Listener {
             public void run() {
                 if (count > 1) {
                     Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Game unpausing in " + count + " seconds...");
-                    count--;
-                } if (count == 1) {
+                } else if (count == 1) {
                     Bukkit.broadcastMessage(ChatColor.LIGHT_PURPLE + "Game unpausing in " + count + " second...");
-                    count--;
                 } else {
                     cancel(); // Stop the countdown
+                    return;  // Added to exit the method after canceling
                 }
+
+                count--; // Move count-- inside the if and else if blocks
             }
         }.runTaskTimer(plugin, 0L, 20L); // 20L represents 1 second (20 ticks per second)
     }

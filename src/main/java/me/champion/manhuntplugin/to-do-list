@@ -18,18 +18,20 @@ Unfixed:
 
     Save zombie debuffs on death
 
-    Make giving items work
-
     Update Zombie join message upon respawn
-
-
+Fixed:
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
+    //I believe its fixed? Called in team manager and mhpause/unpause
 
     Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
+    //Added check for what slot # is being pressed and if the current team is that large
+
+    Make giving items work
+    //It was kinda ur fault, the function calls twice but you dont notice it with functions, so ive just added a very short "cooldown" to the functions actions
 
     Colours in chat on Zombie death
+    //Added colours in chat and fixed chat bug caused by idiot coding
 
-Fixed:
     % sign breaks custom chat
     //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective
 
@@ -37,25 +39,4 @@ Fixed:
     //Set all players to adventure mode on mhcreate then survival on mhstart
 
     MhRestart doesn't restart win condition but we'll fix that later
-    //Apparently we are  dumb and winning on time was always impossible/broken? fixed now
-
-    Clear players on restart
-    //done
-
-    /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
-    //and now it does
-
-    Add fire res buff
-    //Added
-
-
-
-    Colours in chat on death
-    //Created new chat message to override vanilla message on death
-        // -Thank you
-
-    Remove "The game runs normally" server announcements from pausing and unpausing the game
-        //This is related to the tick freeze/unfreeze command the server executes
-        //ChatGPT: "...which may or may not be feasible depending on the plugin's licensing and your programming skills," throwing shade lol.
-            // - "your programming skills, damn.. thank you ChatGPT..."
-???:
+    //Apparently we(I) are dumb and winning on time was always impossible/broken? fixed now
