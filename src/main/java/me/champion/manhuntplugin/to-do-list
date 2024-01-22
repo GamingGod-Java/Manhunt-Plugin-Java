@@ -13,20 +13,14 @@ ideas:
         Random time to unpause
 
 Unfixed:
-
-
     mhcreate should set world spawn
     //chatgpts suggested code doenst work help
 
-
     Save zombie debuffs on death
-
-    % sign breaks custom chat
 
     Make giving items work
 
     Update Zombie join message upon respawn
-
 
 
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
@@ -36,6 +30,9 @@ Unfixed:
     Colours in chat on Zombie death
 
 Fixed:
+    % sign breaks custom chat
+    //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective
+
     Make waiting players unable to break glass
     //Set all players to adventure mode on mhcreate then survival on mhstart
 

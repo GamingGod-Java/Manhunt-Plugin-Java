@@ -471,7 +471,14 @@ public class TeamManager implements Listener {
                 addToTeam(player, "Zombies");
                 pauseGame(player);
             } else {
-                event.setDeathMessage("§c" + event.getEntity() + " §f" +event.getDeathMessage());
+                String originalDeathMessage = event.getDeathMessage();
+                int firstSpaceIndex = originalDeathMessage.indexOf(" ");
+                String playerName = originalDeathMessage.substring(0, firstSpaceIndex);
+                String restOfMessage = originalDeathMessage.substring(firstSpaceIndex + 1);
+
+                // Modify the death message with the new format
+                String newDeathMessage = "§c" + playerName + " §f" + restOfMessage;
+                event.setDeathMessage(newDeathMessage);
             }
 
 
