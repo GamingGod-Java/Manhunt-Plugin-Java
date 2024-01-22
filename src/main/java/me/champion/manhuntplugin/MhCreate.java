@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 public class MhCreate implements CommandExecutor {
 
@@ -69,7 +72,13 @@ public class MhCreate implements CommandExecutor {
 
         setWorldSpawn(player);
 
+        for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
+            onlineplayer.setGameMode(GameMode.ADVENTURE);
+        }
+
         return true;
+
+
     }
 
     private void setWorldSpawn(Player player) {

@@ -1,6 +1,7 @@
 package me.champion.manhuntplugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -72,6 +73,10 @@ public class MhStart implements CommandExecutor {
         if (gameStarted) {
             sender.sendMessage("§cThe game has already started. Use /mhrestart to restart.");
             return true;
+        }
+
+        for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
+            onlineplayer.setGameMode(GameMode.SURVIVAL);
         }
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
