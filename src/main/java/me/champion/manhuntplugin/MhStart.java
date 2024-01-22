@@ -46,10 +46,14 @@ public class MhStart implements CommandExecutor {
         teamManager.unpauseZombies();
     }
 
-    private void hideBossBar() {
+    public void hideBossBar() {
         if (bossBar != null) {
             bossBar.setVisible(false);
             bossBar.removeAll();
+            if (countdownTask != null && !countdownTask.isCancelled()) {
+                countdownTask.cancel();
+                countdownTask = null;
+            }
         }
     }
 
