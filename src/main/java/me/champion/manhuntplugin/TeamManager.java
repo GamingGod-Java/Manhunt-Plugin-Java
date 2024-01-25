@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,11 +58,14 @@ public class TeamManager implements Listener {
     private File statisticsFile;
     private FileConfiguration statisticsConfig;
 
+
+
+
     public void startPotionEffectLoop() {
         potionEffectTask = new BukkitRunnable() {
             @Override
             public void run() {
-                applyPotionEffectsDuringPause();
+                    applyPotionEffectsDuringPause();
             }
         }.runTaskTimer(plugin, 0, 20); // The second parameter (delay) is in ticks, so 20 ticks = 1 second
     }
@@ -164,8 +168,7 @@ public class TeamManager implements Listener {
             // Restore saved potion effects
             for (PotionEffect savedEffect : playerPotionEffects.get(playerUUID).keySet()) {
                 if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW) {
-                    int amplifier = playerPotionEffects.get(playerUUID).get(savedEffect);
-                    player.addPotionEffect(new PotionEffect(savedEffect.getType(), Integer.MAX_VALUE, amplifier));
+                    player.addPotionEffect(new PotionEffect(savedEffect.getType(), savedEffect.getDuration(), savedEffect.getAmplifier()));
                     System.out.println("applied "+savedEffect.toString());
                 }
             }
@@ -367,7 +370,8 @@ public class TeamManager implements Listener {
             }
             //Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
             //Stop reapplying potion effects
-            stopPotionEffectLoop();
+            //
+            // stopPotionEffectLoop();
 
             // Restoring boats and their passengers
             for (BoatData boatData : savedBoats.values()) {
@@ -513,7 +517,8 @@ public class TeamManager implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
-        restoreDebuffEffects(player);
+
+
 
 
         if (team != null && team.equalsIgnoreCase("Zombies")) {
@@ -542,6 +547,14 @@ public class TeamManager implements Listener {
             }
             player.getInventory().addItem(compass);
         }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+            // Delayed potion effect application
+            restoreDebuffEffects(player);
+
+
+
+            // ... (rest of your code for giving items)
+        }, 1);
     }
     public Player findNearestRunner(Location zombieLocation) {
         Player nearestRunner = null;

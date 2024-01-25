@@ -16,10 +16,13 @@ Unfixed:
     mhcreate should set world spawn
     //chatgpts suggested code doenst work help
 
-    Save zombie debuffs on death
+
 
     Update Zombie join message upon respawn
 Fixed:
+    Save zombie debuffs on death
+    //Needed to add delay to respawn, onplayerrespawn is called *before* player respawns
+
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
     //I believe its fixed? Called in team manager and mhpause/unpause
 
@@ -27,16 +30,16 @@ Fixed:
     //Added check for what slot # is being pressed and if the current team is that large
 
     Make giving items work
-    //It was kinda ur fault, the function calls twice but you dont notice it with functions, so ive just added a very short "cooldown" to the functions actions
+    //It was kinda ur fault, the function calls twice but you dont notice it with potion effects, so ive just added a very short "cooldown" to the functions actions
 
     Colours in chat on Zombie death
     //Added colours in chat and fixed chat bug caused by idiot coding
 
     % sign breaks custom chat
-    //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective
+    //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective, but if theres another character it will explode
 
     Make waiting players unable to break glass
-    //Set all players to adventure mode on mhcreate then survival on mhstart
+    //Set all players to adventure mode on mhcreate then survival on mhstart, is there any reason to implement a more intelligent solution?
 
     MhRestart doesn't restart win condition but we'll fix that later
     //Apparently we(I) are dumb and winning on time was always impossible/broken? fixed now

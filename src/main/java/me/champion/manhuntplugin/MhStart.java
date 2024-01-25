@@ -123,7 +123,6 @@ public class MhStart implements CommandExecutor {
         if (bossBar != null) {
             bossBar.removeAll(); // Reset the boss bar for a new game
         }
-
         bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
         bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
 
