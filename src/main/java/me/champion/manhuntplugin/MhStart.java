@@ -81,6 +81,12 @@ public class MhStart implements CommandExecutor {
 
         for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
             onlineplayer.setGameMode(GameMode.SURVIVAL);
+
+            onlineplayer.setHealth(20.0);
+
+            onlineplayer.setFoodLevel(20);
+
+            onlineplayer.setSaturation(20);
         }
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);

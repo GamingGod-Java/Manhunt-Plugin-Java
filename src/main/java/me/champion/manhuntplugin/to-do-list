@@ -14,24 +14,13 @@ ideas:
 
 Unfixed:
     mhcreate should set world spawn
-    //chatgpts suggested code doenst work help
+    //chatgpts suggested code doesn't work help
 
-    Update Zombie join message upon respawn
+    Players joining after mhcreate will not be put into adventure mode
 
-    Plaers joining after mhcreate will not be put into adventure mode
+    Clicking on a GUI slot with nothing in it will produce an error in the console //for some reason I can't replicate this
+
 Fixed:
-    Save zombie debuffs on death
-    //Needed to add delay to respawn, onplayerrespawn is called *before* player respawns
-
-    When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
-    //I believe its fixed? Called in team manager and mhpause/unpause
-
-    Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
-    //Added check for what slot # is being pressed and if the current team is that large
-
-    Make giving items work
-    //It was kinda ur fault, the function calls twice but you dont notice it with potion effects, so ive just added a very short "cooldown" to the functions actions
-
     Colours in chat on Zombie death
     //Added colours in chat and fixed chat bug caused by idiot coding
 
