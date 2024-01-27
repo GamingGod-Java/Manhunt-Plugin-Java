@@ -341,7 +341,8 @@ public class TeamManager implements Listener {
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
             setGamePaused(false);
-
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+            savedBoats.clear(); // Clear the saved boats map after restoring them
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
                 /*if (unpausingPlayer != null) {
@@ -392,8 +393,6 @@ public class TeamManager implements Listener {
                     }
                 }
             }
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
-            savedBoats.clear(); // Clear the saved boats map after restoring them
         }
     }
 

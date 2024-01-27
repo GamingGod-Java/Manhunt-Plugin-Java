@@ -1,5 +1,5 @@
 name: Manhunt
-version: '1.5.35-SNAPSHOT'
+version: '1.5.40-SNAPSHOT'
 main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
 authors: [ GamingGod-Java, AndreBinbow ]
@@ -30,7 +30,7 @@ commands:
     usage: /MhStart
   MhRestart:
     description: Restarts the game so /MhStart can be done all over again
-    usage: /MhStart
+    usage: /MhRestart
   MhTeamChat:
     description: Enables or disables team chat (player has to be on a team)
     usage: /MhTeamChat
@@ -40,3 +40,8 @@ commands:
   MhWheel:
     description: After spinning the wheel on Discord, you can type this command to add the buff or debuff
     usage: /MhWheel
+  MhSettings:
+    description: Settings menu for Operators
+    usage: /MhSettings
+    aliases:
+      - mhs
