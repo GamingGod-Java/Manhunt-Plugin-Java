@@ -89,7 +89,7 @@ public class MhWheel implements CommandExecutor, Listener {
         Player player = (Player) sender;
 
         if (!player.isOp()) {
-            player.sendMessage("You need to be an operator (op) to use this command.");
+            player.sendMessage("§cYou need to be an operator (op) to use this command.");
             return true;
         }
 

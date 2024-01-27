@@ -1,5 +1,6 @@
 package me.champion.manhuntplugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -141,6 +142,7 @@ public class MhCreate implements CommandExecutor {
         }
     }
 
+    // Method to remove the glass sphere created by createGlassSphere
     public void removeGlassSphere(Player player) {
         int removeRadius = 35; // Radius for removal
         World world = player.getWorld();
@@ -166,9 +168,14 @@ public class MhCreate implements CommandExecutor {
         }
     }
 
-    // Method to set the spawn location
+    // Method to set the spawn location and log it to the console
     public static void setSpawnLocation(Location location) {
         spawnLocation = location;
+        World world = location.getWorld();
+        if (world != null) {
+            world.setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            Bukkit.getLogger().info("Spawn location set to: X=" + location.getBlockX() + ", Y=" + location.getBlockY() + ", Z=" + location.getBlockZ());
+        }
     }
 
     // Method to get the spawn location
