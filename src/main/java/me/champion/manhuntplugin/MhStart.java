@@ -96,6 +96,7 @@ public class MhStart implements CommandExecutor {
         gameStarted = true;
         teamManager.pauseZombies();
         startInitialCountdown();
+        giveCompassesToZombies();
         return true;
     }
 
