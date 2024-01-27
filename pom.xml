@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>me.champion</groupId>
-  <artifactId>ManhuntPlugin</artifactId>
+  <artifactId>Manhuntplugin</artifactId>
   <version>1.5.33-SNAPSHOT</version>
   <packaging>jar</packaging>
 
