@@ -295,7 +295,9 @@ public class TeamManager implements Listener {
     public void pauseGame(Player pausingPlayer) {
         if (!isGamePaused()) {
             setGamePaused(true);
-
+            // Execute /tick freeze command
+            System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
 
@@ -323,7 +325,7 @@ public class TeamManager implements Listener {
 
                 //Start reapplying potion effects
                 startPotionEffectLoop();
-                // Execute /tick freeze command
+
 
                 if (player.getVehicle() instanceof Vehicle) {
                     Vehicle boat = (Vehicle) player.getVehicle();
@@ -332,8 +334,6 @@ public class TeamManager implements Listener {
                     player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and will be remounted when the game resumes.");
                 }
             }
-            System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
         }
     }
 
