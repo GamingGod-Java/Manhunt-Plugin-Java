@@ -99,7 +99,7 @@ public class WinCondition implements Listener {
 
     }
 
-    private void spawnFirework(Player player, Color color) {
+    private void spawnFirework(Player player, Color color) { //SPAWN FIREWORK
         Firework firework = player.getWorld().spawn(player.getLocation(), Firework.class);
         FireworkMeta fireworkMeta = firework.getFireworkMeta();
 
