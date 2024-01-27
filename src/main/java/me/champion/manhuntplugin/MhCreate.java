@@ -63,7 +63,8 @@ public class MhCreate implements CommandExecutor {
         teamManager.registerPlatform("Runners", bluePlatformLocation);
         teamManager.registerPlatform("Zombies", redPlatformLocation);
 
-        player.sendMessage("Runners and Zombies platforms spawned around you! Type /mhstart to start the countdown.");
+        player.sendMessage("§bRunner§r and §cZombie§r platforms spawned around you! Type /MhStart to start the countdown.");
+
 
         return true;
     }
@@ -91,29 +92,22 @@ public class MhCreate implements CommandExecutor {
         return centerLocation.clone().add(0, 1, 0);
     }
 
+
+
     public void createGlassSphere(Player player) {
         int createRadius = 15; // Radius for creation
         int sphereHeight = -2; // Height below the player
         World world = player.getWorld();
         Location center = player.getLocation().add(0, sphereHeight, 0);
 
-        Set<Material> flowers = new HashSet<>(Arrays.asList(
-                Material.DANDELION, // Dandelion
-                Material.POPPY, // Poppy
-                Material.BLUE_ORCHID, // Blue Orchid
-                Material.ALLIUM, // Allium
-                Material.AZURE_BLUET, // Azure Bluet
-                Material.RED_TULIP, // Red Tulip
-                Material.ORANGE_TULIP, // Orange Tulip
-                Material.WHITE_TULIP, // White Tulip
-                Material.PINK_TULIP, // Pink Tulip
-                Material.OXEYE_DAISY, // Oxeye Daisy
-                Material.CORNFLOWER, // Cornflower
-                Material.LILY_OF_THE_VALLEY, // Lily of the Valley
-                Material.SUNFLOWER, // Sunflower
-                Material.LILAC, // Lilac
-                Material.ROSE_BUSH, // Rose Bush
-                Material.PEONY // Peony
+        Set<Material> replaceableBlocks = new HashSet<>(Arrays.asList(
+                Material.DANDELION, Material.POPPY, Material.BLUE_ORCHID, Material.ALLIUM,
+                Material.AZURE_BLUET, Material.RED_TULIP, Material.ORANGE_TULIP, Material.WHITE_TULIP,
+                Material.PINK_TULIP, Material.OXEYE_DAISY, Material.CORNFLOWER, Material.LILY_OF_THE_VALLEY,
+                Material.SUNFLOWER, Material.LILAC, Material.ROSE_BUSH, Material.PEONY,
+                Material.TALL_GRASS, Material.SHORT_GRASS, Material.FERN, Material.LARGE_FERN,
+                Material.VINE, Material.SCUTE, Material.SNOW, Material.SUGAR_CANE
+                // Add other non-solid blocks here as needed
         ));
 
         for (int x = -createRadius; x <= createRadius; x++) {
@@ -125,26 +119,19 @@ public class MhCreate implements CommandExecutor {
                         Block block = world.getBlockAt(blockLocation);
                         Material blockType = block.getType();
 
-                        if (blockType == Material.AIR ||
-                                flowers.contains(blockType) || // Treat all flowers as air
-                                blockType == Material.TALL_GRASS ||
-                                blockType == Material.SHORT_GRASS ||
-                                blockType == Material.FERN ||
-                                blockType == Material.LARGE_FERN ||
-                                blockType == Material.VINE ||
-                                blockType == Material.SCUTE ||
-                                blockType == Material.SNOW) { // Turn snow layers into regular glass
-                            blockLocation.getBlock().setType(Material.GLASS, false);
-                        } else if ( // Water based blocks
-                                blockType == Material.WATER ||
-                                        blockType == Material.TALL_SEAGRASS ||
-                                        blockType == Material.SEAGRASS ||
-                                        blockType == Material.KELP ||
-                                        blockType == Material.KELP_PLANT
-                        ) {
-                            blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
-                        } else if (blockType == Material.LAVA) {
+                        // Replace lava with red stained glass
+                        if (blockType == Material.LAVA) {
                             blockLocation.getBlock().setType(Material.RED_STAINED_GLASS, false);
+                        }
+                        // Replace water and water-related blocks with blue stained glass
+                        else if (blockType == Material.WATER || blockType == Material.SEAGRASS ||
+                                blockType == Material.TALL_SEAGRASS || blockType == Material.KELP ||
+                                blockType == Material.KELP_PLANT) {
+                            blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
+                        }
+                        // Replace air and other replaceable non-solid blocks with regular glass
+                        else if (blockType == Material.AIR || replaceableBlocks.contains(blockType)) {
+                            blockLocation.getBlock().setType(Material.GLASS, false);
                         }
                     }
                 }

@@ -21,4 +21,5 @@ me\champion\manhuntplugin\MhReady$1.class
 me\champion\manhuntplugin\MhStart$2.class
 me\champion\manhuntplugin\MhReady.class
 me\champion\manhuntplugin\MhCompass.class
+me\champion\manhuntplugin\BlockBreakListener.class
 me\champion\manhuntplugin\MhRestart.class
