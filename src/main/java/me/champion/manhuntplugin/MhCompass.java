@@ -61,24 +61,13 @@ public class MhCompass implements CommandExecutor, Listener {
     public void giveRunnerCompass(Player player) {
         System.out.println("Gave " + player.getName() + " compass");
         ItemStack compass = new ItemStack(Material.COMPASS);
-
-        // Add a dummy enchantment
         compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-
-        // Retrieve and modify the item meta for the compass
-        ItemMeta meta = compass.getItemMeta();
-        if (meta != null) {
-            // Hide the enchantment information
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-            // Set the display name of the compass
-            meta.setDisplayName("§cTrack Runners");
-
-            // Apply the modified meta back to the compass
-            compass.setItemMeta(meta);
+        ItemMeta compassMeta = compass.getItemMeta();
+        if (compassMeta != null) {
+            compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            compassMeta.setDisplayName("§cTrack Runners");
+            compass.setItemMeta(compassMeta);
         }
-
-        // Give the compass to the player
         player.getInventory().addItem(compass);
     }
 
