@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -31,6 +29,7 @@ import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.logging.Level;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -55,8 +54,8 @@ public class TeamManager implements Listener {
 
 
 
-    private File statisticsFile;
-    private FileConfiguration statisticsConfig;
+    private final File statisticsFile;
+    private final FileConfiguration statisticsConfig;
 
 
 
@@ -325,6 +324,7 @@ public class TeamManager implements Listener {
                 //Start reapplying potion effects
                 startPotionEffectLoop();
                 // Execute /tick freeze command
+                System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
                 Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
                 if (player.getVehicle() instanceof Vehicle) {
                     Vehicle boat = (Vehicle) player.getVehicle();
@@ -434,8 +434,6 @@ public class TeamManager implements Listener {
             // Broadcast message or perform other actions when zombies are unpaused
         }
     }
-
-
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -622,7 +620,8 @@ public class TeamManager implements Listener {
             try {
                 playerData.save(playerDataFile);
             } catch (IOException e) {
-                e.printStackTrace();
+                // Using Bukkit's logger for logging the exception
+                plugin.getLogger().log(Level.SEVERE, "Error saving player data for " + player.getName(), e);
             }
         }
     }

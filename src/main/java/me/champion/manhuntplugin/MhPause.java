@@ -1,7 +1,5 @@
 package me.champion.manhuntplugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,8 +8,7 @@ import org.bukkit.entity.Player;
 public class MhPause implements CommandExecutor {
 
     private final TeamManager teamManager;
-    private final Manhunt plugin; // Add a reference to the Manhunt plugin
-    public int continuousLookingTaskId = -1;
+    private final Manhunt plugin; // Reference to the Manhunt plugin
 
     public MhPause(Manhunt plugin, TeamManager teamManager) {
         this.plugin = plugin;
@@ -20,27 +17,23 @@ public class MhPause implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // Check if the sender is a player with OP permissions
         if (sender instanceof Player && sender.isOp()) {
+            Player player = (Player) sender;
+
+            // Toggle the game's pause state
             if (!teamManager.isGamePaused()) {
-                Player player = (Player) sender;
-
-                // Call the pauseGame method in the TeamManager
+                // If the game is not paused, pause it
                 teamManager.pauseGame(player);
-
-
-
-                return true;
+            } else {
+                // If the game is already paused, notify the sender
+                sender.sendMessage("§cGame is already paused.");
             }
-            if (teamManager.isGamePaused()) {
-                sender.sendMessage("Game is already paused");
-                return true;
-            }
+            return true;
         } else {
-            sender.sendMessage("You do not have OP");
+            // Sender does not have OP permissions
+            sender.sendMessage("§cYou do not have OP");
             return true;
         }
-
-
-        return false;
     }
 }
