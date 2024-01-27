@@ -16,9 +16,9 @@ Unfixed:
     mhcreate should set world spawn
     //chatgpts suggested code doenst work help
 
-
-
     Update Zombie join message upon respawn
+
+    Plaers joining after mhcreate will not be put into adventure mode
 Fixed:
     Save zombie debuffs on death
     //Needed to add delay to respawn, onplayerrespawn is called *before* player respawns

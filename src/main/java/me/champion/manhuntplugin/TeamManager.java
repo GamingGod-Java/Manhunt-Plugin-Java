@@ -474,6 +474,7 @@ public class TeamManager implements Listener {
                 }
                 addToTeam(player, "Zombies");
                 pauseGame(player);
+                player.sendMessage("§cYou have joined the Zombies team!");
             } else {
                 String originalDeathMessage = event.getDeathMessage();
                 int firstSpaceIndex = originalDeathMessage.indexOf(" ");
@@ -550,9 +551,6 @@ public class TeamManager implements Listener {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             // Delayed potion effect application
             restoreDebuffEffects(player);
-
-
-
             // ... (rest of your code for giving items)
         }, 1);
     }
