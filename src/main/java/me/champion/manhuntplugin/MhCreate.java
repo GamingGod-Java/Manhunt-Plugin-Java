@@ -14,9 +14,6 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.entity.Player;
 
 public class MhCreate implements CommandExecutor {
 
@@ -36,17 +33,14 @@ public class MhCreate implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         if (!(sender instanceof Player)) {
-
             sender.sendMessage("Only players can use this command!");
             return true;
         }
 
         Player player = (Player) sender;
 
-
         // Check if player has OP
         if (!sender.isOp()) {
-
             player.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
@@ -54,6 +48,7 @@ public class MhCreate implements CommandExecutor {
         // Teleport the player to the exact center of the block they're standing on
         teleportPlayerToCenter(player);
         createGlassSphere(player);
+
         // Generate a 5x5x1 light blue concrete platform north of the player
         Location bluePlatformLocation = generatePlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
                 Material.LIGHT_BLUE_CONCRETE, -4); // North
@@ -70,24 +65,7 @@ public class MhCreate implements CommandExecutor {
 
         player.sendMessage("Runners and Zombies platforms spawned around you! Type /mhstart to start the countdown.");
 
-        setWorldSpawn(player);
-
-        for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
-            onlineplayer.setGameMode(GameMode.ADVENTURE);
-        }
-
         return true;
-
-
-    }
-
-    private void setWorldSpawn(Player player) {
-        Location location = player.getLocation();
-        World world = location.getWorld();
-        world.setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        player.sendMessage("World spawn set to your location.");
-        // Add debug statement
-        System.out.println("World spawn set: " + location);
     }
 
     private void teleportPlayerToCenter(Player player) {
@@ -112,6 +90,7 @@ public class MhCreate implements CommandExecutor {
         // Return the center location of the generated platform
         return centerLocation.clone().add(0, 1, 0);
     }
+
     public void createGlassSphere(Player player) {
         int createRadius = 15; // Radius for creation
         int sphereHeight = -2; // Height below the player
@@ -150,19 +129,18 @@ public class MhCreate implements CommandExecutor {
                                 flowers.contains(blockType) || // Treat all flowers as air
                                 blockType == Material.TALL_GRASS ||
                                 blockType == Material.SHORT_GRASS ||
-
                                 blockType == Material.FERN ||
                                 blockType == Material.LARGE_FERN ||
                                 blockType == Material.VINE ||
                                 blockType == Material.SCUTE ||
                                 blockType == Material.SNOW) { // Turn snow layers into regular glass
                             blockLocation.getBlock().setType(Material.GLASS, false);
-                        } else if ( //Water based blocks
-                                blockType == Material.WATER
-                                        || blockType == Material.TALL_SEAGRASS
-                                        || blockType == Material.SEAGRASS
-                                        || blockType == Material.KELP
-                                        || blockType == Material.KELP_PLANT
+                        } else if ( // Water based blocks
+                                blockType == Material.WATER ||
+                                        blockType == Material.TALL_SEAGRASS ||
+                                        blockType == Material.SEAGRASS ||
+                                        blockType == Material.KELP ||
+                                        blockType == Material.KELP_PLANT
                         ) {
                             blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
                         } else if (blockType == Material.LAVA) {
@@ -173,7 +151,6 @@ public class MhCreate implements CommandExecutor {
             }
         }
     }
-
 
     public void removeGlassSphere(Player player) {
         int removeRadius = 35; // Radius for removal
