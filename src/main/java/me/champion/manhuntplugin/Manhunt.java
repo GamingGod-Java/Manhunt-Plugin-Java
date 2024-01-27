@@ -21,6 +21,8 @@ public final class Manhunt extends JavaPlugin {
     private MhStart mhStart;
     private TeamChat teamChat;
     private MhWheel mhWheel; // Added this line
+
+    private WinCondition winCondition;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -57,6 +59,7 @@ public final class Manhunt extends JavaPlugin {
         mhStart = new MhStart(teamManager);
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here
+        winCondition = new WinCondition(teamManager, mhStart);
 
         setWorldBorder();
 
@@ -81,6 +84,11 @@ public final class Manhunt extends JavaPlugin {
         Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
+        getServer().getPluginManager().registerEvents(mhWheel, this);
+        getServer().getPluginManager().registerEvents(winCondition, this);
+        winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
+
+
     }
 
     @Override

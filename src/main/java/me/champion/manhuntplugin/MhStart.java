@@ -1,6 +1,7 @@
 package me.champion.manhuntplugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -14,7 +15,8 @@ import org.bukkit.scheduler.BukkitTask;
 public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
-    private boolean gameStarted = false;
+
+    public boolean gameStarted = false;
     private BukkitTask countdownTask;
     private BossBar bossBar;
     public boolean timerExpired = false;
@@ -22,6 +24,7 @@ public class MhStart implements CommandExecutor {
     private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
+
         this.teamManager = teamManager;
     }
 
@@ -39,15 +42,23 @@ public class MhStart implements CommandExecutor {
 
         hideBossBar();
         gameStarted = false;
+        timerExpired = false;
         teamManager.unpauseZombies();
     }
 
-    private void hideBossBar() {
+    public void hideBossBar() {
         if (bossBar != null) {
             bossBar.setVisible(false);
             bossBar.removeAll();
+            if (countdownTask != null && !countdownTask.isCancelled()) {
+                countdownTask.cancel();
+                countdownTask = null;
+            }
         }
     }
+
+
+
 
     public void cancelInitialCountdown() {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
@@ -66,6 +77,10 @@ public class MhStart implements CommandExecutor {
         if (gameStarted) {
             sender.sendMessage("§cThe game has already started. Use /mhrestart to restart.");
             return true;
+        }
+
+        for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
+            onlineplayer.setGameMode(GameMode.SURVIVAL);
         }
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
@@ -94,6 +109,7 @@ public class MhStart implements CommandExecutor {
                     teamManager.unpauseZombies();
                     this.cancel();
                     initialCountdownInProgress = false;
+
                     createAndStartBossBar(); // Start the boss bar timer after the initial countdown
                 } else {
                     Bukkit.broadcastMessage("§cZombies §fcan move in " + secondsLeft + " seconds!");
@@ -107,11 +123,11 @@ public class MhStart implements CommandExecutor {
         if (bossBar != null) {
             bossBar.removeAll(); // Reset the boss bar for a new game
         }
-
         bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
         bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
 
         long totalSeconds = 2 * 3600 + 29 * 60 + 50; // 2 hours, 29 minutes, and 50 seconds
+        //long totalSeconds = 5;
         countdownTask = new BukkitRunnable() {
             long secondsLeft = totalSeconds;
 
@@ -119,6 +135,7 @@ public class MhStart implements CommandExecutor {
             public void run() {
                 if (secondsLeft <= 0) {
                     bossBar.setVisible(false);
+                    timerExpired = true;
                     this.cancel();
                     return;
                 }

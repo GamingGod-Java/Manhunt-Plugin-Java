@@ -1,27 +1,45 @@
-Unfixed:
-    Update Zombie join message upon respawn
+Plugin: FastChunkPregenerator
 
+ideas:
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
-    Chat message deletion upon reentering boats?
+    Anti combat log
 
-    /MhCreate doesn't work with kelp_plant and tall_seagrass, I need to fix that but I'm too lazy rn
+    Rewrite in Kotlin (pain)
 
-    /MhRestart doesn't restart win condition but we'll fix that later
+    Cursed manhunt:
+        Lower tickrate
+        Slow pause/unpause
+        Random time to unpause
+
+Unfixed:
+    mhcreate should set world spawn
+    //chatgpts suggested code doenst work help
+
+
+
+    Update Zombie join message upon respawn
+Fixed:
+    Save zombie debuffs on death
+    //Needed to add delay to respawn, onplayerrespawn is called *before* player respawns
 
     When unpausing with /MhUnpause or /MhReady it does /tick unfreeze twice
-
-    Remove speed 2 and add last man standing icon (maybe a beacon)
+    //I believe its fixed? Called in team manager and mhpause/unpause
 
     Inventory GUI returns "Invalid Target Player" in chat, when trying to click on an empty slot in the player list section
+    //Added check for what slot # is being pressed and if the current team is that large
+
+    Make giving items work
+    //It was kinda ur fault, the function calls twice but you dont notice it with potion effects, so ive just added a very short "cooldown" to the functions actions
 
     Colours in chat on Zombie death
-Fixed:
-    Colours in chat on death
-    //Created new chat message to override vanilla message on death
-        // -Thank you
+    //Added colours in chat and fixed chat bug caused by idiot coding
 
-    Remove "The game runs normally" server announcements from pausing and unpausing the game
-        //This is related to the tick freeze/unfreeze command the server executes
-        //ChatGPT: "...which may or may not be feasible depending on the plugin's licensing and your programming skills," throwing shade lol.
-            // - "your programming skills, damn.. thank you ChatGPT..."
+    % sign breaks custom chat
+    //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective, but if theres another character it will explode
+
+    Make waiting players unable to break glass
+    //Set all players to adventure mode on mhcreate then survival on mhstart, is there any reason to implement a more intelligent solution?
+
+    MhRestart doesn't restart win condition but we'll fix that later
+    //Apparently we(I) are dumb and winning on time was always impossible/broken? fixed now

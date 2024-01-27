@@ -14,6 +14,9 @@ import java.util.Set;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 
 public class MhCreate implements CommandExecutor {
 
@@ -66,7 +69,25 @@ public class MhCreate implements CommandExecutor {
         teamManager.registerPlatform("Zombies", redPlatformLocation);
 
         player.sendMessage("Runners and Zombies platforms spawned around you! Type /mhstart to start the countdown.");
+
+        setWorldSpawn(player);
+
+        for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
+            onlineplayer.setGameMode(GameMode.ADVENTURE);
+        }
+
         return true;
+
+
+    }
+
+    private void setWorldSpawn(Player player) {
+        Location location = player.getLocation();
+        World world = location.getWorld();
+        world.setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        player.sendMessage("World spawn set to your location.");
+        // Add debug statement
+        System.out.println("World spawn set: " + location);
     }
 
     private void teleportPlayerToCenter(Player player) {
@@ -141,6 +162,7 @@ public class MhCreate implements CommandExecutor {
                                         || blockType == Material.TALL_SEAGRASS
                                         || blockType == Material.SEAGRASS
                                         || blockType == Material.KELP
+                                        || blockType == Material.KELP_PLANT
                         ) {
                             blockLocation.getBlock().setType(Material.BLUE_STAINED_GLASS, false);
                         } else if (blockType == Material.LAVA) {

@@ -15,6 +15,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class WinCondition implements Listener {
     private final TeamManager teamManager;
@@ -26,6 +27,12 @@ public class WinCondition implements Listener {
         this.mhstart = mhstart;
     }
     public static boolean endEntered = false;
+
+    public void resetConditions() {
+        ZombieWin = false;
+        RunnerWin = false;
+        teamManager.GameOver = false;
+    }
     @EventHandler
     public void onDragonDeath(EnderDragonChangePhaseEvent event) {
         if (mhstart.isGameStarted()) {
@@ -43,8 +50,19 @@ public class WinCondition implements Listener {
             }
         }
     }
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
+
+    public void scheduleGameConditionCheck() {
+        int delay = 0; // Initial delay (in ticks)
+        int period = 20; // Delay between each run (in ticks)
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                checkGameConditions();
+            }
+        }.runTaskTimer(Manhunt.getPlugin(), delay, period);
+    }
+
+    private void checkGameConditions() {
         if (mhstart.isGameStarted()) {
             if (!ZombieWin && !RunnerWin) {
                 if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
@@ -61,20 +79,21 @@ public class WinCondition implements Listener {
             }
         }
         if (!mhstart.isGameStarted()) {
-            ZombieWin = false;
-            RunnerWin = false;
-            teamManager.GameOver = false;
+            resetConditions();
+            //System.out.println("reset conditions");
         }
     }
 
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
+        System.out.println("ENTER!!!!");
         Player player = event.getPlayer();
 
         // Check if the player is a runner and has entered the End portal
         if (teamManager.isOnTeam(player, "Runners") && event.getTo().getWorld().getEnvironment() == World.Environment.THE_END) {
             endEntered = true;  // Set the flag to true
+            mhstart.hideBossBar();
         }
 
 
