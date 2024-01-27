@@ -239,12 +239,12 @@ public class MhWheel implements CommandExecutor, Listener {
         String[] parts = selectedBuffDebuff.split(" ");
 
         String effectName = parts[0];
-        
+
         if (effectName.equalsIgnoreCase("last")) {
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0));
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
-            
+
         }
         if (effectName.equalsIgnoreCase("clear")) {
             //clearEffects(targetPlayer);
@@ -270,10 +270,10 @@ public class MhWheel implements CommandExecutor, Listener {
                 targetPlayer.sendMessage("You've received diamond leggings!");
                 Bukkit.broadcastMessage(targetPlayer.getName()+" received diamonds leggings");
             }  if (parts[1].equalsIgnoreCase("god")) {
-            itemtogive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
-            targetPlayer.sendMessage("You've received a god apple!");
+                itemtogive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
+                targetPlayer.sendMessage("You've received a god apple!");
                 Bukkit.broadcastMessage(targetPlayer.getName()+" received god apple");
-        }
+            }
             if (itemtogive != null) {
                 targetPlayer.getInventory().addItem(itemtogive);
             }
