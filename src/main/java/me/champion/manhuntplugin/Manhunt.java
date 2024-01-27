@@ -88,6 +88,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(winCondition, this);
         winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
         getServer().getPluginManager().registerEvents(new BlockBreakListener(mhStart), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
     }
 
     @Override

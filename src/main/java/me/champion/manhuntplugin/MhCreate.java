@@ -24,6 +24,8 @@ public class MhCreate implements CommandExecutor {
 
     private final List<Location> platformLocations = new ArrayList<>();
 
+    private static Location spawnLocation; // Declare the spawnLocation variable
+
     public MhCreate(Manhunt plugin, TeamManager teamManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;  // Initialize TeamManager instance
@@ -45,6 +47,9 @@ public class MhCreate implements CommandExecutor {
             return true;
         }
 
+        // Store the spawn location where the command is executed
+        setSpawnLocation(player.getLocation());
+
         // Teleport the player to the exact center of the block they're standing on
         teleportPlayerToCenter(player);
         createGlassSphere(player);
@@ -64,7 +69,6 @@ public class MhCreate implements CommandExecutor {
         teamManager.registerPlatform("Zombies", redPlatformLocation);
 
         player.sendMessage("§bRunner§r and §cZombie§r platforms spawned around you! Type /MhStart to start the countdown.");
-
 
         return true;
     }
@@ -91,8 +95,6 @@ public class MhCreate implements CommandExecutor {
         // Return the center location of the generated platform
         return centerLocation.clone().add(0, 1, 0);
     }
-
-
 
     public void createGlassSphere(Player player) {
         int createRadius = 15; // Radius for creation
@@ -162,5 +164,15 @@ public class MhCreate implements CommandExecutor {
                 }
             }
         }
+    }
+
+    // Method to set the spawn location
+    public static void setSpawnLocation(Location location) {
+        spawnLocation = location;
+    }
+
+    // Method to get the spawn location
+    public static Location getSpawnLocation() {
+        return spawnLocation;
     }
 }

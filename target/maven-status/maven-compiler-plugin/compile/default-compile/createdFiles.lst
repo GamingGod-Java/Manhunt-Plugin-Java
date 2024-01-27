@@ -19,6 +19,7 @@ me\champion\manhuntplugin\TeamManager$2.class
 me\champion\manhuntplugin\MhStart.class
 me\champion\manhuntplugin\MhReady$1.class
 me\champion\manhuntplugin\MhStart$2.class
+me\champion\manhuntplugin\PlayerJoinListener.class
 me\champion\manhuntplugin\MhReady.class
 me\champion\manhuntplugin\MhCompass.class
 me\champion\manhuntplugin\BlockBreakListener.class
