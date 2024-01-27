@@ -263,16 +263,16 @@ public class MhWheel implements CommandExecutor, Listener {
             if (parts[1].equalsIgnoreCase("totem")) {
                 itemtogive = new ItemStack(Material.TOTEM_OF_UNDYING, 1);
                 targetPlayer.sendMessage("You've received a totem!");
-                player.sendMessage(player.getName()+" receieved totem");
+                player.sendMessage(targetPlayer.getName()+" receieved totem");
 
             } if (parts[1].equalsIgnoreCase("diamond")) {
                 itemtogive = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
                 targetPlayer.sendMessage("You've received diamond leggings!");
-                player.sendMessage(player.getName()+" receieved diamonds leggings");
+                player.sendMessage(targetPlayer.getName()+" receieved diamonds leggings");
             }  if (parts[1].equalsIgnoreCase("god")) {
             itemtogive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
             targetPlayer.sendMessage("You've received a god apple!");
-            player.sendMessage(player.getName()+" receieved god apple");
+            player.sendMessage(targetPlayer.getName()+" receieved god apple");
         }
             if (itemtogive != null) {
                 targetPlayer.getInventory().addItem(itemtogive);

@@ -9,6 +9,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -64,6 +67,14 @@ public class MhStart implements CommandExecutor {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
             initialCountdownTask.cancel();
             initialCountdownInProgress = false;
+        }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (!player.isOp() && !gameStarted) {
+            player.setGameMode(GameMode.ADVENTURE);
         }
     }
 
