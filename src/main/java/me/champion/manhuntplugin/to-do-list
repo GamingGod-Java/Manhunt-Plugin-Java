@@ -1,4 +1,4 @@
-Plugin: FastChunkPregenerator
+Plugin: Chunky
 
 ideas:
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
@@ -8,25 +8,17 @@ ideas:
     Rewrite in Kotlin (pain)
 
     Cursed manhunt:
-        Lower tickrate
+        Lower tick rate
         Slow pause/unpause
         Random time to unpause
 
 Unfixed:
 
-    execute mhrestart on win
+    Execute mhrestart on win
 
-    Clicking on a GUI slot with nothing in it will produce an error in the console //for some reason I can't replicate this
+    Clicking on a GUI slot with nothing in it will produce an error in the console
+    //for some reason I can't replicate this
 
 Fixed:
-    Colours in chat on Zombie death
-    //Added colours in chat and fixed chat bug caused by idiot coding
-
-    % sign breaks custom chat
-    //Chatgpt suggestion was just replace all instances of % with %%, seems disturbingly effective, but if theres another character it will explode
-
-    Make waiting players unable to break glass
-    //Set all players to adventure mode on mhcreate then survival on mhstart, is there any reason to implement a more intelligent solution?
-
     MhRestart doesn't restart win condition but we'll fix that later
     //Apparently we(I) are dumb and winning on time was always impossible/broken? fixed now

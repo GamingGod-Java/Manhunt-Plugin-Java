@@ -14,7 +14,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 public class MhSettings implements CommandExecutor, Listener {
-    private Inventory gui;
+    private final Inventory gui;
 
     public MhSettings() {
         // Create a 9-slot inventory for GUI
@@ -26,7 +26,7 @@ public class MhSettings implements CommandExecutor, Listener {
         addItem(Material.LEATHER_HELMET, "MhMove", 1);
         addItem(Material.RED_WOOL, "MhPause", 2); // Red Wool for MhPause
         addItem(Material.GREEN_WOOL, "MhUnpause", 3); // Green Wool for MhUnpause
-        addItem(Material.GREEN_BANNER, "MhReady", 4);
+        addItem(Material.LIME_WOOL, "MhReady", 4); // Lime Wool for MhReady
         addItem(Material.COMPASS, "MhCompass", 5);
         addItem(Material.FIREWORK_ROCKET, "MhStart", 6);
         addItem(Material.REPEATER, "MhRestart", 7);
@@ -62,7 +62,10 @@ public class MhSettings implements CommandExecutor, Listener {
 
         if (clickedItem == null || !clickedItem.hasItemMeta()) return;
 
-        String commandLabel = clickedItem.getItemMeta().getDisplayName();
+        ItemMeta itemMeta = clickedItem.getItemMeta();
+        if (itemMeta == null || !itemMeta.hasDisplayName()) return;
+
+        String commandLabel = itemMeta.getDisplayName();
 
         switch (commandLabel) {
             case "MhCreate":

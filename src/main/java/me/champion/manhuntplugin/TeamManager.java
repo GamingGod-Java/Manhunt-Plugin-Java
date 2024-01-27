@@ -337,22 +337,16 @@ public class TeamManager implements Listener {
         }
     }
 
-
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
             setGamePaused(false);
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
-            savedBoats.clear(); // Clear the saved boats map after restoring them
+            // Execute /tick unfreeze
+            System.out.println("Tick unfreezing inside of TeamManager in the pauseGame method");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
-                /*if (unpausingPlayer != null) {
-                    player.sendMessage("Game unpaused by " + unpausingPlayer.getName() + "!");
-                } else {
-                    player.sendMessage("Game unpaused by server!");
-                }*/
 
-                // Invulnerability, potion, air levels, and fire ticks logic...
-                restorePotionEffects(player);
+                // Invulnerability, air levels, and fire ticks logic...
                 restoreOriginalAirLevels();
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
@@ -360,20 +354,14 @@ public class TeamManager implements Listener {
                 // Reset the player's walk speed to the default Minecraft value (0.2)
                 player.setWalkSpeed(0.2f);
 
-
                 // Switch the player's game mode back to Survival
                 player.setGameMode(GameMode.SURVIVAL);
 
-                //Does this fix it?
+                // Does this fix it?
                 player.setInvulnerable(false);
-
-                // Execute /tick unfreeze command
-
             }
-            //Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
-            //Stop reapplying potion effects
-            //
-            // stopPotionEffectLoop();
+            // Stop reapplying potion effects
+            stopPotionEffectLoop();
 
             // Restoring boats and their passengers
             for (BoatData boatData : savedBoats.values()) {

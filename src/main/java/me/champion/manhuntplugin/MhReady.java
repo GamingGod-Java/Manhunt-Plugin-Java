@@ -2,7 +2,6 @@ package me.champion.manhuntplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -56,20 +55,8 @@ public class MhReady implements CommandExecutor, Listener {
                 public void run() {
                     // Check if the game is still paused (prevent race condition)
                     if (teamManager.isGamePaused()) {
-                        // Reset walk speed for all online players
-                        resetWalkSpeedForAllPlayers();
-
-                        // Set the player back to survival mode
-                        player.setGameMode(GameMode.SURVIVAL);
-
-                        player.setWalkSpeed(0.2f); // Reset walk speed to default (0.2)
-                        //Does this fix it?
-                        player.setInvulnerable(false);
-                        // Unpause the game
+                        // Unpause the game using teamManager
                         teamManager.unpauseGame(player);
-
-                        // Execute /tick unfreeze
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
                     }
 
                     // Reset isUnpausing to allow the command again
@@ -110,13 +97,6 @@ public class MhReady implements CommandExecutor, Listener {
         if (event.getMessage().equalsIgnoreCase("/MhReady") && !event.getPlayer().isOp()) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to use this command.");
-        }
-    }
-
-    // Method to reset walk speed for all online players
-    private void resetWalkSpeedForAllPlayers() {
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.setWalkSpeed(0.2f); // Reset walk speed for each player
         }
     }
 }
