@@ -41,3 +41,5 @@ The game also includes a unique mechanic where entering the End portal triggers 
 1. Download the Manhunt.jar file.
 2. Place it in your server's plugins directory.
 3. Restart your server to activate the plugin.
+
+- GamingGod-Java, AndreBinbow
