@@ -21,7 +21,6 @@ public final class Manhunt extends JavaPlugin {
     private MhStart mhStart;
     private TeamChat teamChat;
     private MhWheel mhWheel; // Added this line
-
     private WinCondition winCondition;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -87,7 +86,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(mhWheel, this);
         getServer().getPluginManager().registerEvents(winCondition, this);
         winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(mhStart), this);
+        getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
     }
 
