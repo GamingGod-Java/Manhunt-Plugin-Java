@@ -37,6 +37,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class TeamManager implements Listener {
+    private boolean deathEventHandled = false;
     private final Map<Material, Team> teams = new HashMap<>();
 
     public boolean GameOver = false;
@@ -49,6 +50,8 @@ public class TeamManager implements Listener {
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
     private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
     private final Map<UUID, BoatData> savedBoats = new HashMap<>();
+
+    private boolean wasDeadPlayerRunner = false;
 
     private BukkitTask potionEffectTask;
 
@@ -159,14 +162,15 @@ public class TeamManager implements Listener {
 
     public void restoreDebuffEffects(Player player) {
         UUID playerUUID = player.getUniqueId();
-        System.out.println("restoring debuffs");
+        //System.out.println("restoring debuffs");
         if (playerPotionEffects.containsKey(playerUUID)) {
             // Clear existing potion effects
             player.getActivePotionEffects().clear();
 
             // Restore saved potion effects
+            System.out.println(wasDeadPlayerRunner + " restore debuff");
             for (PotionEffect savedEffect : playerPotionEffects.get(playerUUID).keySet()) {
-                if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW) {
+                if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW && !wasDeadPlayerRunner) {
                     player.addPotionEffect(new PotionEffect(savedEffect.getType(), savedEffect.getDuration(), savedEffect.getAmplifier()));
                     System.out.println("applied "+savedEffect.toString());
                 }
@@ -192,9 +196,6 @@ public class TeamManager implements Listener {
     }
 
     public TeamManager(Plugin plugin) {
-
-
-
         statisticsFile = new File(plugin.getDataFolder(), "statistics.yml");
         statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
 
@@ -226,7 +227,7 @@ public class TeamManager implements Listener {
     }
 
     public void addToTeam(Player player, String team) {
-        System.out.println("adding " + player.getName() + " to " + team);
+        //System.out.println("adding " + player.getName() + " to " + team);
         UUID playerUUID = player.getUniqueId();
         String currentTeam = playerTeams.get(playerUUID);
 
@@ -296,7 +297,7 @@ public class TeamManager implements Listener {
         if (!isGamePaused()) {
             setGamePaused(true);
             // Execute /tick freeze command
-            System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
+            //System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
@@ -340,8 +341,6 @@ public class TeamManager implements Listener {
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
             setGamePaused(false);
-            // Execute /tick unfreeze
-            System.out.println("Tick unfreezing inside of TeamManager in the pauseGame method");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
@@ -425,7 +424,14 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
+        if (deathEventHandled) {
+            return;  // Skip processing if the death event has already been handled
+        }
+        //System.out.println("onPlayerDeath invoked for " + event.getEntity().getName());
+        wasDeadPlayerRunner = false;
         if (!GameOver) {
+            deathEventHandled = true;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
             savePotionEffects(event.getEntity());
             Player player = event.getEntity();
             EntityDamageEvent lastDamageCause = player.getLastDamageCause();
@@ -458,6 +464,8 @@ public class TeamManager implements Listener {
                     event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
                     updatePlayerStatistics(player.getName(), "environment_deaths");
                 }
+                System.out.println("set to true");
+                wasDeadPlayerRunner = true;
                 addToTeam(player, "Zombies");
                 pauseGame(player);
                 player.sendMessage("§cYou have joined the Zombies team!");
@@ -478,6 +486,7 @@ public class TeamManager implements Listener {
                 boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
             }
         }
+        System.out.println(wasDeadPlayerRunner + " restore debuff");
     }
 
     private void updatePlayerStatistics(String player, String statistic) {
@@ -502,14 +511,11 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        //System.out.println("onPlayerDeath invoked for " + event.getPlayer().getName());
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
-
-
-
-
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            System.out.println("Gave " + player.getName() + " compass and tools");
+            //System.out.println("Gave " + player.getName() + " compass and tools");
 
             // Give 1 stone axe
             ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
@@ -536,7 +542,11 @@ public class TeamManager implements Listener {
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             // Delayed potion effect application
-            restoreDebuffEffects(player);
+            if (!wasDeadPlayerRunner) {
+                System.out.println("dead player not runner");
+                restoreDebuffEffects(player);
+                //wasDeadPlayerRunner = true;
+            }
             // ... (rest of your code for giving items)
         }, 1);
     }

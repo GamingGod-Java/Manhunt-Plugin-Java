@@ -75,8 +75,8 @@ public class WinCondition implements Listener {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
                         spawnFirework(player, Color.RED);
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
                     }
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
                 }
             }
         }
