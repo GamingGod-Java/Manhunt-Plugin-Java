@@ -47,6 +47,7 @@ public class WinCondition implements Listener {
                     spawnFirework(player, Color.AQUA);
 
                 }
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
             }
         }
     }
@@ -74,7 +75,7 @@ public class WinCondition implements Listener {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
                         spawnFirework(player, Color.RED);
-
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
                     }
                 }
             }

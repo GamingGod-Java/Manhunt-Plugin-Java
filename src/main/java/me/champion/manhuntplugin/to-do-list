@@ -19,8 +19,6 @@ Unfixed:
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I can't replicate this
 
-
-
 Fixed:
     Make game listener not apply to OPS
     //just check each listener,efficiency is cringe
