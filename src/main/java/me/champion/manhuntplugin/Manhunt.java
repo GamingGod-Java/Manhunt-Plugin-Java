@@ -38,6 +38,7 @@ public final class Manhunt extends JavaPlugin {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
         enableFlightInServerProperties();
+        setDifficultyHardInServerProperties();
 
         try {
             statisticsConfig.save(statisticsFile);
@@ -139,6 +140,28 @@ public final class Manhunt extends JavaPlugin {
             content = content.replaceAll("allow-flight=false", "allow-flight=true");
             Files.write(Paths.get(propFile.toURI()), content.getBytes());
             getLogger().info("Flight enabled. Server will restart shortly.");
+            Bukkit.getScheduler().runTaskLater(this, () ->
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart"), 100L);
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Failed to modify server.properties: " + e.getMessage(), e);
+        }
+    }
+
+    private void setDifficultyHardInServerProperties() {
+        try {
+            File propFile = new File("server.properties");
+            if (!propFile.exists()) {
+                getLogger().warning("server.properties not found!");
+                return;
+            }
+            String content = new String(Files.readAllBytes(Paths.get(propFile.toURI())));
+            if (!content.contains("difficulty=easy")) {
+                getLogger().info("Difficulty property not found.");
+                return;
+            }
+            content = content.replaceAll("difficulty=easy", "difficulty=hard");
+            Files.write(Paths.get(propFile.toURI()), content.getBytes());
+            getLogger().info("Difficulty hard. Server will restart shortly.");
             Bukkit.getScheduler().runTaskLater(this, () ->
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart"), 100L);
         } catch (IOException e) {

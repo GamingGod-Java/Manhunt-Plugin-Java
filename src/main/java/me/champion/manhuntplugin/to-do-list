@@ -32,6 +32,7 @@ Unfixed:
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I can't replicate this
 
+    Statistics counting
 Fixed:
     Execute mhrestart on win
     //Bukkit.dispatch command just straight up runs "/mhrestart"
