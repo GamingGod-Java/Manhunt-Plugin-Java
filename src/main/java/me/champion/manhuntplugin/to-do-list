@@ -14,10 +14,12 @@ ideas:
 
 Unfixed:
 
-    Execute mhrestart on win
+    Execute MhRestart on win
 
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I can't replicate this
+
+    Make MhRestart clear potion effects and other things
 
 Fixed:
     MhRestart doesn't restart win condition but we'll fix that later
