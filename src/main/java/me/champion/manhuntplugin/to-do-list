@@ -13,6 +13,22 @@ ideas:
         Random time to unpause
 
 Unfixed:
+    Need saturation in "pregame"
+
+    Set day on start
+
+    Set hard
+
+    Set survival on unpause
+
+    ban beds
+
+    nothing on relog
+
+    autosave causes lag
+
+    stronghold???
+
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I can't replicate this
 

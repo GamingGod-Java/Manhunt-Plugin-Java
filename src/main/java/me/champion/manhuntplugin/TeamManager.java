@@ -332,7 +332,7 @@ public class TeamManager implements Listener {
                     Vehicle boat = (Vehicle) player.getVehicle();
                     savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
                     boat.eject(); // Eject all passengers
-                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and will be remounted when the game resumes.");
+                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
                 }
             }
         }
@@ -374,7 +374,7 @@ public class TeamManager implements Listener {
                         for (UUID passengerId : passengers) {
                             Player passenger = Bukkit.getPlayer(passengerId);
                             if (passenger != null && passenger.isOnline()) {
-                                boat.addPassenger(passenger);
+                                //boat.addPassenger(passenger);
                             }
                         }
                     }
