@@ -19,35 +19,37 @@ public class GameControlListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (!mhStart.isGameStarted()) {
+        if (!mhStart.isGameStarted() && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (!mhStart.isGameStarted()) {
+        if (!mhStart.isGameStarted() && !event.getPlayer().isOp()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onEntityPickupItem(EntityPickupItemEvent event) {
-        if (!mhStart.isGameStarted() && event.getEntity() instanceof Player) {
+        if (!mhStart.isGameStarted() && event.getEntity() instanceof Player && !event.getEntity().isOp()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!mhStart.isGameStarted()) {
+        Player player = (Player) event.getWhoClicked();
+        if (!mhStart.isGameStarted() && !player.isOp()) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (!mhStart.isGameStarted() && event.getDamager() instanceof Player && event.getEntity() instanceof Player) {
+        //Removed check for who is attacking as dont want players to die of fall damage before
+        if (!mhStart.isGameStarted() && event.getEntity() instanceof Player) {
             event.setCancelled(true);
         }
     }
