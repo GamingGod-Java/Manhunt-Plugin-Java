@@ -101,11 +101,15 @@ public class MhStart implements CommandExecutor {
             onlineplayer.setFoodLevel(20);
 
             onlineplayer.setSaturation(20);
+
+
         }
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @a");
+
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
 
-        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
+        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this);
         mhCreate.removeGlassSphere((Player) sender);
 
         //resetBossBar();

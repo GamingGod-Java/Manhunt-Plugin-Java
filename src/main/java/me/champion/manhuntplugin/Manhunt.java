@@ -67,7 +67,7 @@ public final class Manhunt extends JavaPlugin {
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
         // Register commands
-        registerCommand("MhCreate", new MhCreate(this, teamManager));
+        registerCommand("MhCreate", new MhCreate(this, teamManager, mhStart));
         registerCommand("MhMove", new TeamMove(teamManager));
         registerCommand("MhPause", new MhPause(this, teamManager));
         registerCommand("MhUnpause", new MhUnpause(this, teamManager));

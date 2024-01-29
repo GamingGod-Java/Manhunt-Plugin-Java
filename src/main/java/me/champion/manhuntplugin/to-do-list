@@ -13,15 +13,12 @@ ideas:
         Random time to unpause
 
 Unfixed:
-    Need saturation in "pregame"
-
     ban beds
 
     nothing on relog
 
     autosave causes lag
 
-    stronghold???
 
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I(J) can't replicate this
@@ -29,6 +26,12 @@ Unfixed:
 
     Statistics counting
 Fixed:
+    Need saturation in "pregame"
+    //just give players saturation in lobby, clear effect on game start, give player saturation if game not started
+
+    stronghold???
+    //See EyeofEnderListener
+
     Set day on start
     // /time set 0 on start
 

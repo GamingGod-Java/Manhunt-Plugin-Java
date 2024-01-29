@@ -41,6 +41,7 @@ public class EyeofEnderListener implements Listener {
                 // Handle Eye of Ender usage
                 if (handleEyeOfEnderUsage(event.getPlayer())) {
                     event.getPlayer().sendMessage("Stronghold inside world border!");
+                    event.setCancelled(true);
                 } if (!handleEyeOfEnderUsage(event.getPlayer())) {
                     event.getPlayer().sendMessage("Something has gone terribly wrong, please contact a server admin");
                     event.setCancelled(true);
