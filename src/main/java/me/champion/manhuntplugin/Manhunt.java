@@ -79,14 +79,16 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhWheel", mhWheel);
         registerCommand("MhSettings", mhSettings);
         // Register event listeners
-        Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
-        Bukkit.getServer().getPluginManager().registerEvents(teamManager, this);
-        Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
+
+        getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
+        getServer().getPluginManager().registerEvents(teamManager, this);
+        getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
+        getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
         getServer().getPluginManager().registerEvents(mhWheel, this);
         getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(new EyeofEnderListener(teamManager, this), this);
         winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);

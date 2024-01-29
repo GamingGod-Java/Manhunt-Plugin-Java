@@ -1,33 +1,33 @@
 package me.champion.manhuntplugin;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.event.block.BlockExplodeEvent;
 
 import java.util.logging.Level;
 import java.io.File;
@@ -293,6 +293,17 @@ public class TeamManager implements Listener {
         return playerTeam != null && playerTeam.equalsIgnoreCase(teamName);
     }
 
+    @EventHandler
+    public void onExplode(BlockExplodeEvent event) {
+        if (event.getBlock() != null && event.getBlock().getType() == Material.WHITE_BED) {
+            // Check if the player is in the Nether or the End
+            if (event.getBlock().getWorld().getEnvironment() == World.Environment.NETHER
+                    || event.getBlock().getWorld().getEnvironment() == World.Environment.THE_END) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     public void pauseGame(Player pausingPlayer) {
         if (!isGamePaused()) {
             setGamePaused(true);
@@ -303,7 +314,7 @@ public class TeamManager implements Listener {
                 frozenPlayers.add(player.getUniqueId());
 
                 // Set the player to Adventure mode
-                player.setGameMode(GameMode.ADVENTURE);
+                //player.setGameMode(GameMode.ADVENTURE);
 
                 // Set the walk speed to 0 - this makes the player unable to walk
                 player.setWalkSpeed(0.0f);

@@ -15,12 +15,6 @@ ideas:
 Unfixed:
     Need saturation in "pregame"
 
-    Set day on start
-
-    Set hard
-
-    Set survival on unpause
-
     ban beds
 
     nothing on relog
@@ -30,10 +24,20 @@ Unfixed:
     stronghold???
 
     Clicking on a GUI slot with nothing in it will produce an error in the console
-    //for some reason I can't replicate this
+    //for some reason I(J) can't replicate this
+    //I(A) also cannot replicate it
 
     Statistics counting
 Fixed:
+    Set day on start
+    // /time set 0 on start
+
+    Set hard
+    //edited similarly to enabling flight
+
+    Set survival on unpause
+    //Stopped setting to adventure
+
     Execute mhrestart on win
     //Bukkit.dispatch command just straight up runs "/mhrestart"
 

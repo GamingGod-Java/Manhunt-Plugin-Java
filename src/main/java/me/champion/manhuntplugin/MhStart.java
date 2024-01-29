@@ -76,6 +76,9 @@ public class MhStart implements CommandExecutor {
         if (!player.isOp() && !gameStarted) {
             player.setGameMode(GameMode.ADVENTURE);
         }
+        if (gameStarted) {
+            bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+        }
     }
 
     @Override
@@ -99,6 +102,8 @@ public class MhStart implements CommandExecutor {
 
             onlineplayer.setSaturation(20);
         }
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
         mhCreate.removeGlassSphere((Player) sender);
