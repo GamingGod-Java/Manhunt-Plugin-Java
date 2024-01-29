@@ -18,13 +18,15 @@ Unfixed:
     nothing on relog
 
     autosave causes lag
+    //Server config issue, make autosaves much less frequent/disable them (if the server crashes we cope?)
 
+    Statistics counting
 
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I(J) can't replicate this
     //I(A) also cannot replicate it
 
-    Statistics counting
+
 Fixed:
     Need saturation in "pregame"
     //just give players saturation in lobby, clear effect on game start, give player saturation if game not started

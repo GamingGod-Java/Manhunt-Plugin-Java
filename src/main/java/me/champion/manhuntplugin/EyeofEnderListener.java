@@ -109,6 +109,9 @@ public class EyeofEnderListener implements Listener {
             }
             //this code is a crime against for loops but idk how to programatically do a square
             Location Strongholdsearch = Bukkit.getWorld("world").locateNearestStructure(new Location(Bukkit.getWorld("world"), X, 0, Z), StructureType.STRONGHOLD, 2000, false).getLocation();
+            if (Strongholdsearch.getBlockX() > 3000 || Strongholdsearch.getBlockX() < -3000 || Strongholdsearch.getBlockZ() > 3000 || Strongholdsearch.getBlockZ() < -3000) {
+                continue;
+            }
             if (!closestStrongholds.contains(Strongholdsearch)) {
                 closestStrongholds.add(Strongholdsearch);
                 System.out.println(Strongholdsearch);

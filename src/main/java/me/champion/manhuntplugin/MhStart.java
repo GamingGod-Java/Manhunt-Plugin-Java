@@ -77,7 +77,15 @@ public class MhStart implements CommandExecutor {
             player.setGameMode(GameMode.ADVENTURE);
         }
         if (gameStarted) {
-            bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+            System.out.println("cheese");
+            Bukkit.getScheduler().runTaskLater(Manhunt.getPlugin(), () -> {
+                // Code to execute after the delay
+
+                // For example, send a welcome message to the player after 1 second
+                bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+                bossBar.addPlayer(player);
+
+            }, 20L); // 20 ticks = 1 second (1 tick = 0.05 seconds)
         }
     }
 

@@ -66,7 +66,7 @@ public class WinCondition implements Listener {
     private void checkGameConditions() {
         if (mhstart.isGameStarted()) {
             if (!ZombieWin && !RunnerWin) {
-                if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
+                /*if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
                     System.out.println(teamManager.playerTeams);
                     System.out.println("Zombie Win");
                     teamManager.GameOver = true;
@@ -77,7 +77,7 @@ public class WinCondition implements Listener {
                         spawnFirework(player, Color.RED);
                     }
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
-                }
+                }*/
             }
         }
         if (!mhstart.isGameStarted()) {
