@@ -13,15 +13,13 @@ ideas:
         Random time to unpause
 
 Unfixed:
-
-
-
-    nothing on relog
+    no boss bar on relog
 
     autosave causes lag
     //Server config issue, make autosaves much less frequent/disable them (if the server crashes we cope?)
 
-    Statistics counting
+    I think we should make the statistics counter more lenient, rather than needing a player to deal the final blow, just needing them to attack the player within a few seconds of their death for a kill and to not count friendly fire kills
+    However, I(A) have no good way of testing this on localhost so we can either figure it out together at some point or you can do it with ur alt? idk
 
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I(J) can't replicate this
