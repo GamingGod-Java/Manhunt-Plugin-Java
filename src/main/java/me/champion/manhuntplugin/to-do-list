@@ -13,7 +13,8 @@ ideas:
         Random time to unpause
 
 Unfixed:
-    ban beds
+
+
 
     nothing on relog
 
@@ -25,9 +26,10 @@ Unfixed:
     Clicking on a GUI slot with nothing in it will produce an error in the console
     //for some reason I(J) can't replicate this
     //I(A) also cannot replicate it
-
-
 Fixed:
+    ban beds
+    //DisableBedBomb.java (i love making new classes for organisation)
+
     Need saturation in "pregame"
     //just give players saturation in lobby, clear effect on game start, give player saturation if game not started
 

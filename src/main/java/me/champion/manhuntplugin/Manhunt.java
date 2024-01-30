@@ -93,6 +93,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
+        getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
     }
 
     @Override
