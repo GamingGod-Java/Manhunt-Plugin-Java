@@ -339,48 +339,44 @@ public class TeamManager implements Listener {
 
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
+            // 1. Unpause the game
             setGamePaused(false);
-            // Execute /tick unfreeze
-            System.out.println("Tick unfreezing inside of TeamManager in the pauseGame method");
+
+            // 2. Unfreeze the game
+            System.out.println("Unfreezing game ticks");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+
+            // 3. Update player states
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
-
-                // Invulnerability, air levels, and fire ticks logic...
                 restoreOriginalAirLevels();
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
-
-                // Reset the player's walk speed to the default Minecraft value (0.2)
                 player.setWalkSpeed(0.2f);
 
-                // Switch the player's game mode back to Survival
-                player.setGameMode(GameMode.SURVIVAL);
-
-                // Does this fix it?
-                player.setInvulnerable(false);
+                // Reapply debuff effects (if any)
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    restoreDebuffEffects(player);
+                }, 1);
             }
-            // Stop reapplying potion effects
+
+            // 4. Stop reapplying potion effects
             stopPotionEffectLoop();
 
-            // Restoring boats and their passengers
-            for (BoatData boatData : savedBoats.values()) {
+            // 5. Remount players to their boats
+            for (Map.Entry<UUID, BoatData> entry : savedBoats.entrySet()) {
+                BoatData boatData = entry.getValue();
                 Vehicle boat = boatData.getBoat();
-                List<UUID> passengers = boatData.getPassengers();
-
-                if (!passengers.isEmpty()) {
-                    Player firstPassenger = Bukkit.getPlayer(passengers.get(0));
-                    if (firstPassenger != null) {
-                        boat.teleport(firstPassenger.getLocation());
-                        for (UUID passengerId : passengers) {
-                            Player passenger = Bukkit.getPlayer(passengerId);
-                            if (passenger != null && passenger.isOnline()) {
-                                boat.addPassenger(passenger);
-                            }
-                        }
+                for (UUID passengerId : boatData.getPassengers()) {
+                    Player passenger = Bukkit.getPlayer(passengerId);
+                    if (passenger != null && boat != null) {
+                        boat.addPassenger(passenger);
                     }
                 }
             }
+
+            // 6. Clear saved boat data
+            savedBoats.clear();
         }
     }
 
