@@ -1,9 +1,6 @@
 package me.champion.manhuntplugin;
 
-import org.bukkit.*;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,13 +8,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.generator.structure.StructureType;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.block.BlockState;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Structure;
 import org.bukkit.entity.EnderSignal;
 
 import java.util.ArrayList;
