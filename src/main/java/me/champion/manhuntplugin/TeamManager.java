@@ -1,33 +1,33 @@
 package me.champion.manhuntplugin;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.event.block.BlockExplodeEvent;
 
 import java.util.logging.Level;
 import java.io.File;
@@ -37,6 +37,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class TeamManager implements Listener {
+    private boolean deathEventHandled = false;
     private final Map<Material, Team> teams = new HashMap<>();
 
     public boolean GameOver = false;
@@ -49,6 +50,8 @@ public class TeamManager implements Listener {
     private final Map<UUID, Integer> originalAirLevels = new HashMap<>();
     private final Map<UUID, Integer> savedFireTicks = new HashMap<>();
     private final Map<UUID, BoatData> savedBoats = new HashMap<>();
+
+    private boolean wasDeadPlayerRunner = false;
 
     private BukkitTask potionEffectTask;
 
@@ -159,14 +162,15 @@ public class TeamManager implements Listener {
 
     public void restoreDebuffEffects(Player player) {
         UUID playerUUID = player.getUniqueId();
-        System.out.println("restoring debuffs");
+        //System.out.println("restoring debuffs");
         if (playerPotionEffects.containsKey(playerUUID)) {
             // Clear existing potion effects
             player.getActivePotionEffects().clear();
 
             // Restore saved potion effects
+            System.out.println(wasDeadPlayerRunner + " restore debuff");
             for (PotionEffect savedEffect : playerPotionEffects.get(playerUUID).keySet()) {
-                if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW) {
+                if (savedEffect.getType() == PotionEffectType.WEAKNESS || savedEffect.getType() == PotionEffectType.SLOW && !wasDeadPlayerRunner) {
                     player.addPotionEffect(new PotionEffect(savedEffect.getType(), savedEffect.getDuration(), savedEffect.getAmplifier()));
                     System.out.println("applied "+savedEffect.toString());
                 }
@@ -192,9 +196,6 @@ public class TeamManager implements Listener {
     }
 
     public TeamManager(Plugin plugin) {
-
-
-
         statisticsFile = new File(plugin.getDataFolder(), "statistics.yml");
         statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
 
@@ -226,7 +227,7 @@ public class TeamManager implements Listener {
     }
 
     public void addToTeam(Player player, String team) {
-        System.out.println("adding " + player.getName() + " to " + team);
+        //System.out.println("adding " + player.getName() + " to " + team);
         UUID playerUUID = player.getUniqueId();
         String currentTeam = playerTeams.get(playerUUID);
 
@@ -292,17 +293,28 @@ public class TeamManager implements Listener {
         return playerTeam != null && playerTeam.equalsIgnoreCase(teamName);
     }
 
+    @EventHandler
+    public void onExplode(BlockExplodeEvent event) {
+        if (event.getBlock() != null && event.getBlock().getType() == Material.WHITE_BED) {
+            // Check if the player is in the Nether or the End
+            if (event.getBlock().getWorld().getEnvironment() == World.Environment.NETHER
+                    || event.getBlock().getWorld().getEnvironment() == World.Environment.THE_END) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     public void pauseGame(Player pausingPlayer) {
         if (!isGamePaused()) {
             setGamePaused(true);
             // Execute /tick freeze command
-            System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
+            //System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
 
                 // Set the player to Adventure mode
-                player.setGameMode(GameMode.ADVENTURE);
+                //player.setGameMode(GameMode.ADVENTURE);
 
                 // Set the walk speed to 0 - this makes the player unable to walk
                 player.setWalkSpeed(0.0f);
@@ -331,7 +343,7 @@ public class TeamManager implements Listener {
                     Vehicle boat = (Vehicle) player.getVehicle();
                     savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
                     boat.eject(); // Eject all passengers
-                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and will be remounted when the game resumes.");
+                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
                 }
             }
         }
@@ -339,44 +351,46 @@ public class TeamManager implements Listener {
 
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
-            // 1. Unpause the game
             setGamePaused(false);
-
-            // 2. Unfreeze the game
-            System.out.println("Unfreezing game ticks");
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
-
-            // 3. Update player states
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
+
+                // Invulnerability, air levels, and fire ticks logic...
                 restoreOriginalAirLevels();
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
+
+                // Reset the player's walk speed to the default Minecraft value (0.2)
                 player.setWalkSpeed(0.2f);
 
-                // Reapply debuff effects (if any)
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                    restoreDebuffEffects(player);
-                }, 1);
-            }
+                // Switch the player's game mode back to Survival
+                player.setGameMode(GameMode.SURVIVAL);
 
-            // 4. Stop reapplying potion effects
+                // Does this fix it?
+                player.setInvulnerable(false);
+            }
+            // Stop reapplying potion effects
             stopPotionEffectLoop();
 
-            // 5. Remount players to their boats
-            for (Map.Entry<UUID, BoatData> entry : savedBoats.entrySet()) {
-                BoatData boatData = entry.getValue();
+            // Restoring boats and their passengers
+            for (BoatData boatData : savedBoats.values()) {
                 Vehicle boat = boatData.getBoat();
-                for (UUID passengerId : boatData.getPassengers()) {
-                    Player passenger = Bukkit.getPlayer(passengerId);
-                    if (passenger != null && boat != null) {
-                        boat.addPassenger(passenger);
+                List<UUID> passengers = boatData.getPassengers();
+
+                if (!passengers.isEmpty()) {
+                    Player firstPassenger = Bukkit.getPlayer(passengers.get(0));
+                    if (firstPassenger != null) {
+                        boat.teleport(firstPassenger.getLocation());
+                        for (UUID passengerId : passengers) {
+                            Player passenger = Bukkit.getPlayer(passengerId);
+                            if (passenger != null && passenger.isOnline()) {
+                                //boat.addPassenger(passenger);
+                            }
+                        }
                     }
                 }
             }
-
-            // 6. Clear saved boat data
-            savedBoats.clear();
         }
     }
 
@@ -415,13 +429,20 @@ public class TeamManager implements Listener {
                 frozenPlayers.clear();
             }
 
-            // Broadcast message or perform other actions when zombies are unpaused
+            // Broadcast message or perform other actions when Zombies are unpaused
         }
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
+        if (deathEventHandled) {
+            return;  // Skip processing if the death event has already been handled
+        }
+        //System.out.println("onPlayerDeath invoked for " + event.getEntity().getName());
+        wasDeadPlayerRunner = false;
         if (!GameOver) {
+            deathEventHandled = true;
+            Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
             savePotionEffects(event.getEntity());
             Player player = event.getEntity();
             EntityDamageEvent lastDamageCause = player.getLastDamageCause();
@@ -454,6 +475,8 @@ public class TeamManager implements Listener {
                     event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
                     updatePlayerStatistics(player.getName(), "environment_deaths");
                 }
+                System.out.println("set to true");
+                wasDeadPlayerRunner = true;
                 addToTeam(player, "Zombies");
                 pauseGame(player);
                 player.sendMessage("§cYou have joined the Zombies team!");
@@ -474,6 +497,7 @@ public class TeamManager implements Listener {
                 boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
             }
         }
+        System.out.println(wasDeadPlayerRunner + " restore debuff");
     }
 
     private void updatePlayerStatistics(String player, String statistic) {
@@ -500,42 +524,46 @@ public class TeamManager implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
-
-
-
-
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            System.out.println("Gave " + player.getName() + " compass and tools");
+            // Check if the player already has the items in their inventory
+            if (!player.getInventory().contains(Material.STONE_AXE) ||
+                    !player.getInventory().contains(Material.STONE_PICKAXE) ||
+                    !player.getInventory().contains(Material.BREAD) ||
+                    !player.getInventory().contains(Material.COMPASS)) {
 
-            // Give 1 stone axe
-            ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
-            player.getInventory().addItem(stoneAxe);
+                // Give 1 stone axe
+                ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
+                player.getInventory().addItem(stoneAxe);
 
-            // Give 1 stone pickaxe
-            ItemStack stonePickaxe = new ItemStack(Material.STONE_PICKAXE, 1);
-            player.getInventory().addItem(stonePickaxe);
+                // Give 1 stone pickaxe
+                ItemStack stonePickaxe = new ItemStack(Material.STONE_PICKAXE, 1);
+                player.getInventory().addItem(stonePickaxe);
 
-            // Give 20 bread
-            ItemStack bread = new ItemStack(Material.BREAD, 20);
-            player.getInventory().addItem(bread);
+                // Give 20 bread
+                ItemStack bread = new ItemStack(Material.BREAD, 20);
+                player.getInventory().addItem(bread);
 
-            // Create and give the compass
-            ItemStack compass = new ItemStack(Material.COMPASS);
-            compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-            ItemMeta compassMeta = compass.getItemMeta();
-            if (compassMeta != null) {
-                compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                compassMeta.setDisplayName("§cTrack Runners");
-                compass.setItemMeta(compassMeta);
+                // Create and give the compass
+                ItemStack compass = new ItemStack(Material.COMPASS);
+                compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+                ItemMeta compassMeta = compass.getItemMeta();
+                if (compassMeta != null) {
+                    compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    compassMeta.setDisplayName("§cTrack Runners");
+                    compass.setItemMeta(compassMeta);
+                }
+                player.getInventory().addItem(compass);
             }
-            player.getInventory().addItem(compass);
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             // Delayed potion effect application
-            restoreDebuffEffects(player);
-            // ... (rest of your code for giving items)
+            if (!wasDeadPlayerRunner) {
+                System.out.println("dead player not runner");
+                restoreDebuffEffects(player);
+            }
         }, 1);
     }
+
     public Player findNearestRunner(Location zombieLocation) {
         Player nearestRunner = null;
         double minDistance = Double.MAX_VALUE;

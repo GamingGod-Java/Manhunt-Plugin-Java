@@ -30,6 +30,9 @@ public class MhStart implements CommandExecutor {
 
         this.teamManager = teamManager;
     }
+    public BossBar getBossBar() {
+        return this.bossBar;
+    }
 
     public boolean isGameStarted() {
         return gameStarted;
@@ -76,6 +79,17 @@ public class MhStart implements CommandExecutor {
         if (!player.isOp() && !gameStarted) {
             player.setGameMode(GameMode.ADVENTURE);
         }
+        if (gameStarted) {
+            System.out.println("cheese");
+            Bukkit.getScheduler().runTaskLater(Manhunt.getPlugin(), () -> {
+                // Code to execute after the delay
+
+                // For example, send a welcome message to the player after 1 second
+                bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+                bossBar.addPlayer(player);
+
+            }, 20L); // 20 ticks = 1 second (1 tick = 0.05 seconds)
+        }
     }
 
     @Override
@@ -98,9 +112,14 @@ public class MhStart implements CommandExecutor {
             onlineplayer.setFoodLevel(20);
 
             onlineplayer.setSaturation(20);
-        }
 
-        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager);
+
+        }
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @a");
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
+
+        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this);
         mhCreate.removeGlassSphere((Player) sender);
 
         //resetBossBar();

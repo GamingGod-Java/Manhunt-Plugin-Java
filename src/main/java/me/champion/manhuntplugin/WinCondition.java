@@ -47,6 +47,7 @@ public class WinCondition implements Listener {
                     spawnFirework(player, Color.AQUA);
 
                 }
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
             }
         }
     }
@@ -74,8 +75,8 @@ public class WinCondition implements Listener {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
                         spawnFirework(player, Color.RED);
-
                     }
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
                 }
             }
         }
@@ -88,7 +89,7 @@ public class WinCondition implements Listener {
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
-        //System.out.println("ENTER!!!!");
+        System.out.println("ENTER!!!!");
         Player player = event.getPlayer();
 
         // Check if the player is a runner and has entered the End portal

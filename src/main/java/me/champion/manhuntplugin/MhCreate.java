@@ -9,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,13 +25,16 @@ public class MhCreate implements CommandExecutor {
     private final Manhunt plugin;
     private final TeamManager teamManager;  // Added TeamManager instance
 
+    private final MhStart mhStart;
+
     private final List<Location> platformLocations = new ArrayList<>();
 
     private static Location spawnLocation; // Declare the spawnLocation variable
 
-    public MhCreate(Manhunt plugin, TeamManager teamManager) {
+    public MhCreate(Manhunt plugin, TeamManager teamManager, MhStart mhStart) {
         this.plugin = plugin;
         this.teamManager = teamManager;  // Initialize TeamManager instance
+        this.mhStart = mhStart;
     }
 
     @Override
@@ -47,7 +52,6 @@ public class MhCreate implements CommandExecutor {
             player.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
-
         // Store the spawn location where the command is executed
         setSpawnLocation(player.getLocation());
 
@@ -95,6 +99,13 @@ public class MhCreate implements CommandExecutor {
 
         // Return the center location of the generated platform
         return centerLocation.clone().add(0, 1, 0);
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        if (!mhStart.gameStarted) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect give "+ event.getPlayer().getName()+ " minecraft:saturation 1000000 255 true");
+        }
     }
 
     public void createGlassSphere(Player player) {

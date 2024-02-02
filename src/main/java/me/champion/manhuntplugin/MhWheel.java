@@ -176,9 +176,9 @@ public class MhWheel implements CommandExecutor, Listener {
         List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE, Material.BEACON);
         List<Material> debuffMaterials = Arrays.asList(Material.LEATHER_BOOTS, Material.WOODEN_SWORD, Material.BARRIER);
         Inventory menu = Bukkit.createInventory(player, 27, "Buffs/Debuffs Menu");
-        for (String buff: buffNames) {
+        /*for (String buff: buffNames) {
             System.out.println(buff);
-        }
+        }*/
         for (int i = 0; i < buffNames.length; i++) {
             ItemStack buffsItem = createMenuItem("Buff: " + buffNames[i], buffMaterials.get(i));
             if (i == 2) {
@@ -296,7 +296,7 @@ public class MhWheel implements CommandExecutor, Listener {
         try {
             amplifier = Integer.parseInt(parts[1])-1;
         } catch (NumberFormatException e) {
-            player.sendMessage("Invalid amplifier format: " + parts[1]);
+            //player.sendMessage("Invalid amplifier format: " + parts[1]);
             return;
         }
 

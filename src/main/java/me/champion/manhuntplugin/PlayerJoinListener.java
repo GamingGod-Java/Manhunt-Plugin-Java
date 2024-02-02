@@ -1,10 +1,12 @@
 package me.champion.manhuntplugin;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
+import org.bukkit.boss.BossBar;
 
 public class PlayerJoinListener implements Listener {
 
@@ -18,9 +20,17 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        // Check if the game has not started
-        if (!mhStart.isGameStarted()) {
-            // Get the spawn location and teleport the player
+        // Check if the game has already started
+        if (mhStart.isGameStarted()) {
+            // Get the boss bar from MhStart
+            BossBar bossBar = mhStart.getBossBar();
+
+            // If the boss bar exists and is visible, add the player to the boss bar
+            if (bossBar != null && bossBar.isVisible()) {
+                bossBar.addPlayer(player);
+            }
+        } else {
+            // The game has not started, handle the player joining as per your existing logic
             Location spawnLocation = MhCreate.getSpawnLocation();
             if (spawnLocation != null) {
                 player.teleport(spawnLocation);
@@ -28,4 +38,3 @@ public class PlayerJoinListener implements Listener {
         }
     }
 }
-

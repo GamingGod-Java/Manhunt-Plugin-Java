@@ -38,6 +38,7 @@ public final class Manhunt extends JavaPlugin {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
         enableFlightInServerProperties();
+        setDifficultyHardInServerProperties();
 
         try {
             statisticsConfig.save(statisticsFile);
@@ -66,7 +67,7 @@ public final class Manhunt extends JavaPlugin {
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
         // Register commands
-        registerCommand("MhCreate", new MhCreate(this, teamManager));
+        registerCommand("MhCreate", new MhCreate(this, teamManager, mhStart));
         registerCommand("MhMove", new TeamMove(teamManager));
         registerCommand("MhPause", new MhPause(this, teamManager));
         registerCommand("MhUnpause", new MhUnpause(this, teamManager));
@@ -78,18 +79,21 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhWheel", mhWheel);
         registerCommand("MhSettings", mhSettings);
         // Register event listeners
-        Bukkit.getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new TeamManager(this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        Bukkit.getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
+
+        getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
+        getServer().getPluginManager().registerEvents(teamManager, this);
+        getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
+        getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
         getServer().getPluginManager().registerEvents(mhWheel, this);
         getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(new EyeofEnderListener(teamManager, this), this);
         winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
+        getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
     }
 
     @Override
@@ -139,6 +143,28 @@ public final class Manhunt extends JavaPlugin {
             content = content.replaceAll("allow-flight=false", "allow-flight=true");
             Files.write(Paths.get(propFile.toURI()), content.getBytes());
             getLogger().info("Flight enabled. Server will restart shortly.");
+            Bukkit.getScheduler().runTaskLater(this, () ->
+                    Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart"), 100L);
+        } catch (IOException e) {
+            getLogger().log(Level.SEVERE, "Failed to modify server.properties: " + e.getMessage(), e);
+        }
+    }
+
+    private void setDifficultyHardInServerProperties() {
+        try {
+            File propFile = new File("server.properties");
+            if (!propFile.exists()) {
+                getLogger().warning("server.properties not found!");
+                return;
+            }
+            String content = new String(Files.readAllBytes(Paths.get(propFile.toURI())));
+            if (!content.contains("difficulty=easy")) {
+                getLogger().info("Difficulty property not found.");
+                return;
+            }
+            content = content.replaceAll("difficulty=easy", "difficulty=hard");
+            Files.write(Paths.get(propFile.toURI()), content.getBytes());
+            getLogger().info("Difficulty hard. Server will restart shortly.");
             Bukkit.getScheduler().runTaskLater(this, () ->
                     Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "restart"), 100L);
         } catch (IOException e) {

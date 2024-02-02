@@ -59,7 +59,7 @@ public class MhCompass implements CommandExecutor, Listener {
     }
 
     public void giveRunnerCompass(Player player) {
-        System.out.println("Gave " + player.getName() + " compass");
+        //System.out.println("Gave " + player.getName() + " compass");
         ItemStack compass = new ItemStack(Material.COMPASS);
         compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
         ItemMeta compassMeta = compass.getItemMeta();
@@ -153,10 +153,6 @@ public class MhCompass implements CommandExecutor, Listener {
 
 
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
-
-
-        //Unsure how to "unsave" location if runner enters nether, additionally, compass working in overworld and not in nether may cause confusion
-        //player.setCompassTarget(nearestRunner.getEyeLocation());
 
         Location particleStartLocation = playerLocation.clone().add(0, 1.3, 0);
         Vector offset = direction.clone().multiply(0.75); // Offset distance
