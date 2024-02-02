@@ -12,6 +12,7 @@ me\champion\manhuntplugin\MhSettings.class
 me\champion\manhuntplugin\TeamManager$1.class
 me\champion\manhuntplugin\MhStart$1.class
 me\champion\manhuntplugin\TeamChat.class
+me\champion\manhuntplugin\DisableBedBomb.class
 me\champion\manhuntplugin\MhCreate.class
 me\champion\manhuntplugin\TeamSelection.class
 me\champion\manhuntplugin\Team.class
