@@ -12,14 +12,16 @@ import org.bukkit.Location;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.EnderSignal;
+import org.bukkit.GameMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EyeofEnderListener implements Listener {
-    private List<Location> closestStrongholds = new ArrayList<>();
+    private final List<Location> closestStrongholds = new ArrayList<>();
     private final TeamManager teamManager;
     private final Plugin plugin;
+
     public EyeofEnderListener(TeamManager teamManager, Plugin plugin) {
         this.teamManager = teamManager;
         this.plugin = plugin;
@@ -29,13 +31,21 @@ public class EyeofEnderListener implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+            // Check if the player is right-clicking on an end portal frame with an Eye of Ender
+            if (event.getClickedBlock().getType() == Material.END_PORTAL_FRAME &&
+                    event.getItem() != null && event.getItem().getType() == Material.ENDER_EYE) {
+                // Allow the normal behavior (placing the eye in the portal frame)
+                return;
+            }
+        }
+
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.getItem() != null && event.getItem().getType() == Material.ENDER_EYE) {
                 // Handle Eye of Ender usage
                 if (handleEyeOfEnderUsage(event.getPlayer())) {
-                    //event.getPlayer().sendMessage("Stronghold inside world border!");
                     event.setCancelled(true);
-                } if (!handleEyeOfEnderUsage(event.getPlayer())) {
+                } else {
                     event.getPlayer().sendMessage("§cSomething has gone terribly wrong, please contact a server admin");
                     event.setCancelled(true);
                 }
@@ -43,27 +53,37 @@ public class EyeofEnderListener implements Listener {
         }
     }
 
-
-
     private boolean handleEyeOfEnderUsage(Player player) {
+        if (player.getGameMode() == GameMode.CREATIVE) {
+            // Do not decrement Eye of Ender in Creative Mode
+            return false;
+        }
+
         Location playerLocation = player.getLocation();
         Location closestStronghold = findClosestStronghold(playerLocation);
         EnderSignal enderSignal = player.getWorld().spawn(playerLocation, EnderSignal.class);
-
-
-
-
 
         if (closestStronghold != null) {
             // Modify the behavior of the Eye of Ender to point to the specified stronghold location
             enderSignal.setTargetLocation(closestStronghold);
             Bukkit.getLogger().info("Eye of Ender points to " + closestStronghold);
+
+            // Decrement Eye of Ender from player's inventory
+            decrementEnderEye(player);
+
             return true;
-
         } else {
-
             return false;
+        }
+    }
 
+    private void decrementEnderEye(Player player) {
+        if (player.getInventory().getItemInMainHand().getType() == Material.ENDER_EYE) {
+            int amount = player.getInventory().getItemInMainHand().getAmount();
+            player.getInventory().getItemInMainHand().setAmount(amount - 1);
+        } else if (player.getInventory().getItemInOffHand().getType() == Material.ENDER_EYE) {
+            int amount = player.getInventory().getItemInOffHand().getAmount();
+            player.getInventory().getItemInOffHand().setAmount(amount - 1);
         }
     }
 
@@ -99,7 +119,7 @@ public class EyeofEnderListener implements Listener {
                 X = 1500;
                 Z = 1500;
             }
-            //this code is a crime against for loops but idk how to programatically do a square
+            //this code is a crime against for loops but idk how to programmatically do a square
             Location Strongholdsearch = Bukkit.getWorld("world").locateNearestStructure(new Location(Bukkit.getWorld("world"), X, 0, Z), StructureType.STRONGHOLD, 2000, false).getLocation();
             if (Strongholdsearch.getBlockX() > 3000 || Strongholdsearch.getBlockX() < -3000 || Strongholdsearch.getBlockZ() > 3000 || Strongholdsearch.getBlockZ() < -3000) {
                 continue;
