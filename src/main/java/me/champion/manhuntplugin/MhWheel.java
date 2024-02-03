@@ -37,7 +37,9 @@ public class MhWheel implements CommandExecutor, Listener {
     private static final long COOLDOWN_TIME_MS = 10;
 
     private final Map<UUID, Map<PotionEffectType, Integer>> playerDebuffs = new HashMap<>();
-
+    private void clearInventory(Player player) {
+        player.getInventory().clear();
+    }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -50,17 +52,12 @@ public class MhWheel implements CommandExecutor, Listener {
         //clearEffects(player);
     }
 
-    // Method to save the debuffs of a player
-
-
     // Method to clear all potion effects from a player
     private void clearEffects(Player player) {
         for (PotionEffect effect : player.getActivePotionEffects()) {
             player.removePotionEffect(effect.getType());
         }
     }
-
-    // ... (rest of the class)
 
     // Method to restore debuffs on respawn
     private void restoreDebuffs(Player player) {
@@ -133,11 +130,11 @@ public class MhWheel implements CommandExecutor, Listener {
                 }
             } else if (title.equals("Buffs/Debuffs Menu")) {
                 event.setCancelled(true);
-
+                System.out.println(slot);
                 if (slot >= 0 && slot <= 8) {
                     selectedBuffDebuff = buffNames[slot];
                     openTeamMembersGUI(player, selectedTeam);
-                } else if (slot >= 10 && slot <= 13) {
+                } else if (slot > 10 && slot <= 13) {
                     selectedBuffDebuff = debuffNames[slot - 11];
                     openTeamMembersGUI(player, selectedTeam);
                 } else if (slot == 9) {
@@ -169,8 +166,7 @@ public class MhWheel implements CommandExecutor, Listener {
 
         player.openInventory(inventory);
     }
-    //private final String[] buffNames = {"Speed 1 inf", "Resistance 1 inf", "Resistance 2 inf", "Strength 1 inf", "FireResistance 1 inf", "Give totem", "Give diamond pants", "Give god apple"};
-    //private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
+
     public void openBuffsDebuffsMenu(Player player) {
 
         List<Material> buffMaterials = Arrays.asList(Material.DIAMOND_BOOTS, Material.SHIELD, Material.SHIELD, Material.DIAMOND_SWORD, Material.LAVA_BUCKET, Material.TOTEM_OF_UNDYING, Material.DIAMOND_LEGGINGS, Material.ENCHANTED_GOLDEN_APPLE, Material.BEACON);
@@ -222,13 +218,8 @@ public class MhWheel implements CommandExecutor, Listener {
         player.openInventory(teamMembersGUI);
     }
 
-
-
     public void applyBuffDebuff(Player player, int slot) {
         System.out.println("applying buff");
-        /*if (slot < 0 || slot >= player.getOpenInventory().getTopInventory().getSize()) {
-            return; // Invalid slot, return early
-        }*/
 
         Player targetPlayer = getSelectedPlayer(player, slot);
 
@@ -244,57 +235,61 @@ public class MhWheel implements CommandExecutor, Listener {
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0));
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 0));
             targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
-
+            String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b"; // Example: Red for Zombies, Blue for Runners
+            String playerName = targetPlayer.getName();
+            Bukkit.broadcastMessage(teamColor + playerName + "§f has received §eLAST MAN STANDING");
         }
         if (effectName.equalsIgnoreCase("clear")) {
-            //clearEffects(targetPlayer);
-            player.getInventory().clear();
-            player.sendMessage("Cleared inventory from " + targetPlayer.getName() + ".");
+            clearInventory(targetPlayer);
+            String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b"; // Team color
+            String playerName = targetPlayer.getName();
+            Bukkit.broadcastMessage(teamColor + playerName + "'s §finventory has been cleared.");
             return;
         }
 
         if (effectName.equalsIgnoreCase("give")) {
             if (isInventoryFull(player)) {
                 targetPlayer.sendMessage("§cYour inventory is too full to receive an item!");
-                player.sendMessage("§c" + player.getName()+" could not receive item as their inventory was full");
+                player.sendMessage("§c" + player.getName() + " could not receive an item as their inventory was full");
                 return;
             }
-            ItemStack itemtogive = null;
-            if (parts[1].equalsIgnoreCase("totem")) {
-                itemtogive = new ItemStack(Material.TOTEM_OF_UNDYING, 1);
-                targetPlayer.sendMessage("You've received a totem!");
-                Bukkit.broadcastMessage(targetPlayer.getName()+" received totem");
+            ItemStack itemToGive = null;
+            String itemName = parts[1].toLowerCase(); // Convert to lowercase for consistent item name
+            String itemDisplayName = "";
 
-            } if (parts[1].equalsIgnoreCase("diamond")) {
-                itemtogive = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
-                targetPlayer.sendMessage("You've received diamond leggings!");
-                Bukkit.broadcastMessage(targetPlayer.getName()+" received diamonds leggings");
-            }  if (parts[1].equalsIgnoreCase("god")) {
-                itemtogive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
-                targetPlayer.sendMessage("You've received a god apple!");
-                Bukkit.broadcastMessage(targetPlayer.getName()+" received god apple");
+            if (itemName.equals("totem")) {
+                itemToGive = new ItemStack(Material.TOTEM_OF_UNDYING, 1);
+                itemDisplayName = "Totem of Undying";
+                //targetPlayer.sendMessage("You've received a totem!");
+            } else if (itemName.equals("diamond")) {
+                itemToGive = new ItemStack(Material.DIAMOND_LEGGINGS, 1);
+                itemDisplayName = "Diamond Leggings";
+                //targetPlayer.sendMessage("You've received diamond leggings!");
+            } else if (itemName.equals("god")) {
+                itemToGive = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE, 1);
+                itemDisplayName = "Enchanted Golden Apple";
+                //targetPlayer.sendMessage("You've received an enchanted golden apple!");
             }
-            if (itemtogive != null) {
-                targetPlayer.getInventory().addItem(itemtogive);
+
+            if (itemToGive != null) {
+                targetPlayer.getInventory().addItem(itemToGive);
+                // Broadcast the item received with proper item name in chat
+                String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b";
+                String playerName = targetPlayer.getName();
+                Bukkit.broadcastMessage(teamColor + playerName + "§f has received §e" + itemDisplayName);
             }
             return;
         }
-
 
         if (parts.length < 3) {
             System.out.println(("Invalid effect format: " + selectedBuffDebuff));
             return;
         }
 
-
-
-
-
-
         int amplifier;
 
         try {
-            amplifier = Integer.parseInt(parts[1])-1;
+            amplifier = Integer.parseInt(parts[1]) - 1;
         } catch (NumberFormatException e) {
             //player.sendMessage("Invalid amplifier format: " + parts[1]);
             return;
@@ -309,19 +304,18 @@ public class MhWheel implements CommandExecutor, Listener {
                 duration = Integer.MAX_VALUE;
             } else {
                 try {
-                    duration = Integer.parseInt(durationString)*20*60;
+                    duration = Integer.parseInt(durationString) * 20 * 60;
                 } catch (NumberFormatException e) {
                     player.sendMessage("Invalid duration format: " + durationString);
                     return;
                 }
             }
 
-
             targetPlayer.addPotionEffect(new PotionEffect(effectType, duration, amplifier));
-            targetPlayer.sendMessage("You got "+effectName);
+            targetPlayer.sendMessage("You got " + effectName);
 
             // Crafting the broadcast message
-            String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b"; // Example: Red for Zombies, Blue for Runners
+            String teamColor = selectedTeam.equals(zombiesTeamName) ? "§c" : "§b";
             String message = teamColor + targetPlayer.getName() + "§f has received " + selectedBuffDebuff;
             Bukkit.broadcastMessage(message);
         } else {
@@ -438,7 +432,7 @@ public class MhWheel implements CommandExecutor, Listener {
             // Check if the slot is empty
             if (item == null || item.getType() == Material.AIR) {
                 emptySlots++;
-                System.out.println("free inv slot");
+                //System.out.println("free inv slot");
             }
         }
         if (emptySlots == 0) {

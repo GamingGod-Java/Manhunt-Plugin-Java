@@ -374,14 +374,17 @@ public class TeamManager implements Listener {
                             Player passenger = Bukkit.getPlayer(passengerId);
                             if (passenger != null && passenger.isOnline() && passenger.getWorld().equals(boat.getWorld())) {
                                 boat.addPassenger(passenger);
+                                // Clear saved data for the passenger
+                                savedBoats.remove(boat.getUniqueId());
                             }
                         }
                     }
                 }
-                savedBoats.clear();
-            }, 20L); // Delay in ticks (20 ticks = 1 second)
+                savedBoats.clear(); // Clear all saved boat data
+            }, 1L); // Delay in ticks (20 ticks = 1 second)
         }
     }
+
 
     public void setGamePaused(boolean paused) {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -649,16 +652,16 @@ public class TeamManager implements Listener {
     }
     @EventHandler
     public void onVehicleEnter(VehicleEnterEvent event) {
-        if (isGamePaused() && event.getVehicle() instanceof Vehicle) {
-            // If the game is paused and a player tries to enter a boat, cancel the event
+        if (isGamePaused()) {
+            // If the game is paused, cancel the event
             event.setCancelled(true);
             if (event.getEntered() instanceof Player) {
                 Player player = (Player) event.getEntered();
-                player.sendMessage(ChatColor.RED + "Nice try Andre, you can not enter a boat while the game is paused.");
-
+                player.sendMessage(ChatColor.RED + "Nice try Andre, you cannot enter a boat while the game is paused.");
             }
         }
     }
+
     public List<Player> getPlayersOnTeam(String teamName) {
         List<Player> teamPlayers = new ArrayList<>();
 

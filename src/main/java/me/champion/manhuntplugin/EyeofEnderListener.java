@@ -89,6 +89,11 @@ public class EyeofEnderListener implements Listener {
         Location closestStronghold = null;
 
         for (Location strongholdLocation : closestStrongholds) {
+            // Ensure that both locations belong to the same world
+            if (playerLocation.getWorld() != strongholdLocation.getWorld()) {
+                continue;
+            }
+
             double distanceSquared = playerLocation.distanceSquared(strongholdLocation);
 
             if (distanceSquared < closestDistanceSquared) {
@@ -123,7 +128,7 @@ public class EyeofEnderListener implements Listener {
             }
             if (!closestStrongholds.contains(Strongholdsearch)) {
                 closestStrongholds.add(Strongholdsearch);
-                System.out.println(Strongholdsearch);
+                //System.out.println(Strongholdsearch);
             }
             if (closestStrongholds.size() > 2) {
                 break;

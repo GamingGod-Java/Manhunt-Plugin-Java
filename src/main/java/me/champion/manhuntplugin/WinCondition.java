@@ -35,22 +35,32 @@ public class WinCondition implements Listener {
     }
     @EventHandler
     public void onDragonDeath(EnderDragonChangePhaseEvent event) {
-        if (mhstart.isGameStarted()) {
-            if (event.getNewPhase() == EnderDragon.Phase.DYING) {
-                // The Ender Dragon has died
-                Bukkit.broadcastMessage("The §5Ender Dragon " + "§fhas been defeated!");
-                RunnerWin = true;
-                teamManager.GameOver = true;
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    player.sendTitle("§bRunners win", "Game Over", 20, 40, 10);
+        EnderDragon.Phase newPhase = event.getNewPhase();
+        System.out.println("Ender Dragon Phase: " + newPhase);
 
-                    spawnFirework(player, Color.AQUA);
+        if (mhstart.isGameStarted() && newPhase == EnderDragon.Phase.DYING) {
+            // The Ender Dragon has died
+            Bukkit.broadcastMessage("The §5Ender Dragon " + "§fhas been defeated!");
+            RunnerWin = true;
+            teamManager.GameOver = true;
 
-                }
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
+            // Increase title duration to 60 ticks (3 seconds)
+            int titleDuration = 60;
+
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                // Send a longer-lasting title
+                player.sendTitle("§bRunners win", "Game Over", titleDuration, 40, titleDuration);
+
+                // Spawn more fireworks
+                spawnFirework(player, Color.AQUA);
+                spawnFirework(player, Color.AQUA);
+                spawnFirework(player, Color.AQUA);
             }
+
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
         }
     }
+
 
     public void scheduleGameConditionCheck() {
         int delay = 0; // Initial delay (in ticks)
@@ -97,8 +107,6 @@ public class WinCondition implements Listener {
             endEntered = true;  // Set the flag to true
             mhstart.hideBossBar();
         }
-
-
     }
 
     private void spawnFirework(Player player, Color color) { //SPAWN FIREWORK

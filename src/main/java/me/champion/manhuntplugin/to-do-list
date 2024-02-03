@@ -13,6 +13,12 @@ ideas:
         Random time to unpause
 
 Unfixed:
+    If a zombie is killed by a runner, the runners name is not blue
+
+    issues with player movement on rejoin ( unpause/pause states are not properly recognised when joining)
+
+    eye of ender can be thrown during pause
+
     Auto-save causes lag
     //Server config issue, make auto-save much less frequent/disable them (if the server crashes we cope?)
 
