@@ -314,7 +314,7 @@ public class TeamManager implements Listener {
                 frozenPlayers.add(player.getUniqueId());
 
                 // Set the player to Adventure mode
-                //player.setGameMode(GameMode.ADVENTURE);
+                player.setGameMode(GameMode.ADVENTURE);
 
                 // Set the walk speed to 0 - this makes the player unable to walk
                 player.setWalkSpeed(0.0f);
@@ -353,44 +353,33 @@ public class TeamManager implements Listener {
         if (isGamePaused()) {
             setGamePaused(false);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+
+            // Restore player states
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.remove(player.getUniqueId());
-
-                // Invulnerability, air levels, and fire ticks logic...
                 restoreOriginalAirLevels();
                 restoreFireTicks(player);
                 player.setInvulnerable(false);
-
-                // Reset the player's walk speed to the default Minecraft value (0.2)
                 player.setWalkSpeed(0.2f);
-
-                // Switch the player's game mode back to Survival
                 player.setGameMode(GameMode.SURVIVAL);
-
-                // Does this fix it?
-                player.setInvulnerable(false);
             }
-            // Stop reapplying potion effects
             stopPotionEffectLoop();
 
-            // Restoring boats and their passengers
-            for (BoatData boatData : savedBoats.values()) {
-                Vehicle boat = boatData.getBoat();
-                List<UUID> passengers = boatData.getPassengers();
-
-                if (!passengers.isEmpty()) {
-                    Player firstPassenger = Bukkit.getPlayer(passengers.get(0));
-                    if (firstPassenger != null) {
-                        boat.teleport(firstPassenger.getLocation());
-                        for (UUID passengerId : passengers) {
+            // Delayed task to restore boats and passengers
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                for (BoatData boatData : savedBoats.values()) {
+                    Vehicle boat = boatData.getBoat();
+                    if (boat != null && boat.isValid()) {
+                        for (UUID passengerId : boatData.getPassengers()) {
                             Player passenger = Bukkit.getPlayer(passengerId);
-                            if (passenger != null && passenger.isOnline()) {
-                                //boat.addPassenger(passenger);
+                            if (passenger != null && passenger.isOnline() && passenger.getWorld().equals(boat.getWorld())) {
+                                boat.addPassenger(passenger);
                             }
                         }
                     }
                 }
-            }
+                savedBoats.clear();
+            }, 20L); // Delay in ticks (20 ticks = 1 second)
         }
     }
 

@@ -54,11 +54,6 @@ public class EyeofEnderListener implements Listener {
     }
 
     private boolean handleEyeOfEnderUsage(Player player) {
-        if (player.getGameMode() == GameMode.CREATIVE) {
-            // Do not decrement Eye of Ender in Creative Mode
-            return false;
-        }
-
         Location playerLocation = player.getLocation();
         Location closestStronghold = findClosestStronghold(playerLocation);
         EnderSignal enderSignal = player.getWorld().spawn(playerLocation, EnderSignal.class);
@@ -66,10 +61,12 @@ public class EyeofEnderListener implements Listener {
         if (closestStronghold != null) {
             // Modify the behavior of the Eye of Ender to point to the specified stronghold location
             enderSignal.setTargetLocation(closestStronghold);
-            Bukkit.getLogger().info("Eye of Ender points to " + closestStronghold);
+            //Bukkit.getLogger().info("Eye of Ender points to " + closestStronghold);
 
-            // Decrement Eye of Ender from player's inventory
-            decrementEnderEye(player);
+            // Decrement Eye of Ender from player's inventory only if not in Creative mode
+            if (player.getGameMode() != GameMode.CREATIVE) {
+                decrementEnderEye(player);
+            }
 
             return true;
         } else {
