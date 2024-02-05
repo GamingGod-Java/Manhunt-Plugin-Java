@@ -476,6 +476,23 @@ public class TeamManager implements Listener {
                 addToTeam(player, "Zombies");
                 pauseGame(player);
                 player.sendMessage("§cYou have joined the Zombies team!");
+            } else if (team != null && team.equalsIgnoreCase("Zombies")) {
+                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
+                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
+                    // Check if the killer is a player
+                    if (damageByEntityEvent.getDamager() instanceof Player) {
+                        Player killer = (Player) damageByEntityEvent.getDamager();
+
+                        event.setDeathMessage("§c" + player.getName() + "§f was slain by §b" + killer.getName());
+                        updatePlayerStatistics(player.getName(), "player_deaths");
+                        updatePlayerStatistics(killer.getName(), "player_kills");
+                    } else {
+                        updatePlayerStatistics(player.getName(), "environment_deaths");
+                        updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
+                    }
+                } else {
+                    updatePlayerStatistics(player.getName(), "environment_deaths");
+                }
             } else {
                 String originalDeathMessage = event.getDeathMessage();
                 int firstSpaceIndex = originalDeathMessage.indexOf(" ");

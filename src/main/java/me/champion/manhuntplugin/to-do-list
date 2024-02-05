@@ -13,18 +13,19 @@ ideas:
         Random time to unpause
 
 Unfixed:
-    If a zombie is killed by a runner, the runners name is not blue
-
-    issues with player movement on rejoin ( unpause/pause states are not properly recognised when joining)
-
-    eye of ender can be thrown during pause
 
     Auto-save causes lag
     //Server config issue, make auto-save much less frequent/disable them (if the server crashes we cope?)
+
+    issues with player movement on rejoin ( unpause/pause states are not properly recognised when joining)
 
     I think we should make the statistics counter more lenient, rather than needing a player to deal the final blow, just needing them to attack the player within a few seconds of their death for a kill and to not count friendly fire kills
     However, I(A) have no good way of testing this on localhost so we can either figure it out together at some point or you can do it with ur alt? idk
 
 Fixed:
-    Make game listener not apply to OPS
-    //just check each listener,efficiency is cringe
+    eye of ender can be thrown during pause
+
+    If a zombie is killed by a runner, the runners name is not blue
+
+
+
