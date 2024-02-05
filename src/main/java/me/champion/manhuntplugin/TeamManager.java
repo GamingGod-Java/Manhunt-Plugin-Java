@@ -308,8 +308,11 @@ public class TeamManager implements Listener {
         if (!isGamePaused()) {
             setGamePaused(true);
             // Execute /tick freeze command
-            //System.out.println("Tick freezing inside of TeamManager in the pauseGame method");
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
+
+            // Clear the playerPotionEffects HashMap
+            playerPotionEffects.clear();
+
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
 
@@ -321,24 +324,6 @@ public class TeamManager implements Listener {
 
                 player.setInvulnerable(true);
 
-                //player.sendMessage("Game paused by " + pausingPlayer.getName() + "!");
-
-                // Invulnerability logic
-                player.setInvulnerable(true);
-
-                // Potion saving logic
-                savePotionEffects(player);
-
-                // Save air bubble progress
-                saveOriginalAirLevels();
-
-                // Save fire ticks
-                saveFireTicks(player);
-
-                //Start reapplying potion effects
-                startPotionEffectLoop();
-
-
                 if (player.getVehicle() instanceof Vehicle) {
                     Vehicle boat = (Vehicle) player.getVehicle();
                     savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
@@ -346,6 +331,17 @@ public class TeamManager implements Listener {
                     player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
                 }
             }
+
+            // Delayed reapplication of potion effects after 20 ticks (1 second)
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                // Potion saving logic
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    savePotionEffects(player);
+                }
+
+                // Start reapplying potion effects
+                startPotionEffectLoop();
+            }, 20L);
         }
     }
 
@@ -367,6 +363,8 @@ public class TeamManager implements Listener {
 
             // Delayed task to restore boats and passengers
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                List<UUID> boatsToRemove = new ArrayList<>();
+
                 for (BoatData boatData : savedBoats.values()) {
                     Vehicle boat = boatData.getBoat();
                     if (boat != null && boat.isValid()) {
@@ -374,14 +372,20 @@ public class TeamManager implements Listener {
                             Player passenger = Bukkit.getPlayer(passengerId);
                             if (passenger != null && passenger.isOnline() && passenger.getWorld().equals(boat.getWorld())) {
                                 boat.addPassenger(passenger);
-                                // Clear saved data for the passenger
-                                savedBoats.remove(boat.getUniqueId());
                             }
                         }
                     }
+                    boatsToRemove.add(boat.getUniqueId());
                 }
+
+                // Remove saved boat data for passengers
+                for (UUID boatUUID : boatsToRemove) {
+                    savedBoats.remove(boatUUID);
+                }
+
                 savedBoats.clear(); // Clear all saved boat data
             }, 1L); // Delay in ticks (20 ticks = 1 second)
+
         }
     }
 

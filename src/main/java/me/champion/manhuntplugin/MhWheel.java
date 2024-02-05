@@ -32,13 +32,26 @@ public class MhWheel implements CommandExecutor, Listener {
     private final String[] debuffNames = {"Slowness 1 20", "Weakness 1 20", "Clear Player"};
     private String selectedTeam = "";
     private String selectedBuffDebuff = "";
+    private final Map<UUID, Map<PotionEffectType, Integer>> playerDebuffs = new HashMap<>();
 
     private final Map<UUID, Long> clickCooldowns = new HashMap<>();
     private static final long COOLDOWN_TIME_MS = 10;
 
-    private final Map<UUID, Map<PotionEffectType, Integer>> playerDebuffs = new HashMap<>();
     private void clearInventory(Player player) {
         player.getInventory().clear();
+    }
+
+    private void saveDebuffs(Player player) {
+        Map<PotionEffectType, Integer> debuffs = new HashMap<>();
+        for (PotionEffect effect : player.getActivePotionEffects()) {
+            if (effect.getType() != PotionEffectType.INCREASE_DAMAGE && // Exclude buffs
+                    effect.getType() != PotionEffectType.SPEED && // Exclude buffs
+                    effect.getType() != PotionEffectType.FIRE_RESISTANCE && // Exclude buffs
+                    effect.getType() != PotionEffectType.JUMP) { // Exclude buffs
+                debuffs.put(effect.getType(), effect.getAmplifier());
+            }
+        }
+        playerDebuffs.put(player.getUniqueId(), debuffs);
     }
 
     @EventHandler
@@ -46,10 +59,11 @@ public class MhWheel implements CommandExecutor, Listener {
         Player player = event.getEntity();
 
         // Save debuffs before death
-        //saveDebuffs(player);
+        saveDebuffs(player);
 
         // Remove all potion effects on death (optional)
-        //clearEffects(player);
+        clearEffects(player);
+
     }
 
     // Method to clear all potion effects from a player
@@ -68,13 +82,20 @@ public class MhWheel implements CommandExecutor, Listener {
             }
         }
     }
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        if (teamManager.isOnTeam(player, zombiesTeamName)) {
+            // Player is a zombie
+            // Apply debuffs (e.g., potion effects) when respawning as a zombie
+            restoreDebuffs(player);
+        }
+    }
 
     public MhWheel(JavaPlugin plugin, TeamManager teamManager) {
         this.plugin = plugin;
         this.teamManager = teamManager;
     }
-
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
