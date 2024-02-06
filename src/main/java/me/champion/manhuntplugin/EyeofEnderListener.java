@@ -1,6 +1,7 @@
 package me.champion.manhuntplugin;
 
 
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -8,11 +9,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.generator.structure.StructureType;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.Location;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.EnderSignal;
-import org.bukkit.GameMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +51,11 @@ public class EyeofEnderListener implements Listener {
     }
 
     private boolean handleEyeOfEnderUsage(Player player) {
-        Location playerLocation = player.getLocation();
+        Location playerLocation = player.getLocation().add(0, 1, 0); // Add 1 block to the Y-coordinate
+        World.Environment playerEnvironment = playerLocation.getWorld().getEnvironment();
+        if (playerEnvironment == World.Environment.NETHER || playerEnvironment == World.Environment.THE_END) {
+            return true;
+        }
         Location closestStronghold = findClosestStronghold(playerLocation);
         EnderSignal enderSignal = player.getWorld().spawn(playerLocation, EnderSignal.class);
 
