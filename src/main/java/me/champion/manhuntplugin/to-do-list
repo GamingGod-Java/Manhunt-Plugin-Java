@@ -1,6 +1,4 @@
-Plugin: Chunky
-
-ideas:
+Ideas:
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
     Anti combat log
@@ -23,9 +21,6 @@ Unfixed:
     However, I(A) have no good way of testing this on localhost so we can either figure it out together at some point or you can do it with ur alt? idk
 
 Fixed:
-    eye of ender can be thrown during pause
-
-    If a zombie is killed by a runner, the runners name is not blue
 
 
 

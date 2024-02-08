@@ -49,5 +49,4 @@ public class DisableBedBomb implements Listener {
                 material == Material.RED_BED ||
                 material == Material.BLACK_BED;
     }
-
 }
