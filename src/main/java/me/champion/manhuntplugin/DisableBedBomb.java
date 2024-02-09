@@ -18,18 +18,20 @@ public class DisableBedBomb implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        // Check if the player is trying to place a bed
-        if (event.getAction().name().contains("RIGHT") && event.hasItem()) {
+        // Check if the action is a right-click and if the player has an item
+        if (event.getAction().name().contains("RIGHT") && event.hasItem() && event.getItem() != null) {
+            // Check if the item is a bed
             if (isBed(event.getItem().getType())) {
-            // Check if the player is in the Nether or the End
-            if (event.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER ||
-                    event.getPlayer().getWorld().getEnvironment() == World.Environment.THE_END) {
-                event.setCancelled(true); // Cancel the bed placement
-                event.getPlayer().sendMessage("§cYou can't place beds in the Nether or the End!");
-            }
+                // Check if the player is in the Nether or the End
+                if (event.getPlayer().getWorld().getEnvironment() == World.Environment.NETHER ||
+                        event.getPlayer().getWorld().getEnvironment() == World.Environment.THE_END) {
+                    event.setCancelled(true); // Cancel the bed placement
+                    event.getPlayer().sendMessage("§cYou can't place beds in the Nether or the End!");
+                }
             }
         }
     }
+
 
     private boolean isBed(Material material) {
         return material == Material.WHITE_BED ||

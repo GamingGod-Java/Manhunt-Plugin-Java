@@ -38,11 +38,19 @@ public class MhSettings implements CommandExecutor, Listener {
     private void addItem(Material material, String name, int slot) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        item.setItemMeta(meta);
+
+        if (meta != null) {
+            meta.setDisplayName(name);
+            item.setItemMeta(meta);
+        } else {
+            System.out.println("Warning: ItemMeta is null for material: " + material);
+        }
+
         gui.setItem(slot, item);
     }
 
+
+    @SuppressWarnings("NullableProblems")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && sender.hasPermission("manhunt.settings")) {

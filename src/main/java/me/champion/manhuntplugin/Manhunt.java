@@ -20,7 +20,7 @@ public final class Manhunt extends JavaPlugin {
     private TeamManager teamManager;
     private MhStart mhStart;
     private TeamChat teamChat;
-    private MhWheel mhWheel; // Added this line
+    private MhWheel mhWheel;
     private WinCondition winCondition;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -59,7 +59,7 @@ public final class Manhunt extends JavaPlugin {
         mhStart = new MhStart(teamManager);
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here
-        winCondition = new WinCondition(teamManager, mhStart);
+        winCondition = new WinCondition(teamManager, mhStart, this);
         MhSettings mhSettings = new MhSettings();
 
         setWorldBorder();
@@ -83,7 +83,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamManager, this);
         getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(new WinCondition(teamManager, mhStart), this);
+        getServer().getPluginManager().registerEvents(winCondition, this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
         getServer().getPluginManager().registerEvents(mhWheel, this);

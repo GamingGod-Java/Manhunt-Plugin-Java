@@ -38,6 +38,7 @@ public class MhCompass implements CommandExecutor, Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {

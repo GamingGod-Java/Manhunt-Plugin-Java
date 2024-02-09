@@ -1,16 +1,12 @@
 package me.champion.manhuntplugin;
 
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.Event;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
@@ -27,14 +23,11 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.event.block.BlockExplodeEvent;
 
 import java.util.logging.Level;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class TeamManager implements Listener {
     private boolean deathEventHandled = false;
@@ -293,17 +286,6 @@ public class TeamManager implements Listener {
         return playerTeam != null && playerTeam.equalsIgnoreCase(teamName);
     }
 
-    @EventHandler
-    public void onExplode(BlockExplodeEvent event) {
-        if (event.getBlock() != null && event.getBlock().getType() == Material.WHITE_BED) {
-            // Check if the player is in the Nether or the End
-            if (event.getBlock().getWorld().getEnvironment() == World.Environment.NETHER
-                    || event.getBlock().getWorld().getEnvironment() == World.Environment.THE_END) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
     public void pauseGame(Player pausingPlayer) {
         if (!isGamePaused()) {
             setGamePaused(true);
@@ -312,7 +294,6 @@ public class TeamManager implements Listener {
 
             // Clear the playerPotionEffects HashMap
             playerPotionEffects.clear();
-
             for (Player player : Bukkit.getOnlinePlayers()) {
                 frozenPlayers.add(player.getUniqueId());
 
@@ -324,6 +305,9 @@ public class TeamManager implements Listener {
 
                 player.setInvulnerable(true);
 
+                // Save fire ticks for the current player
+                saveFireTicks(player);
+                saveOriginalAirLevels();
                 if (player.getVehicle() instanceof Vehicle) {
                     Vehicle boat = (Vehicle) player.getVehicle();
                     savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
@@ -344,6 +328,7 @@ public class TeamManager implements Listener {
             }, 20L);
         }
     }
+
 
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {

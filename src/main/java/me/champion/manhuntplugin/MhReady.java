@@ -26,6 +26,7 @@ public class MhReady implements CommandExecutor, Listener {
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player && sender.isOp()) {
@@ -86,7 +87,7 @@ public class MhReady implements CommandExecutor, Listener {
                     return;  // Added to exit the method after canceling
                 }
 
-                count--; // Move count-- inside the if and else if blocks
+                count--; // Move count-- inside the "if" and "else if" blocks
             }
         }.runTaskTimer(plugin, 0L, 20L); // 20L represents 1 second (20 ticks per second)
     }

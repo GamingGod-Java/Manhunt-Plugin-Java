@@ -48,7 +48,7 @@ public class GameControlListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        //Removed check for who is attacking as dont want players to die of fall damage before
+        //Removed check for whom the attacker is, as don't want players to die of fall damage before
         if (!mhStart.isGameStarted() && event.getEntity() instanceof Player) {
             event.setCancelled(true);
         }

@@ -52,37 +52,47 @@ public class EyeofEnderListener implements Listener {
 
     private boolean handleEyeOfEnderUsage(Player player) {
         Location playerLocation = player.getLocation().add(0, 1, 0); // Add 1 block to the Y-coordinate
-        World.Environment playerEnvironment = playerLocation.getWorld().getEnvironment();
-        if (playerEnvironment == World.Environment.NETHER || playerEnvironment == World.Environment.THE_END) {
-            return true;
-        }
-        Location closestStronghold = findClosestStronghold(playerLocation);
-        EnderSignal enderSignal = player.getWorld().spawn(playerLocation, EnderSignal.class);
+        World playerWorld = playerLocation.getWorld();
 
+        // Check if the world is not null
+        if (playerWorld != null) {
+            World.Environment playerEnvironment = playerWorld.getEnvironment();
 
-        if (teamManager.isGamePaused()) {
-            return true;
-        }
+            // Check if the player is in the Nether or the End
+            if (playerEnvironment == World.Environment.NETHER || playerEnvironment == World.Environment.THE_END) {
+                player.sendMessage("§cYou can't use Eye of Ender in the Nether or the End!");
+                return true; // Prevent the usage
+            }
 
+            // Find the closest stronghold
+            Location closestStronghold = findClosestStronghold(playerLocation);
 
+            // Spawn the Ender Signal
+            EnderSignal enderSignal = playerWorld.spawn(playerLocation, EnderSignal.class);
 
-        if (closestStronghold != null) {
-            // Modify the behavior of the Eye of Ender to point to the specified stronghold location
-            enderSignal.setTargetLocation(closestStronghold);
-            //Bukkit.getLogger().info("Eye of Ender points to " + closestStronghold);
+            if (teamManager.isGamePaused()) {
+                return true; // Do nothing if the game is paused
+            }
 
-            // Decrement Eye of Ender from player's inventory
-            if (player.getGameMode() != GameMode.CREATIVE) {
-                // Do not decrement Eye of Ender in Creative Mode
-                decrementEnderEye(player);
-                return true; //did something
-            } else {
+            // Check if the closet stronghold was found
+            if (closestStronghold != null) {
+                enderSignal.setTargetLocation(closestStronghold); // Set the target location for the Ender Signal
+
+                // Decrement the Eye of Ender from the player's inventory if not in Creative mode
+                if (player.getGameMode() != GameMode.CREATIVE) {
+                    decrementEnderEye(player);
+                }
                 return true;
+            } else {
+                player.sendMessage("§cNo strongholds found nearby.");
+                return false;
             }
         } else {
-            return false; //failed
+            player.sendMessage("§cError: World not found!");
+            return false; // World is null, so return false
         }
     }
+
 
     private void decrementEnderEye(Player player) {
         if (player.getInventory().getItemInMainHand().getType() == Material.ENDER_EYE) {
@@ -106,7 +116,6 @@ public class EyeofEnderListener implements Listener {
                 closestStronghold = strongholdLocation;
             }
         }
-
         return closestStronghold;
     }
 
@@ -139,9 +148,6 @@ public class EyeofEnderListener implements Listener {
                 break;
             }
         }
-
         return null;
     }
-
-
 }

@@ -9,23 +9,26 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EnderDragonChangePhaseEvent;
+
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.Plugin;
 
 public class WinCondition implements Listener {
     private final TeamManager teamManager;
     private final MhStart mhstart;
+    private final Plugin plugin;
     private boolean ZombieWin = false;
     private boolean RunnerWin = false;
-    public WinCondition(TeamManager teamManager, MhStart mhstart) {
+
+    public WinCondition(TeamManager teamManager, MhStart mhstart, Plugin plugin) {
         this.teamManager = teamManager;
         this.mhstart = mhstart;
+        this.plugin = plugin;
     }
+
     public static boolean endEntered = false;
 
     public void resetConditions() {
@@ -33,34 +36,39 @@ public class WinCondition implements Listener {
         RunnerWin = false;
         teamManager.GameOver = false;
     }
-    @EventHandler
-    public void onDragonDeath(EnderDragonChangePhaseEvent event) {
-        EnderDragon.Phase newPhase = event.getNewPhase();
-        System.out.println("Ender Dragon Phase: " + newPhase);
 
-        if (mhstart.isGameStarted() && newPhase == EnderDragon.Phase.DYING) {
-            // The Ender Dragon has died
-            Bukkit.broadcastMessage("The §5Ender Dragon " + "§fhas been defeated!");
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getEntity() instanceof EnderDragon && mhstart.isGameStarted()) {
             RunnerWin = true;
             teamManager.GameOver = true;
+            Bukkit.broadcastMessage("The §5Ender Dragon §fhas been defeated!");
 
-            // Increase title duration to 60 ticks (3 seconds)
-            int titleDuration = 60;
+            new BukkitRunnable() {
+                int count = 10; // Runs for 5 seconds (10 times with 0.5s interval)
+
+                @Override
+                public void run() {
+                    if (count <= 0) {
+                        this.cancel();
+                        return;
+                    }
+
+                    for (Player player : teamManager.getPlayersOnTeam("Runners")) {
+                        spawnFirework(player, Color.AQUA);
+                    }
+
+                    count--;
+                }
+            }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                // Send a longer-lasting title
-                player.sendTitle("§bRunners win", "Game Over", titleDuration, 40, titleDuration);
-
-                // Spawn more fireworks
-                spawnFirework(player, Color.AQUA);
-                spawnFirework(player, Color.AQUA);
-                spawnFirework(player, Color.AQUA);
+                player.sendTitle("§bRunners win", "Game Over", 60, 40, 60);
             }
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
         }
     }
-
 
     public void scheduleGameConditionCheck() {
         int delay = 0; // Initial delay (in ticks)
@@ -82,10 +90,32 @@ public class WinCondition implements Listener {
                     teamManager.GameOver = true;
                     teamManager.unpauseGame(null);
                     ZombieWin = true;
+
+                    // Increase title duration to 60 ticks (3 seconds)
+                    int titleDuration = 60;
+
                     for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendTitle("§cZombies Win", "Game Over", 20, 40, 10);
-                        spawnFirework(player, Color.RED);
+                        player.sendTitle("§cZombies Win", "Game Over", titleDuration, 40, titleDuration);
                     }
+
+                    new BukkitRunnable() {
+                        int count = 10; // Runs for 5 seconds (10 times with 0.5s interval)
+
+                        @Override
+                        public void run() {
+                            if (count <= 0) {
+                                this.cancel();
+                                return;
+                            }
+
+                            for (Player player : teamManager.getPlayersOnTeam("Zombies")) {
+                                spawnFirework(player, Color.RED);
+                            }
+
+                            count--;
+                        }
+                    }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
+
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
                 }
             }
@@ -95,7 +125,6 @@ public class WinCondition implements Listener {
             //System.out.println("reset conditions");
         }
     }
-
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
@@ -109,17 +138,13 @@ public class WinCondition implements Listener {
         }
     }
 
-    private void spawnFirework(Player player, Color color) { //SPAWN FIREWORK
+    private void spawnFirework(Player player, Color color) {
         Firework firework = player.getWorld().spawn(player.getLocation(), Firework.class);
         FireworkMeta fireworkMeta = firework.getFireworkMeta();
-
-        FireworkEffect.Builder effect = FireworkEffect.builder();
-        effect.withColor(color);
-        effect.with(FireworkEffect.Type.BALL_LARGE);
-        effect.trail(true); // Add trail effect
-        effect.flicker(true); // Add twinkle effect
-
-        fireworkMeta.addEffect(effect.build());
+        FireworkEffect effect = FireworkEffect.builder().withColor(color)
+                .with(FireworkEffect.Type.BALL_LARGE)
+                .trail(true).flicker(true).build();
+        fireworkMeta.addEffect(effect);
         fireworkMeta.setPower(1);
         firework.setFireworkMeta(fireworkMeta);
     }

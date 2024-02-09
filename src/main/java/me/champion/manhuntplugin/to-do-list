@@ -12,9 +12,6 @@ Ideas:
 
 Unfixed:
 
-    Auto-save causes lag
-    //Server config issue, make auto-save much less frequent/disable them (if the server crashes we cope?)
-
     issues with player movement on rejoin ( unpause/pause states are not properly recognised when joining)
 
     I think we should make the statistics counter more lenient, rather than needing a player to deal the final blow, just needing them to attack the player within a few seconds of their death for a kill and to not count friendly fire kills
