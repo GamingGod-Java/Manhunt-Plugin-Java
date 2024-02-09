@@ -346,7 +346,7 @@ public class TeamManager implements Listener {
             }
             stopPotionEffectLoop();
 
-            // Delayed task to restore boats and passengers
+// Delayed task to restore boats and passengers
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 List<UUID> boatsToRemove = new ArrayList<>();
 
@@ -359,15 +359,15 @@ public class TeamManager implements Listener {
                                 boat.addPassenger(passenger);
                             }
                         }
+                        // Add the check here to ensure boat is not null before calling getUniqueId()
+                        boatsToRemove.add(boat.getUniqueId());
                     }
-                    boatsToRemove.add(boat.getUniqueId());
                 }
 
-                // Remove saved boat data for passengers
+                // Remove processed boats from savedBoats
                 for (UUID boatUUID : boatsToRemove) {
                     savedBoats.remove(boatUUID);
                 }
-
                 savedBoats.clear(); // Clear all saved boat data
             }, 1L); // Delay in ticks (20 ticks = 1 second)
 
@@ -435,7 +435,7 @@ public class TeamManager implements Listener {
             if (team != null && team.equalsIgnoreCase("Runners")) {
 
                 // Check if the player was killed by another entity
-                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
+                if (lastDamageCause != null) {
                     EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
 
                     // Check if the killer is a player
@@ -463,7 +463,7 @@ public class TeamManager implements Listener {
                 player.sendMessage("§cYou have joined the Zombies team!");
             } else if (team != null && team.equalsIgnoreCase("Zombies")) {
                 EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
-                if (lastDamageCause instanceof EntityDamageByEntityEvent) {
+                if (lastDamageCause != null) {
                     // Check if the killer is a player
                     if (damageByEntityEvent.getDamager() instanceof Player) {
                         Player killer = (Player) damageByEntityEvent.getDamager();

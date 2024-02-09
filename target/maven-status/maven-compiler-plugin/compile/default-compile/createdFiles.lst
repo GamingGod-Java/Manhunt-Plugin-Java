@@ -5,6 +5,7 @@ me\champion\manhuntplugin\TeamManager$BoatData.class
 me\champion\manhuntplugin\WinCondition.class
 me\champion\manhuntplugin\GameControlListener.class
 me\champion\manhuntplugin\Manhunt.class
+me\champion\manhuntplugin\WinCondition$2.class
 me\champion\manhuntplugin\MhCompass$1.class
 me\champion\manhuntplugin\MhUnpause.class
 me\champion\manhuntplugin\TeamMove.class
@@ -19,6 +20,7 @@ me\champion\manhuntplugin\Team.class
 me\champion\manhuntplugin\WinCondition$1.class
 me\champion\manhuntplugin\MhWheel.class
 me\champion\manhuntplugin\TeamManager$2.class
+me\champion\manhuntplugin\WinCondition$3.class
 me\champion\manhuntplugin\MhStart.class
 me\champion\manhuntplugin\MhReady$1.class
 me\champion\manhuntplugin\MhStart$2.class
