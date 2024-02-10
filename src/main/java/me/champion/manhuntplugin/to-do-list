@@ -11,12 +11,17 @@ Ideas:
         Random time to unpause
 
 Unfixed:
+    SERVER PERFORMANCE
 
-    issues with player movement on rejoin ( unpause/pause states are not properly recognised when joining)
+    MhIntro can be ran by anyone, at any time, any number of times
 
-    I think we should make the statistics counter more lenient, rather than needing a player to deal the final blow, just needing them to attack the player within a few seconds of their death for a kill and to not count friendly fire kills
-    However, I(A) have no good way of testing this on localhost so we can either figure it out together at some point or you can do it with ur alt? idk
+    When zombie kills zombie message is blue
 
+    Improper kill credit (push of cliff = environment), also death messages should be more helpful
+
+    On runner win, no fireworks spawned on zombies
+
+    Add way to enable/disable mhintro
 Fixed:
 
 
