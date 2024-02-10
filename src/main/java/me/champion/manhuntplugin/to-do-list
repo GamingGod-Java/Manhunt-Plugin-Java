@@ -15,11 +15,12 @@ Unfixed:
 
     MhIntro can be ran by anyone, at any time, any number of times
 
-    When zombie kills zombie message is blue
-
-    Improper kill credit (push of cliff = environment), also death messages should be more helpful
-
     On runner win, no fireworks spawned on zombies
 
     Add way to enable/disable MhIntro
 Fixed:
+    When zombie kills zombie message is blue
+    //Rewrote player death logic, statistics tracking now based on death message
+
+
+
