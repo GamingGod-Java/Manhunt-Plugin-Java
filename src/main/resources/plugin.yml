@@ -45,3 +45,6 @@ commands:
     usage: /MhSettings
     aliases:
       - mhs
+  MhIntro:
+    description: Plays the intro sound
+    usage: /MhIntro
