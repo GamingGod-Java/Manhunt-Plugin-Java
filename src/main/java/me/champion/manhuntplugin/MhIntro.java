@@ -1,6 +1,7 @@
 package me.champion.manhuntplugin;
 
 //to edit the audio clip https://www.veed.io/edit/6c0e89c8-c54c-46a4-a08d-54ab53165127
+//to update the resourcepack for the server, upload it here first, then change values in server.properties https://mc-packs.net/
 //I can share the login details with you
 
 import org.bukkit.command.Command;
