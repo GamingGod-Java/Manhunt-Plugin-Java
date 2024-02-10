@@ -231,16 +231,26 @@ public class TeamManager implements Listener {
 
         playerTeams.put(playerUUID, team);
 
-        // Update their display name and nametag based on the team
+// Update their display name, nametag, and play a sound based on the team
         if (team.equalsIgnoreCase("Zombies")) {
             player.setDisplayName("§c" + player.getName()); // Red "Zombie" prefix
             player.setPlayerListName("§cZ " + player.getName()); // Red "Zombie" prefix
             sendTitle(player, ChatColor.RED + "You have joined the Zombies team");
+
+            // Play the zombies sound for the player
+            player.playSound(player.getLocation(), "zombies", 1.0f, 1.0f); // Custom zombie sound
+            player.sendMessage(ChatColor.GREEN + "Played zombies sound."); // Debug message
+
         } else if (team.equalsIgnoreCase("Runners")) {
             player.setDisplayName("§b" + player.getName()); // Aqua "Runner" prefix
             player.setPlayerListName("§bR " + player.getName()); // Aqua "Runner" prefix
             sendTitle(player, ChatColor.AQUA + "You have joined the Runners team");
+
+            // Play the runners sound for the player
+            player.playSound(player.getLocation(), "runners", 1.0f, 1.0f); // Custom runner sound
+            player.sendMessage(ChatColor.GREEN + "Played runners sound."); // Debug message
         }
+
     }
 
     @EventHandler
@@ -346,7 +356,7 @@ public class TeamManager implements Listener {
             }
             stopPotionEffectLoop();
 
-// Delayed task to restore boats and passengers
+            // Delayed task to restore boats and passengers
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 List<UUID> boatsToRemove = new ArrayList<>();
 
