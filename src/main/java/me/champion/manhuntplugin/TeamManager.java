@@ -240,8 +240,6 @@ public class TeamManager implements Listener {
 
             // Play the zombies sound for the player
             player.playSound(player.getLocation(), "zombies", 1.0f, 1.0f); // Custom zombie sound
-            player.sendMessage(ChatColor.GREEN + "Played zombies sound."); // Debug message
-
         } else if (team.equalsIgnoreCase("Runners")) {
             player.setDisplayName("§b" + player.getName()); // Aqua "Runner" prefix
             player.setPlayerListName("§bR " + player.getName()); // Aqua "Runner" prefix
@@ -249,9 +247,7 @@ public class TeamManager implements Listener {
 
             // Play the runners sound for the player
             player.playSound(player.getLocation(), "runners", 1.0f, 1.0f); // Custom runner sound
-            player.sendMessage(ChatColor.GREEN + "Played runners sound."); // Debug message
         }
-
     }
 
     @EventHandler
