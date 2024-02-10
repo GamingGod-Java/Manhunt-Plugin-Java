@@ -23,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
+import org.checkerframework.checker.units.qual.N;
 
 import java.util.logging.Level;
 import java.io.File;
@@ -432,79 +433,64 @@ public class TeamManager implements Listener {
         //System.out.println("onPlayerDeath invoked for " + event.getEntity().getName());
         wasDeadPlayerRunner = false;
         if (!GameOver) {
+            boolean NaturalCauses = true;
             deathEventHandled = true;
             Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
             savePotionEffects(event.getEntity());
             Player player = event.getEntity();
-            EntityDamageEvent lastDamageCause = player.getLastDamageCause();
+            //EntityDamageEvent lastDamageCause = player.getLastDamageCause();
 
             UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
             String team = playerTeams.get(playerUUID);
-
-
-            if (team != null && team.equalsIgnoreCase("Runners")) {
-
-                // Check if the player was killed by another entity
-                if (lastDamageCause != null) {
-                    EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
-
-                    // Check if the killer is a player
-                    if (damageByEntityEvent.getDamager() instanceof Player) {
-                        Player killer = (Player) damageByEntityEvent.getDamager();
-
-                        // Custom logic for when a player is killed by another player
-                        event.setDeathMessage("§b" + player.getName() + "§f has been infected by §c" + killer.getName());
-                        updatePlayerStatistics(player.getName(), "player_deaths");
-                        updatePlayerStatistics(killer.getName(), "player_kills");
-
-                    } else {
-                        event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
-                        updatePlayerStatistics(player.getName(), "environment_deaths");
-                        updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
-                    }
-                } else {
-                    event.setDeathMessage("§b" + player.getName() + " §fhas been infected by the environment");
-                    updatePlayerStatistics(player.getName(), "environment_deaths");
-                }
-                System.out.println("set to true");
-                wasDeadPlayerRunner = true;
-                addToTeam(player, "Zombies");
-                pauseGame(player);
-                player.sendMessage("§cYou have joined the Zombies team!");
-            } else if (team != null && team.equalsIgnoreCase("Zombies")) {
-                EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) lastDamageCause;
-                if (lastDamageCause != null) {
-                    // Check if the killer is a player
-                    if (damageByEntityEvent.getDamager() instanceof Player) {
-                        Player killer = (Player) damageByEntityEvent.getDamager();
-
-                        event.setDeathMessage("§c" + player.getName() + "§f was slain by §b" + killer.getName());
-                        updatePlayerStatistics(player.getName(), "player_deaths");
-                        updatePlayerStatistics(killer.getName(), "player_kills");
-                    } else {
-                        updatePlayerStatistics(player.getName(), "environment_deaths");
-                        updatePlayerStatistics(damageByEntityEvent.getDamager().getName(), "player_kills");
-                    }
-                } else {
-                    updatePlayerStatistics(player.getName(), "environment_deaths");
-                }
-            } else {
-                String originalDeathMessage = event.getDeathMessage();
-                int firstSpaceIndex = originalDeathMessage.indexOf(" ");
-                String playerName = originalDeathMessage.substring(0, firstSpaceIndex);
-                String restOfMessage = originalDeathMessage.substring(firstSpaceIndex + 1);
-
-                // Modify the death message with the new format
-                String newDeathMessage = "§c" + playerName + " §f" + restOfMessage;
-                event.setDeathMessage(newDeathMessage);
-            }
 
 
             // Remove the player from the saved boat data if they die while in a boat
             for (BoatData boatData : savedBoats.values()) {
                 boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
             }
-        }
+            String deathMessage = event.getDeathMessage();
+            String newDeathMessage = deathMessage;
+            if (deathMessage.contains("by")) {
+                String[] deathMessageSplits = deathMessage.split(" ");
+                for (int i = 0; i < deathMessageSplits.length; i++) {
+                    if ("by".equals(deathMessageSplits[i])) {
+                        for (Player iplayer : Bukkit.getOnlinePlayers()) {
+                            if (deathMessageSplits[i+1].equals(iplayer.getName())) {
+                                updatePlayerStatistics(iplayer.getName(), "player_kills");
+                                NaturalCauses = false;
+                            }
+                        }
+                    }
+                }
+            }
+                assert deathMessage != null;
+                String playername = player.getName();
+                if (deathMessage.contains(playername)) {
+                    System.out.println(getPlayersOnTeam("Runners"));
+                    System.out.println(getPlayersOnTeam("Zombies"));
+                    if (team != null && team.equalsIgnoreCase("Runners")) {
+                        wasDeadPlayerRunner = true;
+                        newDeathMessage = newDeathMessage.replace(playername, "§b"+playername+"§f");
+                        addToTeam(player, "Zombies");
+                        pauseGame(player);
+                        //event.setDeathMessage(newDeathMessage);
+
+
+                    } if (team != null && team.equalsIgnoreCase("Zombies")) {
+                        newDeathMessage = newDeathMessage.replace(playername, "§c"+playername+"§f");
+                        //event.setDeathMessage(newDeathMessage);
+
+                    } if (NaturalCauses == true) {
+                        updatePlayerStatistics(playername, "environment_deaths");
+                    } if (NaturalCauses == false) {
+                        updatePlayerStatistics(playername, "player_deaths");
+                    }
+                    event.setDeathMessage(newDeathMessage);
+
+
+                }
+            }
+
         System.out.println(wasDeadPlayerRunner + " restore debuff");
     }
 
