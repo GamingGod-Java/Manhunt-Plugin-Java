@@ -21,6 +21,3 @@ Unfixed:
 Fixed:
     When zombie kills zombie message is blue
     //Rewrote player death logic, statistics tracking now based on death message
-
-
-
