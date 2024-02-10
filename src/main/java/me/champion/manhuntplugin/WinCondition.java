@@ -54,7 +54,7 @@ public class WinCondition implements Listener {
                         return;
                     }
 
-                    for (Player player : teamManager.getPlayersOnTeam("Runners")) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
                         spawnFirework(player, Color.AQUA);
                     }
 
