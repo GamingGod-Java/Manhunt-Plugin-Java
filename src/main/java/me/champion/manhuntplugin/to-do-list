@@ -1,4 +1,4 @@
-Ideas:
+Ideas:U
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
     Anti combat log
@@ -13,11 +13,24 @@ Ideas:
 Unfixed:
     SERVER PERFORMANCE
 
-    MhIntro can be ran by anyone, at any time, any number of times
+    Add way to enable/disable MhIntro
+
+    MhMove doesn't play sound
+
+    Add confirmation to /mhrestart due to similarities with /mhr
+
+    Add date, time, and duration to statistics tracking
+
+    Add wins/losses (locked to starting teams)
+
+    The TeamMove class is supposed to be called MhMove
+
+Fixed:
+    When Zombie kills Zombie message is blue
+    //Rewrote player death logic, statistics tracking now based on death message
 
     On runner win, no fireworks spawned on zombies
+    //Just changed WinCondition to spawn for everyone and not just Runners on Runner win /shrug
 
-    Add way to enable/disable MhIntro
-Fixed:
-    When zombie kills zombie message is blue
-    //Rewrote player death logic, statistics tracking now based on death message
+    MhIntro can be ran by anyone, at any time, any number of times
+    //I might have fixed it? (chatgpt and I don't have pack to test with
