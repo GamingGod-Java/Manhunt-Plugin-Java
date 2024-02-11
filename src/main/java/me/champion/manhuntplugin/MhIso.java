@@ -63,49 +63,74 @@ public class MhIso implements Listener, CommandExecutor {
 
         Player player = (Player) sender;
 
-
-
         // Check if player has OP
         if (!sender.isOp()) {
             player.sendMessage("§cYou do not have permission to use this command.");
             return true;
         }
 
-        if (args.length < 2 && !fight) {
-            player.sendMessage("Usage: /isoult <player1> <player2>");
+        // Handle the command to end the game
+        if (args.length == 1 && args[0].equalsIgnoreCase("end")) {
+            if (fight) {
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    restorePlayerLocation(onlinePlayer);
+                    onlinePlayer.setGameMode(GameMode.SURVIVAL);
+                }
+                fight = false;
+                player.sendMessage("Game has been ended.");
+            } else {
+                player.sendMessage("The game is not currently running.");
+            }
             return true;
         }
 
-        if (!fight) {
-
-            String runnername = args[0];
-            String zombiename = args[1];
-
-            Player runner = Bukkit.getPlayerExact(runnername);
-            Player zombie = Bukkit.getPlayerExact(zombiename);
-
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                savePlayerLocation(onlinePlayer);
-                if ((!onlinePlayer.getName().equals(runnername) && !onlinePlayer.getName().equals(zombiename))) {
-                    player.setGameMode(GameMode.SPECTATOR);
-                }
-            }
-
-            runner.teleport(runnerlocation);
-            zombie.teleport(zombielocation);
-
-            //teamManager.pauseGame(player);
-        }
-
+        // Check if game is already going, prevent starting a new one
         if (fight) {
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                restorePlayerLocation(onlinePlayer);
-                player.setGameMode(GameMode.SURVIVAL);
+            player.sendMessage("A game is already in progress. Use /mhiso end to end the current game.");
+            return true;
+        }
+
+        // Existing game start logic
+        if (args.length < 2) {
+            player.sendMessage("Usage: /MhIso <player1> <player2>");
+            return true;
+        }
+
+        String runnername = args[0];
+        String zombiename = args[1];
+
+        // Check if the runner and zombie are the same player
+        if (runnername.equalsIgnoreCase(zombiename)) {
+            player.sendMessage("Error: A player cannot fight themselves.");
+            return true;
+        }
+
+        Player runner = Bukkit.getPlayerExact(runnername);
+        Player zombie = Bukkit.getPlayerExact(zombiename);
+
+        if (runner == null || zombie == null) {
+            player.sendMessage("One or both specified players are not online.");
+            return true;
+        }
+
+        if (runnerlocation == null || zombielocation == null) {
+            player.sendMessage("Error: Game locations not set up correctly.");
+            return true;
+        }
+
+        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            savePlayerLocation(onlinePlayer);
+            if ((!onlinePlayer.getName().equals(runnername) && !onlinePlayer.getName().equals(zombiename))) {
+                onlinePlayer.setGameMode(GameMode.SPECTATOR);
             }
         }
 
-        fight = !fight;
+        runner.teleport(runnerlocation);
+        zombie.teleport(zombielocation);
 
+        // Additional setup or game logic can be added here
+
+        fight = true;
         return true;
     }
 
@@ -120,9 +145,13 @@ public class MhIso implements Listener, CommandExecutor {
         if (playerLocations.containsKey(playerId)) {
             Location location = playerLocations.get(playerId);
 
-            // Check if the location is not null and the world is valid
-            if (location != null && Bukkit.getWorld(location.getWorld().getName()) != null) {
-                player.teleport(location);
+            // Check if the location and world are not null
+            if (location != null && location.getWorld() != null) {
+                if (Bukkit.getWorld(location.getWorld().getName()) != null) {
+                    player.teleport(location);
+                } else {
+                    player.sendMessage("Invalid world in saved location for " + player.getName());
+                }
             } else {
                 player.sendMessage("Invalid saved location for " + player.getName());
             }

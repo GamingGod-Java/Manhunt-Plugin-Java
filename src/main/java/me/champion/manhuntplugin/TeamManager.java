@@ -3,6 +3,7 @@ package me.champion.manhuntplugin;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.player.*;
@@ -10,6 +11,9 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -18,7 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.block.Block;
 
 import java.util.logging.Level;
 import java.io.File;
@@ -56,7 +59,7 @@ public class TeamManager implements Listener {
         potionEffectTask = new BukkitRunnable() {
             @Override
             public void run() {
-                    applyPotionEffectsDuringPause();
+                applyPotionEffectsDuringPause();
             }
         }.runTaskTimer(plugin, 0, 20); // The second parameter (delay) is in ticks, so 20 ticks = 1 second
     }
@@ -441,8 +444,38 @@ public class TeamManager implements Listener {
                 boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
             }
             String deathMessage = event.getDeathMessage();
-            String newDeathMessage = deathMessage;
-            if (deathMessage.contains("by")) {
+            //String newDeathMessage = deathMessage;
+            String[] deathMessageParts = deathMessage.split(" ");
+            StringBuilder newDeathMessageBuilder = new StringBuilder();
+
+            for (String part : deathMessageParts) {
+                boolean playerFound = false;
+
+                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    if (part.equalsIgnoreCase(onlinePlayer.getName())) {
+                        String coloredName;
+                        if (playerTeams.get(player.getUniqueId()).equalsIgnoreCase("Runners")) {
+                            coloredName = "§b" + onlinePlayer.getName() + "§f";
+                        } else if (playerTeams.get(player.getUniqueId()).equalsIgnoreCase("Zombies")) {
+                            coloredName = "§c" + onlinePlayer.getName() + "§f";
+                        } else {
+                            coloredName = onlinePlayer.getName();
+                        }
+
+                        // Append the colored name to the newDeathMessage
+                        newDeathMessageBuilder.append(coloredName).append(" ");
+                        playerFound = true;
+                        break;  // Break from the loop once a player is found
+                    }
+                }
+
+                if (!playerFound) {
+                    // Append the unchanged part to the newDeathMessage
+                    newDeathMessageBuilder.append(part).append(" ");
+                }
+            }
+            String newDeathMessage = newDeathMessageBuilder.toString().trim();
+            if (newDeathMessage.contains("by")) {
                 String[] deathMessageSplits = deathMessage.split(" ");
                 for (int i = 0; i < deathMessageSplits.length; i++) {
                     if ("by".equals(deathMessageSplits[i])) {
@@ -455,33 +488,31 @@ public class TeamManager implements Listener {
                     }
                 }
             }
-                assert deathMessage != null;
-                String playername = player.getName();
-                if (deathMessage.contains(playername)) {
-                    System.out.println(getPlayersOnTeam("Runners"));
-                    System.out.println(getPlayersOnTeam("Zombies"));
-                    if (team != null && team.equalsIgnoreCase("Runners")) {
-                        wasDeadPlayerRunner = true;
-                        newDeathMessage = newDeathMessage.replace(playername, "§b"+playername+"§f");
-                        addToTeam(player, "Zombies");
-                        pauseGame(player);
-                        //event.setDeathMessage(newDeathMessage);
+            assert newDeathMessage != null;
+            String playername = player.getName();
+            if (newDeathMessage.contains(playername)) {
+                System.out.println(getPlayersOnTeam("Runners"));
+                System.out.println(getPlayersOnTeam("Zombies"));
+                if (team != null && team.equalsIgnoreCase("Runners")) {
+                    wasDeadPlayerRunner = true;
+                    addToTeam(player, "Zombies");
+                    pauseGame(player);
+                    //event.setDeathMessage(newDeathMessage);
 
 
-                    } if (team != null && team.equalsIgnoreCase("Zombies")) {
-                        newDeathMessage = newDeathMessage.replace(playername, "§c"+playername+"§f");
-                        //event.setDeathMessage(newDeathMessage);
+                } if (team != null && team.equalsIgnoreCase("Zombies")) {
+                    //event.setDeathMessage(newDeathMessage);
 
-                    } if (NaturalCauses == true) {
-                        updatePlayerStatistics(playername, "environment_deaths");
-                    } if (NaturalCauses == false) {
-                        updatePlayerStatistics(playername, "player_deaths");
-                    }
-                    event.setDeathMessage(newDeathMessage);
-
-
+                } if (NaturalCauses == true) {
+                    updatePlayerStatistics(playername, "environment_deaths");
+                } if (NaturalCauses == false) {
+                    updatePlayerStatistics(playername, "player_deaths");
                 }
+                event.setDeathMessage(newDeathMessage);
+
+
             }
+        }
 
         System.out.println(wasDeadPlayerRunner + " restore debuff");
     }
@@ -509,42 +540,46 @@ public class TeamManager implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        World world = player.getWorld();
-        Location respawnLocation = player.getLocation();
-
-        // Check if the player is respawning on a barrier
-        if (respawnLocation.getBlock().getType() == Material.BARRIER) {
-            boolean safeGroundFound = false;
-            while (respawnLocation.getBlockY() > 0 && !safeGroundFound) {
-                respawnLocation.subtract(0, 1, 0);
-                Block blockBelow = respawnLocation.getBlock();
-
-                // Check for a non-barrier, solid block
-                if (blockBelow.getType() != Material.BARRIER && blockBelow.getType().isSolid()) {
-                    safeGroundFound = true;
-                }
-            }
-
-            // If a safe ground block is found, teleport the player
-            if (safeGroundFound) {
-                player.teleport(respawnLocation.add(0, 1, 0)); // Add 1 to Y to place player above the ground block
-            } else {
-                // Handle the case where no safe ground is found
-                // For example, teleport to a default safe location
-                player.teleport(world.getSpawnLocation()); // Or any other predefined safe location
-            }
-        }
-
-        // Rest of your existing code...
         String team = playerTeams.get(player.getUniqueId());
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            // Your existing code for the Zombies team...
+            // Check if the player already has the items in their inventory
+            if (!player.getInventory().contains(Material.STONE_AXE) ||
+                    !player.getInventory().contains(Material.STONE_PICKAXE) ||
+                    !player.getInventory().contains(Material.BREAD) ||
+                    !player.getInventory().contains(Material.COMPASS)) {
+
+                // Give 1 stone axe
+                ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
+                player.getInventory().addItem(stoneAxe);
+
+                // Give 1 stone pickaxe
+                ItemStack stonePickaxe = new ItemStack(Material.STONE_PICKAXE, 1);
+                player.getInventory().addItem(stonePickaxe);
+
+                // Give 20 bread
+                ItemStack bread = new ItemStack(Material.BREAD, 20);
+                player.getInventory().addItem(bread);
+
+                // Create and give the compass
+                ItemStack compass = new ItemStack(Material.COMPASS);
+                compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
+                ItemMeta compassMeta = compass.getItemMeta();
+                if (compassMeta != null) {
+                    compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    compassMeta.setDisplayName("§cTrack Runners");
+                    compass.setItemMeta(compassMeta);
+                }
+                player.getInventory().addItem(compass);
+            }
         }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            // Your existing delayed potion effect application code...
+            // Delayed potion effect application
+            if (!wasDeadPlayerRunner) {
+                System.out.println("dead player not runner");
+                restoreDebuffEffects(player);
+            }
         }, 1);
     }
-
 
     public Player findNearestRunner(Location zombieLocation) {
         Player nearestRunner = null;
