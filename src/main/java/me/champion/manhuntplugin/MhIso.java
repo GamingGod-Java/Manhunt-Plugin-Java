@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class IsoUlt implements Listener, CommandExecutor {
+public class MhIso implements Listener, CommandExecutor {
     private TeamManager teamManager;
     private Plugin plugin;
 
@@ -23,12 +23,12 @@ public class IsoUlt implements Listener, CommandExecutor {
     private boolean fight = false;
 
     private final Map<UUID, Location> playerLocations = new HashMap<>();
-    public  IsoUlt(TeamManager teamManager, Plugin plugin) {
+    public  MhIso(TeamManager teamManager, Plugin plugin) {
         this.teamManager = teamManager;
         this.plugin = plugin;
     }
 
-    public void createBedrockBox(Player player) {
+    public void createBarrierBox(Player player) {
         int boxRadius = 16; // Radius for bedrock box
         int boxHeight = 5;  // Height of the bedrock box
         World world = player.getWorld();
@@ -103,8 +103,8 @@ public class IsoUlt implements Listener, CommandExecutor {
 
         if (fight) {
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-               restorePlayerLocation(onlinePlayer);
-               player.setGameMode(GameMode.SURVIVAL);
+                restorePlayerLocation(onlinePlayer);
+                player.setGameMode(GameMode.SURVIVAL);
             }
         }
 

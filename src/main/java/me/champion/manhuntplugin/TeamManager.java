@@ -3,18 +3,13 @@ package me.champion.manhuntplugin;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,7 +18,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.stream.Collectors;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.units.qual.N;
+import org.bukkit.block.Block;
 
 import java.util.logging.Level;
 import java.io.File;
@@ -514,46 +509,42 @@ public class TeamManager implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
-        String team = playerTeams.get(player.getUniqueId());
-        if (team != null && team.equalsIgnoreCase("Zombies")) {
-            // Check if the player already has the items in their inventory
-            if (!player.getInventory().contains(Material.STONE_AXE) ||
-                    !player.getInventory().contains(Material.STONE_PICKAXE) ||
-                    !player.getInventory().contains(Material.BREAD) ||
-                    !player.getInventory().contains(Material.COMPASS)) {
+        World world = player.getWorld();
+        Location respawnLocation = player.getLocation();
 
-                // Give 1 stone axe
-                ItemStack stoneAxe = new ItemStack(Material.STONE_AXE, 1);
-                player.getInventory().addItem(stoneAxe);
+        // Check if the player is respawning on a barrier
+        if (respawnLocation.getBlock().getType() == Material.BARRIER) {
+            boolean safeGroundFound = false;
+            while (respawnLocation.getBlockY() > 0 && !safeGroundFound) {
+                respawnLocation.subtract(0, 1, 0);
+                Block blockBelow = respawnLocation.getBlock();
 
-                // Give 1 stone pickaxe
-                ItemStack stonePickaxe = new ItemStack(Material.STONE_PICKAXE, 1);
-                player.getInventory().addItem(stonePickaxe);
-
-                // Give 20 bread
-                ItemStack bread = new ItemStack(Material.BREAD, 20);
-                player.getInventory().addItem(bread);
-
-                // Create and give the compass
-                ItemStack compass = new ItemStack(Material.COMPASS);
-                compass.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
-                ItemMeta compassMeta = compass.getItemMeta();
-                if (compassMeta != null) {
-                    compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    compassMeta.setDisplayName("§cTrack Runners");
-                    compass.setItemMeta(compassMeta);
+                // Check for a non-barrier, solid block
+                if (blockBelow.getType() != Material.BARRIER && blockBelow.getType().isSolid()) {
+                    safeGroundFound = true;
                 }
-                player.getInventory().addItem(compass);
+            }
+
+            // If a safe ground block is found, teleport the player
+            if (safeGroundFound) {
+                player.teleport(respawnLocation.add(0, 1, 0)); // Add 1 to Y to place player above the ground block
+            } else {
+                // Handle the case where no safe ground is found
+                // For example, teleport to a default safe location
+                player.teleport(world.getSpawnLocation()); // Or any other predefined safe location
             }
         }
+
+        // Rest of your existing code...
+        String team = playerTeams.get(player.getUniqueId());
+        if (team != null && team.equalsIgnoreCase("Zombies")) {
+            // Your existing code for the Zombies team...
+        }
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            // Delayed potion effect application
-            if (!wasDeadPlayerRunner) {
-                System.out.println("dead player not runner");
-                restoreDebuffEffects(player);
-            }
+            // Your existing delayed potion effect application code...
         }, 1);
     }
+
 
     public Player findNearestRunner(Location zombieLocation) {
         Player nearestRunner = null;

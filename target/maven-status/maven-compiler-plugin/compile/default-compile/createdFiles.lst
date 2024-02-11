@@ -11,6 +11,7 @@ me\champion\manhuntplugin\MhUnpause.class
 me\champion\manhuntplugin\TeamMove.class
 me\champion\manhuntplugin\MhSettings.class
 me\champion\manhuntplugin\TeamManager$1.class
+me\champion\manhuntplugin\MhIso.class
 me\champion\manhuntplugin\MhStart$1.class
 me\champion\manhuntplugin\TeamChat.class
 me\champion\manhuntplugin\DisableBedBomb.class

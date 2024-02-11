@@ -27,17 +27,17 @@ public class MhCreate implements CommandExecutor {
 
     private final MhStart mhStart;
 
-    private final IsoUlt isoUlt;  // Added IsoUlt instance
+    private final MhIso mhIso;  // Added IsoUlt instance
 
     private final List<Location> platformLocations = new ArrayList<>();
 
     private static Location spawnLocation; // Declare the spawnLocation variable
 
-    public MhCreate(Manhunt plugin, TeamManager teamManager, MhStart mhStart, IsoUlt isoUlt) {
+    public MhCreate(Manhunt plugin, TeamManager teamManager, MhStart mhStart, MhIso mhIso) {
         this.plugin = plugin;
         this.teamManager = teamManager;  // Initialize TeamManager instance
         this.mhStart = mhStart;
-        this.isoUlt = isoUlt;
+        this.mhIso = mhIso;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class MhCreate implements CommandExecutor {
 
         player.sendMessage("§bRunner§r and §cZombie§r platforms spawned around you! Type /MhStart to start the countdown.");
 
-        isoUlt.createBedrockBox(player);
+        mhIso.createBarrierBox(player);
 
         return true;
     }

@@ -48,6 +48,6 @@ commands:
   MhIntro:
     description: Plays the intro sound
     usage: /MhIntro
-  isoult:
+  MhIso:
     description: Places 2 players into a 1v1 arena
-    usage: /isoult
+    usage: /<command> <player1> <player2> OR /<command> end
