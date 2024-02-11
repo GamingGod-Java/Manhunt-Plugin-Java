@@ -19,7 +19,7 @@ Unfixed:
 
     Add confirmation to /mhrestart due to similarities with /mhr
 
-    Add date, time, and duration to statistics tracking
+    Add duration to statistics tracking
 
     Add wins/losses (locked to starting teams)
 
@@ -35,4 +35,6 @@ Fixed:
     //Just changed WinCondition to spawn for everyone and not just Runners on Runner win /shrug
 
     MhIntro can be ran by anyone, at any time, any number of times
-    //I might have fixed it? (chatgpt and I don't have pack to test with
+    //I might have fixed it? (chatgpt and I don't have pack to test with)
+
+    Added date/time to file name in sessions folder

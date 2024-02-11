@@ -24,6 +24,8 @@ public final class Manhunt extends JavaPlugin {
     private TeamChat teamChat;
     private MhWheel mhWheel;
     private WinCondition winCondition;
+
+    private IsoUlt isoUlt;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
@@ -75,6 +77,8 @@ public final class Manhunt extends JavaPlugin {
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here
         winCondition = new WinCondition(teamManager, mhStart, this);
+        isoUlt = new IsoUlt(teamManager, this);
+
         MhSettings mhSettings = new MhSettings();
 
         setWorldBorder();
@@ -82,7 +86,7 @@ public final class Manhunt extends JavaPlugin {
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
         // Register commands
-        registerCommand("MhCreate", new MhCreate(this, teamManager, mhStart));
+        registerCommand("MhCreate", new MhCreate(this, teamManager, mhStart, isoUlt));
         registerCommand("MhMove", new TeamMove(teamManager));
         registerCommand("MhPause", new MhPause(this, teamManager));
         registerCommand("MhUnpause", new MhUnpause(this, teamManager));
@@ -94,6 +98,7 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhWheel", mhWheel);
         registerCommand("MhSettings", mhSettings);
         registerCommand("MhIntro", new MhIntro());
+        registerCommand("isoult", isoUlt);
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
@@ -109,6 +114,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
+        getServer().getPluginManager().registerEvents(isoUlt, this);
         getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
     }
 

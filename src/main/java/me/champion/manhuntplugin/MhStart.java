@@ -115,7 +115,7 @@ public class MhStart implements CommandExecutor {
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
 
-        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this);
+        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this, new IsoUlt(teamManager, Manhunt.getPlugin()));
         mhCreate.removeGlassSphere((Player) sender);
 
         //resetBossBar();
