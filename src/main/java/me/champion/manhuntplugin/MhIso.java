@@ -91,12 +91,8 @@ public class MhIso implements Listener, CommandExecutor {
                 }
             }
 
-
-
             runner.teleport(runnerlocation);
             zombie.teleport(zombielocation);
-
-
 
             //teamManager.pauseGame(player);
         }
