@@ -9,6 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.io.File;
 import java.io.IOException;
@@ -40,11 +42,24 @@ public final class Manhunt extends JavaPlugin {
         enableFlightInServerProperties();
         setDifficultyHardInServerProperties();
 
+        // Creating a directory to store session files if it doesn't exist
+        File sessionDirectory = new File(getDataFolder(), "sessions");
+        if (!sessionDirectory.exists()) {
+            sessionDirectory.mkdir();
+        }
+
+        // Creating unique filenames based on date/time
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDate = dateFormat.format(new Date());
+
+        statisticsFile = new File(sessionDirectory, "statistics_" + currentDate + ".yml");
+        // configFile = new File(sessionDirectory, "config_" + currentDate + ".yml");
+
         try {
             statisticsConfig.save(statisticsFile);
-            getLogger().info("Created and saved statistics.yml");
+            getLogger().info("Created and saved " + statisticsFile.getName());
         } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to save statistics.yml: " + e.getMessage(), e);
+            getLogger().log(Level.SEVERE, "Failed to save " + statisticsFile.getName() + ": " + e.getMessage(), e);
         }
 
         config = new YamlConfiguration();
@@ -55,7 +70,7 @@ public final class Manhunt extends JavaPlugin {
         }
         getLogger().info("Emptied playerdata.yml");
 
-        teamManager = new TeamManager(this);
+        teamManager = new TeamManager(this, currentDate);
         mhStart = new MhStart(teamManager);
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here

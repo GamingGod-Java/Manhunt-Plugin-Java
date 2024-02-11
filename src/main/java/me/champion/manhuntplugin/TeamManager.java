@@ -189,8 +189,9 @@ public class TeamManager implements Listener {
         originalAirLevels.clear();
     }
 
-    public TeamManager(Plugin plugin) {
-        statisticsFile = new File(plugin.getDataFolder(), "statistics.yml");
+    public TeamManager(Plugin plugin, String SessionID) {
+        File sessionDirectory = new File(plugin.getDataFolder(), "sessions");
+        statisticsFile = new File(sessionDirectory,"statistics_" + SessionID + ".yml");
         statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
 
         if (!statisticsFile.exists()) {
