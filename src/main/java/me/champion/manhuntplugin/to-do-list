@@ -15,7 +15,7 @@ Unfixed:
 
     Add way to enable/disable MhIntro
 
-    Mhmove doesnt play sound
+    MhMove doesn't play sound
 
     Add confirmation to /mhrestart due to similarities with /mhr
 
@@ -23,16 +23,16 @@ Unfixed:
 
     Add wins/losses (locked to starting teams)
 
+    The TeamMove class is supposed to be called MhMove
+
+    Create multiple versions of the same text for joining teams
 
 Fixed:
-    When zombie kills zombie message is blue
+    When Zombie kills Zombie message is blue
     //Rewrote player death logic, statistics tracking now based on death message
 
     On runner win, no fireworks spawned on zombies
-    //Just changed wincondition to spawn for everyone and not just runners on runner win /shrug
+    //Just changed WinCondition to spawn for everyone and not just Runners on Runner win /shrug
 
     MhIntro can be ran by anyone, at any time, any number of times
-    //I might have fixed it? (chatgpt and i dont have pack to test with
-
-
-
+    //I might have fixed it? (chatgpt and I don't have pack to test with

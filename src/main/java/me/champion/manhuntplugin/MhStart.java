@@ -13,7 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-
+import org.bukkit.Sound;
 public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
@@ -62,9 +62,6 @@ public class MhStart implements CommandExecutor {
         }
     }
 
-
-
-
     public void cancelInitialCountdown() {
         if (initialCountdownTask != null && !initialCountdownTask.isCancelled()) {
             initialCountdownTask.cancel();
@@ -112,7 +109,7 @@ public class MhStart implements CommandExecutor {
 
             onlineplayer.setSaturation(20);
 
-
+            onlineplayer.playSound(onlineplayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F);
         }
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @a");
 
