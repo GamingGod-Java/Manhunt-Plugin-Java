@@ -27,6 +27,8 @@ Unfixed:
 
     Saving information between restarts
 
+    Custom manhunt client
+
 Fixed:
     When Zombie kills Zombie message is blue
     //Rewrote player death logic, statistics tracking now based on death message
