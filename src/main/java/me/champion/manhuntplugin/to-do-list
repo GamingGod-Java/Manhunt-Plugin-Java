@@ -11,13 +11,7 @@ Ideas:U
         Random time to unpause
 
 Unfixed:
-    SERVER PERFORMANCE
-
     Add way to enable/disable MhIntro
-
-    MhMove doesn't play sound
-
-    Add confirmation to /mhrestart due to similarities with /mhr
 
     Add duration to statistics tracking
 
@@ -26,6 +20,12 @@ Unfixed:
     The TeamMove class is supposed to be called MhMove
 
     Create multiple versions of the same text for joining teams
+
+    Dragon not perching (may be linked to peaceful mode)
+
+    zombie win event not triggered (after server restart?)
+
+    Saving information between restarts
 
 Fixed:
     When Zombie kills Zombie message is blue
