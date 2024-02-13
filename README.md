@@ -29,6 +29,7 @@ Prefixed with /Mh
 * /MhTeamChat: Enables or disables team chat (player must be on a team).
 * /MhWheel: After spinning the wheel on Discord, use this command to add the buff or debuff.
 * /MhSettings: Settings menu for Operators.
+* /MhIntro: This will play the intro sound for all players (you need the resourcepack)
 
 ### Win Conditions
 * Runner Victory: Achieved by defeating the Ender Dragon. Upon the dragon's defeat, a message announces the Runners' victory, and celebratory fireworks are launched.
