@@ -1,4 +1,4 @@
-Ideas:U
+Ideas:
     Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
 
     Anti combat log
@@ -10,24 +10,24 @@ Ideas:U
         Slow pause/unpause
         Random time to unpause
 
-Unfixed:
+    Custom manhunt client
+
     Add way to enable/disable MhIntro
 
     Add duration to statistics tracking
-
     Add wins/losses (locked to starting teams)
-
-    The TeamMove class is supposed to be called MhMove
 
     Create multiple versions of the same text for joining teams
 
+
+Unfixed:
     Dragon not perching (may be linked to peaceful mode)
 
     zombie win event not triggered (after server restart?)
 
-    Saving information between restarts
+    The TeamMove class is supposed to be called MhMove
 
-    Custom manhunt client
+    Saving information between restarts
 
 Fixed:
     When Zombie kills Zombie message is blue
