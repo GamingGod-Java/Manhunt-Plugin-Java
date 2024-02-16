@@ -62,6 +62,8 @@ public class MhCreate implements CommandExecutor {
         teleportPlayerToCenter(player);
         createGlassSphere(player);
 
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule domobspawning false");
+
         // Generate a 5x5x1 light blue concrete platform north of the player
         Location bluePlatformLocation = generatePlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
                 Material.LIGHT_BLUE_CONCRETE, -4); // North
@@ -77,6 +79,10 @@ public class MhCreate implements CommandExecutor {
         teamManager.registerPlatform("Zombies", redPlatformLocation);
 
         player.sendMessage("§bRunner§r and §cZombie§r platforms spawned around you! Type /MhStart to start the countdown.");
+
+        for (Player onlineplayer: Bukkit.getOnlinePlayers()) {
+            onlineplayer.setInvulnerable(true);
+        }
 
         mhIso.createBarrierBox(player);
 

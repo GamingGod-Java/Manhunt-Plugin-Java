@@ -110,10 +110,14 @@ public class MhStart implements CommandExecutor {
             onlineplayer.setSaturation(20);
 
             onlineplayer.playSound(onlineplayer.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F);
+
+            onlineplayer.setInvulnerable(false);
         }
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect clear @a");
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule domobspawning true");
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this, new MhIso(teamManager, Manhunt.getPlugin()));
         mhCreate.removeGlassSphere((Player) sender);

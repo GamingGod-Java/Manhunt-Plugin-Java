@@ -32,9 +32,9 @@ public class MhIso implements Listener, CommandExecutor {
         int boxRadius = 16; // Radius for bedrock box
         int boxHeight = 5;  // Height of the bedrock box
         World world = player.getWorld();
-        Location center = player.getLocation().add(0, 20, 0);
-        runnerlocation = player.getLocation().add(10, 21, 0);
-        zombielocation = player.getLocation().add(-10, 21, 0);
+        Location center = player.getLocation().add(40, 20, 40);
+        runnerlocation = player.getLocation().add(50, 21, 40);
+        zombielocation = player.getLocation().add(30, 21, 40);
 
         for (int x = -boxRadius; x <= boxRadius; x++) {
             for (int y = 0; y <= boxHeight; y++) {
