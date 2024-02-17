@@ -32,22 +32,14 @@ public class MhIso implements Listener, CommandExecutor {
         int boxRadius = 16; // Radius for bedrock box
         int boxHeight = 5;  // Height of the bedrock box
         World world = player.getWorld();
-
-        // Set the center location at Y level 315
-        Location center = player.getLocation().clone();
-        center.setY(85); // Set Y to 315
-
-        // Set runner and zombie locations at Y level 315
-        runnerlocation = center.clone().add(10, 1, 0); // 1 block above center Y level
-        zombielocation = center.clone().add(-10, 1, 0); // 1 block above center Y level
+        Location center = player.getLocation().add(40, 20, 40);
+        runnerlocation = player.getLocation().add(50, 21, 40);
+        zombielocation = player.getLocation().add(30, 21, 40);
 
         for (int x = -boxRadius; x <= boxRadius; x++) {
             for (int y = 0; y <= boxHeight; y++) {
                 for (int z = -boxRadius; z <= boxRadius; z++) {
                     Location blockLocation = center.clone().add(x, y, z);
-
-                    // Set Y level of the block location to 315
-                    blockLocation.setY(315);
 
                     // Floor: Bedrock
                     if (y == 0) {
@@ -61,7 +53,6 @@ public class MhIso implements Listener, CommandExecutor {
             }
         }
     }
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {

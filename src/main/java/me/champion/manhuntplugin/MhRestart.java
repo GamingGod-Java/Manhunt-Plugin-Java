@@ -22,16 +22,21 @@ public class MhRestart implements CommandExecutor {
             sender.sendMessage("§cYou do not have permission to use this command.");
             return true;
         } else {
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.getInventory().clear();
+            if (args.length == 1 && args[0].equalsIgnoreCase("confirm")) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    player.getInventory().clear();
+                }
+                mhStart.resetGame(); // Reset game, including both countdowns and boss bar
+                // Broadcast message to all players
+                Bukkit.broadcastMessage("The game has been reset.");
+                teamManager.unpauseZombies();
+                return true;
+            } else {
+                // Ask for confirmation
+                sender.sendMessage("§aAre you sure you want to reset the game?");
+                sender.sendMessage("§aTo confirm, use: /mhrestart confirm");
+                return true;
             }
-            mhStart.resetGame(); // Reset game, including both countdowns and boss bar
-            // Broadcast message to all players
-            Bukkit.broadcastMessage("The game has been reset.");
-            teamManager.unpauseZombies();
         }
-
-
-        return true;
     }
 }

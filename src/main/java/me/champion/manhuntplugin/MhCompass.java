@@ -1,5 +1,7 @@
 package me.champion.manhuntplugin;
 
+import org.bukkit.Bukkit;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 
 import org.bukkit.Location;
@@ -122,7 +124,7 @@ public class MhCompass implements CommandExecutor, Listener {
                 spawnParticlesNearLine(player);
             }
         };
-        task.runTaskTimer(plugin, 0L, 2L); // Spawn every 2 ticks
+        task.runTaskTimer(plugin, 0L, 1L);
         particleTasks.put(player.getUniqueId(), task);
     }
 
@@ -155,10 +157,10 @@ public class MhCompass implements CommandExecutor, Listener {
 
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
 
-        Location particleStartLocation = playerLocation.clone().add(0, 1.3, 0);
-        Vector offset = direction.clone().multiply(0.75); // Offset distance
+        Location particleStartLocation = playerLocation.clone().add(player.getVelocity().multiply(0.7)).add(0, 1.3, 0);
+        Vector offset = direction.clone().multiply(1.3); // Offset distance
         Location particleLocation = particleStartLocation.clone().add(offset);
 
-        player.getWorld().spawnParticle(Particle.DRAGON_BREATH, particleLocation, 1, 0, 0, 0, 0, null);
+        player.getWorld().spawnParticle(Particle.DRAGON_BREATH, particleLocation, 1, 0, 0, 0, 0, null, true);
     }
 }
