@@ -117,7 +117,7 @@ public class MhStart implements CommandExecutor {
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
 
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule domobspawning true");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doMobSpawning true");
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this, new MhIso(teamManager, Manhunt.getPlugin()));
         mhCreate.removeGlassSphere((Player) sender);
