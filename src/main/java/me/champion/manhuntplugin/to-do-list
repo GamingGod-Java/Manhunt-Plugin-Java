@@ -22,6 +22,7 @@ Ideas:
 
 Unfixed:
     Dragon not perching (may be linked to peaceful mode)
+    //just dont set it to peaceful
 
     zombie win event not triggered (after server restart?)
 
@@ -31,14 +32,12 @@ Unfixed:
 
     Particles need to stay at set distance from player
 
+    Saturation in pregame
+
+    Death detection only works sometimes?
+    //Unsure how to reproduce
+
+
 Fixed:
-    When Zombie kills Zombie message is blue
-    //Rewrote player death logic, statistics tracking now based on death message
-
-    On runner win, no fireworks spawned on zombies
-    //Just changed WinCondition to spawn for everyone and not just Runners on Runner win /shrug
-
-    MhIntro can be ran by anyone, at any time, any number of times
-    //I might have fixed it? (chatgpt and I don't have pack to test with)
-
-    Added date/time to file name in sessions folder
+    Nerf skeletons
+    //DamageNerf class, 50% damage

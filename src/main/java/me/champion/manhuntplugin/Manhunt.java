@@ -116,6 +116,7 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(mhSettings, this);
         getServer().getPluginManager().registerEvents(new MhIso(teamManager, this), this);
         getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
+        getServer().getPluginManager().registerEvents(new DamageNerf(teamManager), this);
     }
 
     @Override

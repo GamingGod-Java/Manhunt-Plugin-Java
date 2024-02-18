@@ -422,15 +422,16 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        if (deathEventHandled) {
+        /*if (deathEventHandled) {
             return;  // Skip processing if the death event has already been handled
-        }
+        }*/
         //System.out.println("onPlayerDeath invoked for " + event.getEntity().getName());
         wasDeadPlayerRunner = false;
         if (!GameOver) {
             boolean NaturalCauses = true;
-            deathEventHandled = true;
-            Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
+            //
+            // deathEventHandled = true;
+            //Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
             savePotionEffects(event.getEntity());
             Player player = event.getEntity();
             //EntityDamageEvent lastDamageCause = player.getLastDamageCause();
@@ -450,6 +451,7 @@ public class TeamManager implements Listener {
 
             for (String part : deathMessageParts) {
                 boolean playerFound = false;
+                System.out.println(part);
 
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if (part.equalsIgnoreCase(onlinePlayer.getName())) {
