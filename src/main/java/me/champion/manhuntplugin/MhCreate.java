@@ -129,14 +129,14 @@ public class MhCreate implements CommandExecutor {
         return centerLocation.clone().add(0, 1, 0);
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         /*Player player = event.getPlayer();
         if (!mhStart.gameStarted) {
             //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect give "+ event.getPlayer().getName()+ " minecraft:saturation 1000000 255 true");
             player.setSaturation(Float.MAX_VALUE);
-        }*/
-    }
+        }
+    }*/
 
     public void createGlassSphere(Player player) {
         int createRadius = 15; // Radius for creation

@@ -19,17 +19,17 @@ Ideas:
 
     Create multiple versions of the same text for joining teams
 
-
+    Compass rework
 Unfixed:
     zombie win event not triggered (after server restart?)
 
     Saving information between restarts
 
-    Death detection only works sometimes?
-    //Unsure how to reproduce, there were some inefficiencies baked into the onplayer death class due to having a check that no one had died in the last 5 seconds to prevent the same evnet being called multiple times which may have been its cause?
+    Disable inventory management during pause?
 
+    When glass sphere disappears, it doesnt replace snow/grass it destroyed
+
+    Autocomplete in mhmove is broken, maybe because it only works on capital letters
+
+    Change how to get kit to avoid instance suicide
 Fixed:
-    Nerf skeletons
-    //DamageNerf class, 50% damage
-
-    Made particles work on moving players
