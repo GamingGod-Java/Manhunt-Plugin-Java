@@ -544,7 +544,6 @@ public class TeamManager implements Listener {
         Player player = event.getPlayer();
         String team = playerTeams.get(player.getUniqueId());
         if (team != null && team.equalsIgnoreCase("Zombies")) {
-            // Check if the player already has the items in their inventory
             if (!player.getInventory().contains(Material.STONE_AXE) ||
                     !player.getInventory().contains(Material.STONE_PICKAXE) ||
                     !player.getInventory().contains(Material.BREAD) ||

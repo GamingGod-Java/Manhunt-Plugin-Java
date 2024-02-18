@@ -21,18 +21,11 @@ Ideas:
 
 
 Unfixed:
-    Dragon not perching (may be linked to peaceful mode)
-    //just dont set it to peaceful
-
     zombie win event not triggered (after server restart?)
 
     The TeamMove class is supposed to be called MhMove
 
     Saving information between restarts
-
-    Particles need to stay at set distance from player
-
-    Saturation in pregame
 
     Death detection only works sometimes?
     //Unsure how to reproduce
