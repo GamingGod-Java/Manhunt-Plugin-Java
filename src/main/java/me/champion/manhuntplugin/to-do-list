@@ -23,13 +23,10 @@ Ideas:
 Unfixed:
     zombie win event not triggered (after server restart?)
 
-    The TeamMove class is supposed to be called MhMove
-
     Saving information between restarts
 
     Death detection only works sometimes?
-    //Unsure how to reproduce
-
+    //Unsure how to reproduce, there were some inefficiencies baked into the onplayer death class due to having a check that no one had died in the last 5 seconds to prevent the same evnet being called multiple times which may have been its cause?
 
 Fixed:
     Nerf skeletons
