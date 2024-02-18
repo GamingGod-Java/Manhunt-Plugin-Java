@@ -148,6 +148,8 @@ public class MhCompass implements CommandExecutor, Listener {
         }
 
         Location runnerLocation = nearestRunner.getEyeLocation();
+        //Location runnerLocation = new Location(player.getWorld(), 0, 70, 0);
+        //Test location
 
         // Check if the zombie and runner are in the same dimension
         if (!playerLocation.getWorld().equals(runnerLocation.getWorld())) {
@@ -157,7 +159,7 @@ public class MhCompass implements CommandExecutor, Listener {
 
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
 
-        Location particleStartLocation = playerLocation.clone().add(player.getVelocity().multiply(1.1)).add(0, 1.3, 0);
+        Location particleStartLocation = playerLocation.clone().add(player.getVelocity().multiply(1.2)).add(0, 1.3, 0);
         Vector offset = direction.clone().multiply(0.75); // Offset distance
         Location particleLocation = particleStartLocation.clone().add(offset);
 

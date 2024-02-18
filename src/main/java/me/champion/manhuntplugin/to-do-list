@@ -41,3 +41,5 @@ Unfixed:
 Fixed:
     Nerf skeletons
     //DamageNerf class, 50% damage
+
+    Made particles work on moving players

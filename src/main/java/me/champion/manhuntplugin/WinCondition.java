@@ -128,7 +128,6 @@ public class WinCondition implements Listener {
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
-        //System.out.println("ENTER!!!!");
         Player player = event.getPlayer();
 
         // Check if the player is a runner and has entered the End portal
