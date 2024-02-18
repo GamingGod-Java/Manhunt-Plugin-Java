@@ -2,12 +2,15 @@ package me.champion.manhuntplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -118,6 +121,17 @@ public class MhStart implements CommandExecutor {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 0");
 
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doMobSpawning true");
+
+        World world = ((Player) sender).getWorld();
+            // Iterate through all entities in the world
+            for (Entity entity : world.getEntities()) {
+                // Check if the entity is an item
+                if (entity instanceof Item) {
+                    // Remove the item entity
+                    entity.remove();
+                }
+            }
+
 
         MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this, new MhIso(teamManager, Manhunt.getPlugin()));
         mhCreate.removeGlassSphere((Player) sender);
