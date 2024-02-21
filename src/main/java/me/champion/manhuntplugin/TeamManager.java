@@ -456,9 +456,9 @@ public class TeamManager implements Listener {
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if (part.equalsIgnoreCase(onlinePlayer.getName())) {
                         String coloredName;
-                        if (playerTeams.get(player.getUniqueId()).equalsIgnoreCase("Runners")) {
+                        if (playerTeams.get(onlinePlayer.getUniqueId()).equalsIgnoreCase("Runners")) {
                             coloredName = "§b" + onlinePlayer.getName() + "§f";
-                        } else if (playerTeams.get(player.getUniqueId()).equalsIgnoreCase("Zombies")) {
+                        } else if (playerTeams.get(onlinePlayer.getUniqueId()).equalsIgnoreCase("Zombies")) {
                             coloredName = "§c" + onlinePlayer.getName() + "§f";
                         } else {
                             coloredName = onlinePlayer.getName();

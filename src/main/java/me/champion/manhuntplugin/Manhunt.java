@@ -29,7 +29,7 @@ public final class Manhunt extends JavaPlugin {
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
-    File statisticsFile = new File(getDataFolder(), "statistics.yml");
+    File statisticsFile;
     FileConfiguration statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
 
     @Override

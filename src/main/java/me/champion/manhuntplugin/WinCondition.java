@@ -116,7 +116,7 @@ public class WinCondition implements Listener {
                         }
                     }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
 
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
                 }
             }
         }
