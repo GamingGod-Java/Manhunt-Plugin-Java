@@ -56,6 +56,7 @@ public final class Manhunt extends JavaPlugin {
 
         statisticsFile = new File(sessionDirectory, "statistics_" + currentDate + ".yml");
         // configFile = new File(sessionDirectory, "config_" + currentDate + ".yml");
+        statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
 
         try {
             statisticsConfig.save(statisticsFile);
