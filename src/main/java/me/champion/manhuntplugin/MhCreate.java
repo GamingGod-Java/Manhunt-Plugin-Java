@@ -1,9 +1,6 @@
 package me.champion.manhuntplugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +38,8 @@ public class MhCreate implements CommandExecutor {
         this.mhIso = mhIso;
     }
 
+    private BukkitTask saturationTask;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -62,7 +62,7 @@ public class MhCreate implements CommandExecutor {
         teleportPlayerToCenter(player);
         createGlassSphere(player);
 
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule domobspawning false");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doMobSpawning false");
 
         // Generate a 5x5x1 light blue concrete platform north of the player
         Location bluePlatformLocation = generatePlatform(player.getLocation().add(0, -1, -PLATFORM_DISTANCE / 2),
@@ -85,6 +85,23 @@ public class MhCreate implements CommandExecutor {
         }
 
         mhIso.createBarrierBox(player);
+
+        saturationTask = Bukkit.getScheduler().runTaskTimer(Bukkit.getPluginManager().getPlugin("Manhunt"), () -> {
+            for (Player onlineplayer : Bukkit.getOnlinePlayers()) {
+                // Assuming 'player' is the Player object you want to modify
+
+
+                // Check if the player is in survival mode
+                if (!mhStart.gameStarted) {
+                    // Set the player's saturation to the maximum value
+                    onlineplayer.setSaturation(Float.MAX_VALUE);
+                }
+                 else {
+                    // Cancel the task if the player is not in survival mode
+                    saturationTask.cancel();
+                }
+            }
+        }, 0L, 20L * 60L); // Run the task every 60 seconds (adjust as needed)
 
         return true;
     }
@@ -112,12 +129,14 @@ public class MhCreate implements CommandExecutor {
         return centerLocation.clone().add(0, 1, 0);
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+        /*Player player = event.getPlayer();
         if (!mhStart.gameStarted) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect give "+ event.getPlayer().getName()+ " minecraft:saturation 1000000 255 true");
+            //Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "effect give "+ event.getPlayer().getName()+ " minecraft:saturation 1000000 255 true");
+            player.setSaturation(Float.MAX_VALUE);
         }
-    }
+    }*/
 
     public void createGlassSphere(Player player) {
         int createRadius = 15; // Radius for creation

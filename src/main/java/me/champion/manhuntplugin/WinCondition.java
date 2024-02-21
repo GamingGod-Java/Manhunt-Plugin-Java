@@ -66,7 +66,7 @@ public class WinCondition implements Listener {
                 player.sendTitle("§bRunners win", "Game Over", 60, 40, 60);
             }
 
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart");
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
         }
     }
 
@@ -128,7 +128,6 @@ public class WinCondition implements Listener {
 
     @EventHandler
     public void onPlayerPortal(PlayerPortalEvent event) {
-        //System.out.println("ENTER!!!!");
         Player player = event.getPlayer();
 
         // Check if the player is a runner and has entered the End portal

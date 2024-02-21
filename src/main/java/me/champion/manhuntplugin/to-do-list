@@ -19,26 +19,17 @@ Ideas:
 
     Create multiple versions of the same text for joining teams
 
-
+    Compass rework
 Unfixed:
-    Dragon not perching (may be linked to peaceful mode)
-
     zombie win event not triggered (after server restart?)
-
-    The TeamMove class is supposed to be called MhMove
 
     Saving information between restarts
 
-    Particles need to stay at set distance from player
+    Disable inventory management during pause?
 
+    When glass sphere disappears, it doesnt replace snow/grass it destroyed
+
+    Autocomplete in mhmove is broken, maybe because it only works on capital letters
+
+    Change how to get kit to avoid instance suicide
 Fixed:
-    When Zombie kills Zombie message is blue
-    //Rewrote player death logic, statistics tracking now based on death message
-
-    On runner win, no fireworks spawned on zombies
-    //Just changed WinCondition to spawn for everyone and not just Runners on Runner win /shrug
-
-    MhIntro can be ran by anyone, at any time, any number of times
-    //I might have fixed it? (chatgpt and I don't have pack to test with)
-
-    Added date/time to file name in sessions folder

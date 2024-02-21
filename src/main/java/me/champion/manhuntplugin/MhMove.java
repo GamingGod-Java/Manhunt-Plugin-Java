@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TeamMove implements CommandExecutor, TabCompleter {
+public class MhMove implements CommandExecutor, TabCompleter {
 
     private final TeamManager teamManager;
 
-    public TeamMove(TeamManager teamManager) {
+    public MhMove(TeamManager teamManager) {
         this.teamManager = teamManager;
     }
 

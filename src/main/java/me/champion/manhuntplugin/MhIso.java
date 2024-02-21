@@ -41,9 +41,9 @@ public class MhIso implements Listener, CommandExecutor {
                 for (int z = -boxRadius; z <= boxRadius; z++) {
                     Location blockLocation = center.clone().add(x, y, z);
 
-                    // Floor: Bedrock
+                    // Floor: Barrier
                     if (y == 0) {
-                        world.getBlockAt(blockLocation).setType(Material.BEDROCK, false);
+                        world.getBlockAt(blockLocation).setType(Material.BARRIER, false);
                     }
                     // Walls and Roof: Barriers
                     else if (Math.abs(x) == boxRadius || Math.abs(z) == boxRadius || y == boxHeight) {
