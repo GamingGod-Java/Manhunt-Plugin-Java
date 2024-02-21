@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.bukkit.Particle;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.entity.Vehicle;
 
 import java.util.*;
 
@@ -141,28 +142,54 @@ public class MhCompass implements CommandExecutor, Listener {
         }
 
         Location playerLocation = player.getLocation();
-        Player nearestRunner = teamManager.findNearestRunner(playerLocation);
-
+        Player nearestRunner = teamManager.findNearestRunner(playerLocation); // Assuming this method exists in TeamManager
+        double offsetDistance;
         if (nearestRunner == null) {
             return;
         }
 
         Location runnerLocation = nearestRunner.getEyeLocation();
-        //Location runnerLocation = new Location(player.getWorld(), 0, 70, 0);
-        //Test location
 
         // Check if the zombie and runner are in the same dimension
         if (!playerLocation.getWorld().equals(runnerLocation.getWorld())) {
             return;
         }
 
+// Determine offset distance based on player's movement state
+        if (player.isInsideVehicle() && player.getVehicle() instanceof Vehicle) {
+            offsetDistance = 3.0; // If player is in a boat, set offset to 3 blocks
+        } else {
+            double playerSpeed = player.getVelocity().length(); // Get player's speed
+            if (player.isSprinting()) {
+                offsetDistance = 3.0; // If player is sprinting, set offset to 3 blocks
+            } else if (playerSpeed >= 0.1) {
+                offsetDistance = 3.0; // If player is walking, set offset to 2 blocks
+            } else {
+                offsetDistance = 0.3; // If player is standing still or walking slowly, set offset to 0.3 blocks
+            }
+        }
 
+
+        // Calculate direction vector from player to nearest runner
         Vector direction = runnerLocation.toVector().subtract(playerLocation.toVector()).normalize();
 
-        Location particleStartLocation = playerLocation.clone().add(player.getVelocity().multiply(1.2)).add(0, 1.3, 0);
-        Vector offset = direction.clone().multiply(0.75); // Offset distance
+        // Calculate particle start location
+        Location particleStartLocation;
+        if (player.isInsideVehicle() && player.getVehicle() instanceof Vehicle) {
+            particleStartLocation = playerLocation.clone().add(0, 1, 0); // If player is in a vehicle, set Y level to 1 block
+        } else if (player.isSneaking()) {
+            particleStartLocation = playerLocation.clone().add(0, 1.25, 0); // If player is crouching, set Y level to 1.25 blocks
+        } else {
+            particleStartLocation = playerLocation.clone().add(0, 1.5, 0); // Default Y level when not in a vehicle or crouching
+        }
+
+
+        Vector offset = direction.clone().multiply(offsetDistance);
+
+        // Final particle location calculation
         Location particleLocation = particleStartLocation.clone().add(offset);
 
-        player.getWorld().spawnParticle(Particle.DRAGON_BREATH, particleLocation, 1, 0, 0, 0, 0, null, true);
+        // Spawn particles at particleLocation
+        player.getWorld().spawnParticle(Particle.COMPOSTER, particleLocation, 1, 0, 0, 0, 0, null, true);
     }
 }

@@ -8,7 +8,6 @@ me\champion\manhuntplugin\Manhunt.class
 me\champion\manhuntplugin\WinCondition$2.class
 me\champion\manhuntplugin\MhCompass$1.class
 me\champion\manhuntplugin\MhUnpause.class
-me\champion\manhuntplugin\TeamMove.class
 me\champion\manhuntplugin\MhSettings.class
 me\champion\manhuntplugin\TeamManager$1.class
 me\champion\manhuntplugin\MhIso.class
