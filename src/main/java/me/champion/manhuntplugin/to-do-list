@@ -29,9 +29,13 @@ Unfixed:
 
     Change how to get kit to avoid instance suicide
 
-    More details statistics tracking
-
-    Make stastics not "roll over"
+    Statistics redo
 
     should only track statistics if we type /mhstart track
+
+    Fortress check
+
+    Warped forest check
+
+    Elytra rework
 Fixed:
