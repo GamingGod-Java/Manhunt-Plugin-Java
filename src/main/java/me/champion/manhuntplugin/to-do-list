@@ -19,12 +19,8 @@ Ideas:
 
     Create multiple versions of the same text for joining teams
 
-    Compass rework
+
 Unfixed:
-    zombie win event not triggered (after server restart?)
-
-    Saving information between restarts
-
     Disable inventory management during pause?
 
     When glass sphere disappears, it doesnt replace snow/grass it destroyed
@@ -32,4 +28,14 @@ Unfixed:
     Autocomplete in mhmove is broken, maybe because it only works on capital letters
 
     Change how to get kit to avoid instance suicide
+
+    Statistics redo
+
+    should only track statistics if we type /mhstart track
+
+    Fortress check
+
+    Warped forest check
+
+    Elytra rework
 Fixed:
