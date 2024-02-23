@@ -51,3 +51,6 @@ commands:
   MhIso:
     description: Places 2 players into a 1v1 arena
     usage: /<command> <player1> <player2> OR /<command> end
+  MhTracker:
+    description: Toggles the tracking actionbar instead of the compass
+    usage: /MhTracker

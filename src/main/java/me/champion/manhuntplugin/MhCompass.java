@@ -180,7 +180,7 @@ public class MhCompass implements CommandExecutor, Listener {
         } else if (player.isSneaking()) {
             particleStartLocation = playerLocation.clone().add(0, 1.25, 0); // If player is crouching, set Y level to 1.25 blocks
         } else {
-            particleStartLocation = playerLocation.clone().add(0, 1.5, 0); // Default Y level when not in a vehicle or crouching
+            particleStartLocation = playerLocation.clone().add(0, 1.25, 0); // Default Y level when not in a vehicle or crouching
         }
 
 
@@ -190,6 +190,6 @@ public class MhCompass implements CommandExecutor, Listener {
         Location particleLocation = particleStartLocation.clone().add(offset);
 
         // Spawn particles at particleLocation
-        player.getWorld().spawnParticle(Particle.COMPOSTER, particleLocation, 1, 0, 0, 0, 0, null, true);
+        player.getWorld().spawnParticle(Particle.DRAGON_BREATH, particleLocation, 1, 0, 0, 0, 0, null, true);
     }
 }

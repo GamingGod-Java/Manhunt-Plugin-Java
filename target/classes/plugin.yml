@@ -1,5 +1,5 @@
 name: Manhunt
-version: '1.7.12-SNAPSHOT'
+version: '1.7.18-SNAPSHOT'
 main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
 authors: [ GamingGod-Java, AndreBinbow ]
@@ -51,3 +51,6 @@ commands:
   MhIso:
     description: Places 2 players into a 1v1 arena
     usage: /<command> <player1> <player2> OR /<command> end
+  MhTracker:
+    description: Toggles the tracking actionbar instead of the compass
+    usage: /MhTracker

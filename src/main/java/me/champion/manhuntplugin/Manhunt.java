@@ -24,7 +24,6 @@ public final class Manhunt extends JavaPlugin {
     private TeamChat teamChat;
     private MhWheel mhWheel;
     private WinCondition winCondition;
-
     private MhIso mhIso;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -99,6 +98,8 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhSettings", mhSettings);
         registerCommand("MhIntro", new MhIntro());
         registerCommand("MhIso", mhIso);
+        registerCommand("MhTracker", new MhTracker(this));
+
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
