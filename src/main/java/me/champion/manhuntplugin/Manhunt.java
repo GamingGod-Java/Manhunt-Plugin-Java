@@ -99,8 +99,7 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhSettings", mhSettings);
         registerCommand("MhIntro", new MhIntro());
         registerCommand("MhIso", mhIso);
-        registerCommand("MhTracker", new MhTracker(this));
-
+        //registerCommand("MhTracker", new MhTracker(this, teamManager));
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
@@ -112,13 +111,13 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(mhWheel, this);
         getServer().getPluginManager().registerEvents(winCondition, this);
         getServer().getPluginManager().registerEvents(new EyeofEnderListener(teamManager, this), this);
-        winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
         getServer().getPluginManager().registerEvents(new MhIso(teamManager, this), this);
         getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
         getServer().getPluginManager().registerEvents(new DamageNerf(teamManager), this);
+        winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
     }
 
     @Override
