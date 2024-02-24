@@ -75,10 +75,13 @@ public class MhTracker implements CommandExecutor, Listener {
 
                 // Check if the zombie is holding a compass
                 if (zombie.getInventory().getItemInMainHand().getType().toString().equalsIgnoreCase("COMPASS")) {
-                    Player nearestRunner = findNearestRunner(zombie);
+                    Player nearestRunner = teamManager.findNearestRunner(zombie.getLocation());
                     if (nearestRunner != null && isLookingAt(zombie, nearestRunner)) {
                         // Update the action bar message
-                        sendActionBar(zombie, "Nearest Runner: " + nearestRunner.getName());
+                        sendActionBar(zombie, "Tracking runner");
+                    } else if (nearestRunner == null) {
+                        sendActionBar(zombie, "§cNO RUNNER FOUND");
+
                     }
                 }
             }
