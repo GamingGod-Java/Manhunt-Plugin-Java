@@ -343,11 +343,18 @@ public class MhCompass implements CommandExecutor, Listener {
 
         // Get the color from the hashmap
         Color dyeColor = playerDyeColors.get(player.getUniqueId());
+        System.out.println(playerDyeColors.get(player.getUniqueId()));
+        System.out.println("playerdye colours:"+playerDyeColors);
+        System.out.println("ID"+player.getUniqueId());
+
 
         // Spawn particles with the selected color (or null if no color is selected)
-        if (dyeColor != null) {
+        /*if (dyeColor != null) {
             player.getWorld().spawnParticle(Particle.REDSTONE, particleLocation, 1, 0, 0, 0, 0, new Particle.DustOptions(dyeColor, particleSize));
         }
+        else if (dyeColor == null)  {
+            player.getWorld().spawnParticle(Particle.REDSTONE, particleLocation, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(255, 255, 255), particleSize));
+        }*/
     }
 
     private double getPlayerYOffset(Player player) {
