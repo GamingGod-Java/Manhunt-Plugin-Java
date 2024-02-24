@@ -113,7 +113,7 @@ public class MhCompass implements CommandExecutor, Listener {
         cancelExistingParticleTask(player.getUniqueId());
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (event.getAction().name().contains("RIGHT") && isHoldingRunnerCompass(player.getItemInHand())) {
@@ -206,7 +206,7 @@ public class MhCompass implements CommandExecutor, Listener {
         );
     }
 
-    @EventHandler
+    /*@EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
@@ -270,7 +270,7 @@ public class MhCompass implements CommandExecutor, Listener {
             default:
                 return Color.WHITE;
         }
-    }
+    }*/
 
     private boolean isHoldingRunnerCompass(ItemStack item) {
         if (item == null || item.getType() != Material.COMPASS) {
@@ -343,9 +343,9 @@ public class MhCompass implements CommandExecutor, Listener {
 
         // Get the color from the hashmap
         Color dyeColor = playerDyeColors.get(player.getUniqueId());
-        System.out.println(playerDyeColors.get(player.getUniqueId()));
-        System.out.println("playerdye colours:"+playerDyeColors);
-        System.out.println("ID"+player.getUniqueId());
+        //System.out.println(playerDyeColors.get(player.getUniqueId()));
+        //System.out.println("playerdye colours:"+playerDyeColors);
+        //System.out.println("ID"+player.getUniqueId());
 
 
         // Spawn particles with the selected color (or null if no color is selected)
@@ -355,6 +355,9 @@ public class MhCompass implements CommandExecutor, Listener {
         else if (dyeColor == null)  {
             player.getWorld().spawnParticle(Particle.REDSTONE, particleLocation, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(255, 255, 255), particleSize));
         }*/
+
+        player.setCompassTarget(runnerLocation);
+
     }
 
     private double getPlayerYOffset(Player player) {
