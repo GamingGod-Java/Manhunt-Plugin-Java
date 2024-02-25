@@ -14,7 +14,6 @@ me\champion\manhuntplugin\MhCreate.class
 me\champion\manhuntplugin\TeamSelection.class
 me\champion\manhuntplugin\Team.class
 me\champion\manhuntplugin\TeamManager$2.class
-me\champion\manhuntplugin\MhCompass$2.class
 me\champion\manhuntplugin\MhStart.class
 me\champion\manhuntplugin\MhReady$1.class
 me\champion\manhuntplugin\MhStart$2.class

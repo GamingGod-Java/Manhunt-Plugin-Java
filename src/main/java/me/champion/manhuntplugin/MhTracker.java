@@ -2,6 +2,8 @@ package me.champion.manhuntplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -18,6 +21,7 @@ public class MhTracker implements CommandExecutor, Listener {
     private JavaPlugin plugin;
     private boolean trackingEnabled = false;
     private TeamManager teamManager;
+    private Location zombieLodestoneLocation = null;
 
     public MhTracker(JavaPlugin plugin, TeamManager teamManager) {
         this.plugin = plugin;
@@ -58,9 +62,9 @@ public class MhTracker implements CommandExecutor, Listener {
         return true;
     }
 
-   private void sendActionBar(Player player, String message) {
-       String command = "minecraft:title " + player.getName() + " actionbar [\"\",{\"text\":\"" + message + "\"}]";
-       Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+    private void sendActionBar(Player player, String message) {
+        String command = "minecraft:title " + player.getName() + " actionbar [\"\",{\"text\":\"" + message + "\"}]";
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
     }
 
     private void startActionBarTask(Player zombie) {
@@ -74,14 +78,11 @@ public class MhTracker implements CommandExecutor, Listener {
                 }
 
                 // Check if the zombie is holding a compass
-                if (zombie.getInventory().getItemInMainHand().getType().toString().equalsIgnoreCase("COMPASS")) {
-                    Player nearestRunner = teamManager.findNearestRunner(zombie.getLocation());
+                if (zombie.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
+                    Player nearestRunner = findNearestRunner(zombie);
                     if (nearestRunner != null && isLookingAt(zombie, nearestRunner)) {
                         // Update the action bar message
-                        sendActionBar(zombie, "Tracking runner");
-                    } else if (nearestRunner == null) {
-                        sendActionBar(zombie, "§cNO RUNNER FOUND");
-
+                        sendActionBar(zombie, "Nearest Runner: " + nearestRunner.getName());
                     }
                 }
             }
@@ -92,7 +93,7 @@ public class MhTracker implements CommandExecutor, Listener {
     public void onCompassRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (event.getAction().name().contains("RIGHT_CLICK") &&
-                player.getInventory().getItemInMainHand().getType().toString().equalsIgnoreCase("COMPASS")) {
+                player.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
             if (!isZombie(player)) {
                 player.sendMessage(ChatColor.RED + "Only zombies can toggle tracking with the compass.");
                 return;
@@ -107,6 +108,7 @@ public class MhTracker implements CommandExecutor, Listener {
             event.setCancelled(true); // Cancel the event to prevent compass usage
         }
     }
+
     private Player findNearestRunner(Player zombie) {
         Player nearestRunner = null;
         double minDistance = Double.MAX_VALUE;
@@ -119,6 +121,12 @@ public class MhTracker implements CommandExecutor, Listener {
                     nearestRunner = player;
                 }
             }
+        }
+
+        // Update nearest runner's location and set it as the zombie's lodestone location if tracking is enabled
+        if (trackingEnabled && nearestRunner != null) {
+            zombieLodestoneLocation = nearestRunner.getLocation();
+            zombie.setCompassTarget(nearestRunner.getLocation());
         }
 
         return nearestRunner;
