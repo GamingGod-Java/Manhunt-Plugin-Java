@@ -9,46 +9,50 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import org.bukkit.Particle;
-import org.bukkit.Color;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.event.block.Action;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 
-import java.util.*;
+//import java.util.*;
 
+//import org.bukkit.event.player.PlayerJoinEvent;
+//import org.bukkit.event.player.PlayerItemHeldEvent;
+//import org.bukkit.event.player.PlayerQuitEvent;
+//import org.bukkit.event.entity.PlayerDeathEvent;
+//import org.bukkit.event.player.PlayerDropItemEvent;
+//import org.bukkit.inventory.Inventory;
+//import org.bukkit.Bukkit;
+//import org.bukkit.Particle;
+//import org.bukkit.event.inventory.InventoryClickEvent;
+//import org.bukkit.scheduler.BukkitRunnable;
+//import org.bukkit.util.Vector;
+//import org.bukkit.Color;
 public class MhCompass implements CommandExecutor, Listener {
     private final TeamManager teamManager;
     private final Plugin plugin;
-    private final Map<UUID, BukkitRunnable> particleTasks;
-    private final Map<UUID, Double> previousOffsetDistances;
-    private final Map<UUID, Color> playerDyeColors;
-    private final Map<UUID, Inventory> dyeColorGUIs;
+    //private final Map<UUID, BukkitRunnable> particleTasks;
+    //private final Map<UUID, Double> previousOffsetDistances;
+    //private final Map<UUID, Color> playerDyeColors;
+    //private final Map<UUID, Inventory> dyeColorGUIs;
 
     public MhCompass(TeamManager teamManager, Plugin plugin) {
         this.teamManager = teamManager;
         this.plugin = plugin;
-        this.particleTasks = new HashMap<>();
-        this.previousOffsetDistances = new HashMap<>();
-        this.playerDyeColors = new HashMap<>();
-        this.dyeColorGUIs = new HashMap<>();
+        //this.particleTasks = new HashMap<>();
+        //this.previousOffsetDistances = new HashMap<>();
+        //this.playerDyeColors = new HashMap<>();
+        //this.dyeColorGUIs = new HashMap<>();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -80,7 +84,7 @@ public class MhCompass implements CommandExecutor, Listener {
         }
         player.getInventory().addItem(compass);
     }
-
+/*
     @EventHandler
     public void onPlayerItemHeld(PlayerItemHeldEvent event) {
         Player player = event.getPlayer();
@@ -114,7 +118,7 @@ public class MhCompass implements CommandExecutor, Listener {
         cancelExistingParticleTask(player.getUniqueId());
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (event.getAction().name().contains("RIGHT") && isHoldingRunnerCompass(player.getItemInHand())) {
@@ -207,7 +211,7 @@ public class MhCompass implements CommandExecutor, Listener {
         );
     }
 
-    /*@EventHandler
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
@@ -281,7 +285,7 @@ public class MhCompass implements CommandExecutor, Listener {
         ItemMeta meta = item.getItemMeta();
         return meta != null && "§cTrack Runners".equals(meta.getDisplayName());
     }
-
+/*
     private void startParticleTask(Player player) {
         BukkitRunnable task = new BukkitRunnable() {
             @Override
@@ -353,12 +357,12 @@ public class MhCompass implements CommandExecutor, Listener {
 
 
         // Spawn particles with the selected color (or null if no color is selected)
-        /*if (dyeColor != null) {
+        if (dyeColor != null) {
             player.getWorld().spawnParticle(Particle.REDSTONE, particleLocation, 1, 0, 0, 0, 0, new Particle.DustOptions(dyeColor, particleSize));
         }
         else if (dyeColor == null)  {
             player.getWorld().spawnParticle(Particle.REDSTONE, particleLocation, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.fromRGB(255, 255, 255), particleSize));
-        }*/
+        }
 
         player.setCompassTarget(runnerLocation);
         compassMeta.setLodestone(runnerLocation);
@@ -379,5 +383,80 @@ public class MhCompass implements CommandExecutor, Listener {
 
     private double interpolate(double startValue, double endValue, double ratio) {
         return startValue + (endValue - startValue) * ratio;
+    }
+
+ */
+@EventHandler
+public void onPlayerInteract(PlayerInteractEvent event) {
+    Player player = event.getPlayer();
+    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+        if (isHoldingRunnerCompass(player.getInventory().getItemInMainHand())) {
+            updateTrackingCompass(player);
+            event.setCancelled(true); // Prevent normal left-click behavior
+        }
+    }
+}
+
+    private void updateTrackingCompass(Player player) {
+        Location playerLocation = player.getLocation();
+        Player nearestRunner = teamManager.findNearestRunner(playerLocation);
+        if (nearestRunner != null) {
+            Location runnerLocation = nearestRunner.getLocation();
+            Location lodestoneLocation = new Location(runnerLocation.getWorld(), runnerLocation.getBlockX() + 0.5, 0, runnerLocation.getBlockZ() + 0.5);
+
+            // Debug print when a runner is found
+            //System.out.println("Runner found: " + nearestRunner.getName());
+
+            // Remove old lodestone if exists
+            removeOldLodestone(lodestoneLocation);
+
+            // Place new lodestone
+            placeLodestone(lodestoneLocation);
+
+            // Set compass to track new lodestone
+            setTrackingCompass(player, lodestoneLocation);
+
+            // Debug print when lodestone is set
+            //System.out.println("Lodestone set for player: " + player.getName());
+        } else {
+            player.sendMessage(ChatColor.RED + "No runner found to track.");
+        }
+    }
+
+    private void removeOldLodestone(Location location) {
+        if (location.getBlock().getType() == Material.LODESTONE) {
+            location.getBlock().setType(Material.AIR);
+            // Debug print when old lodestone is removed
+            //System.out.println("Old lodestone removed at location: " + location.toString());
+        } else {
+            // Debug print if no old lodestone is found at the specified location
+            //System.out.println("No old lodestone found at location: " + location.toString());
+        }
+    }
+
+    private void placeLodestone(Location location) {
+        World world = location.getWorld();
+        if (world != null) {
+            Block lodestoneBlock = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+            lodestoneBlock.setType(Material.LODESTONE);
+
+            Block bedrockBlock = world.getBlockAt(location.getBlockX(), location.getBlockY() + 1, location.getBlockZ());
+            bedrockBlock.setType(Material.BEDROCK);
+        }
+    }
+
+    private void setTrackingCompass(Player player, Location lodestoneLocation) {
+        ItemStack compass = player.getInventory().getItemInMainHand();
+        CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
+        if (compassMeta != null) {
+            compassMeta.setDisplayName("§cTrack Runners");
+            compassMeta.setLodestoneTracked(false); // Clear any previous tracked lodestone
+            compassMeta.setLodestone(lodestoneLocation);
+            compassMeta.setLodestoneTracked(true);
+            //player.sendMessage(ChatColor.GREEN + "Compass is now tracking the nearest runner.");
+            compass.setItemMeta(compassMeta);
+            // Debug print when compass is updated
+            //System.out.println("Compass updated for player: " + player.getName() + " to track lodestone at " + lodestoneLocation.toString());
+        }
     }
 }

@@ -3,7 +3,6 @@ me\champion\manhuntplugin\TeamManager.class
 me\champion\manhuntplugin\MhPause.class
 me\champion\manhuntplugin\TeamManager$BoatData.class
 me\champion\manhuntplugin\GameControlListener.class
-me\champion\manhuntplugin\MhCompass$1.class
 me\champion\manhuntplugin\MhUnpause.class
 me\champion\manhuntplugin\MhSettings.class
 me\champion\manhuntplugin\TeamManager$1.class

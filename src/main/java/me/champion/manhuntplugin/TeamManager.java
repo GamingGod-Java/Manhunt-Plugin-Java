@@ -586,14 +586,13 @@ public class TeamManager implements Listener {
         Player nearestRunner = null;
         double minDistance = Double.MAX_VALUE;
 
-
-
         for (Player runner : Bukkit.getOnlinePlayers()) {
             if (!zombieLocation.getWorld().equals(runner.getWorld())) {
-                continue;
+                continue; // Skip players in different worlds
             }
-            // Check if the player is a runner and in the same world as the zombie
-            if (isOnTeam(runner, "Runners") && runner.getWorld().equals(zombieLocation.getWorld())) {
+
+            // Check if the player is a runner
+            if (isOnTeam(runner, "Runners")) {
                 double distance = zombieLocation.distance(runner.getLocation());
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -604,6 +603,7 @@ public class TeamManager implements Listener {
 
         return nearestRunner;
     }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();

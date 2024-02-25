@@ -11,11 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
-
+import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
+import org.bukkit.inventory.ItemStack;
 public class MhTracker implements CommandExecutor, Listener {
 
     private JavaPlugin plugin;
@@ -52,42 +53,42 @@ public class MhTracker implements CommandExecutor, Listener {
         trackingEnabled = !trackingEnabled;
 
         if (trackingEnabled) {
-            // Start the action bar update task if tracking is enabled
-            startActionBarTask(player);
-            player.sendMessage(ChatColor.GREEN + "Tracking has been enabled.");
+            // Start the sound update task if tracking is enabled
+            startSoundTask(player);
+            player.sendMessage(ChatColor.GREEN + "Sound has been enabled.");
         } else {
-            player.sendMessage(ChatColor.RED + "Tracking has been disabled.");
+            player.sendMessage(ChatColor.RED + "Sound has been disabled.");
         }
 
         return true;
     }
-
+/*
     private void sendActionBar(Player player, String message) {
         String command = "minecraft:title " + player.getName() + " actionbar [\"\",{\"text\":\"" + message + "\"}]";
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
     }
+*/
+private void startSoundTask(Player zombie) {
+    new BukkitRunnable() {
+        @Override
+        public void run() {
+            // Check if the zombie is still online and tracking is still enabled
+            if (!zombie.isOnline() || !trackingEnabled) {
+                cancel(); // Stop the task if the zombie is offline or tracking is disabled
+                return;
+            }
 
-    private void startActionBarTask(Player zombie) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Check if the zombie is still online and tracking is still enabled
-                if (!zombie.isOnline() || !trackingEnabled) {
-                    cancel(); // Stop the task if the zombie is offline or tracking is disabled
-                    return;
-                }
-
-                // Check if the zombie is holding a compass
-                if (zombie.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
-                    Player nearestRunner = findNearestRunner(zombie);
-                    if (nearestRunner != null && isLookingAt(zombie, nearestRunner)) {
-                        // Update the action bar message
-                        sendActionBar(zombie, "Nearest Runner: " + nearestRunner.getName());
-                    }
+            // Check if the zombie is holding a compass
+            if (zombie.getInventory().getItemInMainHand().getType() == Material.COMPASS) {
+                Player nearestRunner = findNearestRunner(zombie);
+                if (nearestRunner != null && isLookingAt(zombie, nearestRunner)) {
+                    // Play noteblock sound
+                    zombie.playSound(zombie.getLocation(), Sound.BLOCK_NOTE_BLOCK_HARP, SoundCategory.PLAYERS, 1, 1);
                 }
             }
-        }.runTaskTimer(plugin, 0, 20); // Run the task every 20 ticks (1 second)
-    }
+        }
+    }.runTaskTimer(plugin, 0, 20); // Run the task every second (20 ticks)
+}
 
     @EventHandler
     public void onCompassRightClick(PlayerInteractEvent event) {
@@ -100,10 +101,10 @@ public class MhTracker implements CommandExecutor, Listener {
             }
             trackingEnabled = !trackingEnabled;
             if (trackingEnabled) {
-                startActionBarTask(player);
-                player.sendMessage(ChatColor.GREEN + "Tracking has been enabled.");
+                startSoundTask(player);
+                player.sendMessage(ChatColor.GREEN + "Sound has been enabled.");
             } else {
-                player.sendMessage(ChatColor.RED + "Tracking has been disabled.");
+                player.sendMessage(ChatColor.RED + "Sound has been disabled.");
             }
             event.setCancelled(true); // Cancel the event to prevent compass usage
         }
@@ -112,10 +113,12 @@ public class MhTracker implements CommandExecutor, Listener {
     private Player findNearestRunner(Player zombie) {
         Player nearestRunner = null;
         double minDistance = Double.MAX_VALUE;
+        Location zombieLocation = zombie.getLocation();
 
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (teamManager != null && teamManager.isOnTeam(player, "Runners") && !player.equals(zombie)) {
-                double distance = zombie.getLocation().distance(player.getLocation());
+            // Check if the player is on the "Runners" team and is in the same world as the zombie
+            if (teamManager != null && teamManager.isOnTeam(player, "Runners") && player.getWorld().equals(zombieLocation.getWorld()) && !player.equals(zombie)) {
+                double distance = zombieLocation.distance(player.getLocation());
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearestRunner = player;
@@ -131,6 +134,7 @@ public class MhTracker implements CommandExecutor, Listener {
 
         return nearestRunner;
     }
+
 
     private boolean isLookingAt(Player player, Player target) {
         // Get the direction vector from the player to the target
