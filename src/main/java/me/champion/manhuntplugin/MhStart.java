@@ -75,18 +75,23 @@ public class MhStart implements CommandExecutor {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+
+        // Check if the game has started and the player is not on any team
+        if (gameStarted && !teamManager.isOnTeam(player, "Runners") && !teamManager.isOnTeam(player, "Zombies")) {
+            player.setGameMode(GameMode.SPECTATOR);
+            return;
+        }
+
+        // Set the player's game mode to adventure if they are not an operator and the game hasn't started yet
         if (!player.isOp() && !gameStarted) {
             player.setGameMode(GameMode.ADVENTURE);
         }
+
+        // If the game has started, show the boss bar to the player after a short delay
         if (gameStarted) {
-            System.out.println("cheese");
             Bukkit.getScheduler().runTaskLater(Manhunt.getPlugin(), () -> {
-                // Code to execute after the delay
-
-                // For example, send a welcome message to the player after 1 second
-                bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
+                bossBar.setVisible(true);
                 bossBar.addPlayer(player);
-
             }, 20L); // 20 ticks = 1 second (1 tick = 0.05 seconds)
         }
     }

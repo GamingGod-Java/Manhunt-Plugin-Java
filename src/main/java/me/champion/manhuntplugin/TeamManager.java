@@ -301,24 +301,26 @@ public class TeamManager implements Listener {
             // Clear the playerPotionEffects HashMap
             playerPotionEffects.clear();
             for (Player player : Bukkit.getOnlinePlayers()) {
-                frozenPlayers.add(player.getUniqueId());
+                if (player.getGameMode() != GameMode.SPECTATOR) { // Check if player is not in spectator mode
+                    frozenPlayers.add(player.getUniqueId());
 
-                // Set the player to Adventure mode
-                player.setGameMode(GameMode.ADVENTURE);
+                    // Set the player to Adventure mode
+                    player.setGameMode(GameMode.ADVENTURE);
 
-                // Set the walk speed to 0 - this makes the player unable to walk
-                player.setWalkSpeed(0.0f);
+                    // Set the walk speed to 0 - this makes the player unable to walk
+                    player.setWalkSpeed(0.0f);
 
-                player.setInvulnerable(true);
+                    player.setInvulnerable(true);
 
-                // Save fire ticks for the current player
-                saveFireTicks(player);
-                saveOriginalAirLevels();
-                if (player.getVehicle() instanceof Vehicle) {
-                    Vehicle boat = (Vehicle) player.getVehicle();
-                    savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
-                    boat.eject(); // Eject all passengers
-                    player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
+                    // Save fire ticks for the current player
+                    saveFireTicks(player);
+                    saveOriginalAirLevels();
+                    if (player.getVehicle() instanceof Vehicle) {
+                        Vehicle boat = (Vehicle) player.getVehicle();
+                        savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
+                        boat.eject(); // Eject all passengers
+                        player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
+                    }
                 }
             }
 
@@ -326,7 +328,9 @@ public class TeamManager implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 // Potion saving logic
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    savePotionEffects(player);
+                    if (player.getGameMode() != GameMode.SPECTATOR) { // Check if player is not in spectator mode
+                        savePotionEffects(player);
+                    }
                 }
 
                 // Start reapplying potion effects
@@ -335,7 +339,6 @@ public class TeamManager implements Listener {
         }
     }
 
-
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
             setGamePaused(false);
@@ -343,12 +346,14 @@ public class TeamManager implements Listener {
 
             // Restore player states
             for (Player player : Bukkit.getOnlinePlayers()) {
-                frozenPlayers.remove(player.getUniqueId());
-                restoreOriginalAirLevels();
-                restoreFireTicks(player);
-                player.setInvulnerable(false);
-                player.setWalkSpeed(0.2f);
-                player.setGameMode(GameMode.SURVIVAL);
+                if (player.getGameMode() != GameMode.SPECTATOR) { // Check if player is not in spectator mode
+                    frozenPlayers.remove(player.getUniqueId());
+                    restoreOriginalAirLevels();
+                    restoreFireTicks(player);
+                    player.setInvulnerable(false);
+                    player.setWalkSpeed(0.2f);
+                    player.setGameMode(GameMode.SURVIVAL);
+                }
             }
             stopPotionEffectLoop();
 
@@ -379,7 +384,6 @@ public class TeamManager implements Listener {
 
         }
     }
-
 
     public void setGamePaused(boolean paused) {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

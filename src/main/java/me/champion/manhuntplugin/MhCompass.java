@@ -389,10 +389,23 @@ public class MhCompass implements CommandExecutor, Listener {
 @EventHandler
 public void onPlayerInteract(PlayerInteractEvent event) {
     Player player = event.getPlayer();
-    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-        if (isHoldingRunnerCompass(player.getInventory().getItemInMainHand())) {
-            updateTrackingCompass(player);
-            event.setCancelled(true); // Prevent normal left-click behavior
+    Action action = event.getAction();
+    ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+    // Check if the action is a left-click and the player is holding the "Track Runners" compass
+    if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
+        if (isHoldingRunnerCompass(itemInHand)) {
+            // Check if the click occurred in the Nether
+            if (player.getWorld().getEnvironment() == World.Environment.NETHER) {
+                // Only perform lodestone-related actions in the Nether
+                updateTrackingCompass(player);
+                event.setCancelled(true); // Prevent normal left-click behavior
+                // Debug message for placing lodestone in the Nether
+                //player.sendMessage(ChatColor.GREEN + "Placed lodestone in the Nether.");
+            } else {
+                // Debug message for not placing lodestone in the overworld
+                //player.sendMessage(ChatColor.RED + "Did not place lodestone in the Overworld.");
+            }
         }
     }
 }
