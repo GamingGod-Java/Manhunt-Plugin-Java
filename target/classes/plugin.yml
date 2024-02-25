@@ -22,6 +22,9 @@ commands:
     usage: /MhReady
     aliases:
       - mhr
+  MhSearch:
+    description: Searches for tools necessary for a manhunt
+    usage: /MhSearch
   MhCompass:
     description: Gives a runner compass to a player on the Zombies team
     usage: /MhCompass
