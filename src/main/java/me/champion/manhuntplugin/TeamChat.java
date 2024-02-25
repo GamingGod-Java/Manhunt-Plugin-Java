@@ -55,14 +55,14 @@ public class TeamChat implements Listener, CommandExecutor {
 
             if (inTeamChat.contains(player.getUniqueId())) {
                 String playerName = player.getName();
-                String message = String.format("X: %d, Y: %d, Z: %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
+                String message = String.format("%d, %d, %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
                 String formattedMessage = teamChatColor + "[" + team + " Chat] " + playerName + ": " + ChatColor.WHITE + message;
                 sendTeamMessage(team, formattedMessage);
                 return true;
             } if (!inTeamChat.contains(player.getUniqueId())) {
                 inTeamChat.add(player.getUniqueId());
                 String playerName = player.getName();
-                String message = String.format("X: %d, Y: %d, Z: %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
+                String message = String.format("%d, %d, %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
                 String formattedMessage = teamChatColor + "[" + team + " Chat] " + playerName + ": " + ChatColor.WHITE + message;
                 sendTeamMessage(team, formattedMessage);
                 inTeamChat.remove(player.getUniqueId());
