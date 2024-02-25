@@ -37,6 +37,9 @@ commands:
     aliases:
       - teamchat
       - tc
+  MhCoords:
+    description: Sends your coords in the chat
+    usage: /MhCoords
   MhWheel:
     description: After spinning the wheel on Discord, you can type this command to add the buff or debuff
     usage: /MhWheel
