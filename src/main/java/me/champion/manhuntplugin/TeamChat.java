@@ -32,6 +32,45 @@ public class TeamChat implements Listener, CommandExecutor {
             return true;
         }
 
+        if (command.getName().equalsIgnoreCase("MhCoords") && sender instanceof Player) {
+            Player player = (Player) sender;
+            String team = null;
+            Boolean isOnAnyTeam = false;
+            ChatColor teamChatColor = ChatColor.GRAY;
+
+                for (String t : Arrays.asList("Zombies", "Runners")) {
+                    if (teamManager.isOnTeam(player, t)) {
+                        isOnAnyTeam = true;
+                        team = t;
+                        // Set the color based on the team
+                        teamChatColor = (team.equalsIgnoreCase("Runners")) ? ChatColor.AQUA : ChatColor.RED;
+                        break;
+                    }
+                }
+                if (isOnAnyTeam == false) {
+                    player.sendMessage(ChatColor.RED + "You need to select a team before sending a team message");
+                    return true;
+                }
+
+
+            if (inTeamChat.contains(player.getUniqueId())) {
+                String playerName = player.getName();
+                String message = String.format("%d, %d, %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
+                String formattedMessage = teamChatColor + "[" + team + " Chat] " + playerName + ": " + ChatColor.WHITE + message;
+                sendTeamMessage(team, formattedMessage);
+                return true;
+            } if (!inTeamChat.contains(player.getUniqueId())) {
+                inTeamChat.add(player.getUniqueId());
+                String playerName = player.getName();
+                String message = String.format("%d, %d, %d", (int) player.getLocation().getX(), (int) player.getLocation().getY(), (int) player.getLocation().getZ());
+                String formattedMessage = teamChatColor + "[" + team + " Chat] " + playerName + ": " + ChatColor.WHITE + message;
+                sendTeamMessage(team, formattedMessage);
+                inTeamChat.remove(player.getUniqueId());
+                return true;
+            }
+
+        }
+
         return false;
     }
 

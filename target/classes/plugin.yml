@@ -1,5 +1,5 @@
 name: Manhunt
-version: '1.8.14-SNAPSHOT'
+version: '1.8.20-SNAPSHOT'
 main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
 authors: [ GamingGod-Java, AndreBinbow ]
@@ -22,6 +22,9 @@ commands:
     usage: /MhReady
     aliases:
       - mhr
+  MhSearch:
+    description: Searches for tools necessary for a manhunt
+    usage: /MhSearch
   MhCompass:
     description: Gives a runner compass to a player on the Zombies team
     usage: /MhCompass
@@ -37,6 +40,9 @@ commands:
     aliases:
       - teamchat
       - tc
+  MhCoords:
+    description: Sends your coords in the chat
+    usage: /MhCoords
   MhWheel:
     description: After spinning the wheel on Discord, you can type this command to add the buff or debuff
     usage: /MhWheel

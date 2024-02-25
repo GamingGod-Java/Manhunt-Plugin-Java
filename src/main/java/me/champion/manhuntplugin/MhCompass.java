@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -301,6 +302,9 @@ public class MhCompass implements CommandExecutor, Listener {
     }
 
     private void spawnParticlesNearLine(Player player) {
+        ItemStack compassItem = player.getInventory().getItemInMainHand();
+        CompassMeta compassMeta = (CompassMeta) compassItem.getItemMeta();
+
         if (!teamManager.isOnTeam(player, "Zombies")) {
             return;
         }
@@ -357,6 +361,7 @@ public class MhCompass implements CommandExecutor, Listener {
         }*/
 
         player.setCompassTarget(runnerLocation);
+        compassMeta.setLodestone(runnerLocation);
 
     }
 
