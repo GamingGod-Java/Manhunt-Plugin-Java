@@ -53,13 +53,13 @@ public class MhSearch implements Listener, CommandExecutor {
         }
 
         if (biomeFound) {
-            sender.sendMessage("§2Warped forest found");
+            sender.sendMessage("§aWarped forest found");
         } else {
             sender.sendMessage("§cNo warped forest found");
         }
         //String message = String.format("@ %d %d %d", FortressSearch.getBlockX(), FortressSearch.getBlockY(), FortressSearch.getBlockZ());
         if (FortressSearch.getBlockX() < maxX && FortressSearch.getBlockX() > minX && FortressSearch.getBlockZ() < maxZ && FortressSearch.getBlockZ() > minZ) {
-            sender.sendMessage("§2Fortress found");
+            sender.sendMessage("§aFortress found");
             return true;
         } else {
             sender.sendMessage("§cNo fortress found");
