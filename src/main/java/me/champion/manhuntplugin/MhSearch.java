@@ -34,7 +34,7 @@ public class MhSearch implements Listener, CommandExecutor {
         Biome targetBiome = Biome.WARPED_FOREST;
         Location FortressSearch = netherWorld.locateNearestStructure(new Location(netherWorld, 0, 0, 0), StructureType.FORTRESS, 2000, false).getLocation();
         if (FortressSearch == null) {
-            sender.sendMessage("No fortress found within the specified region, somehow?????????????");
+            sender.sendMessage("No fortress found within the specified region, somehow???");
 
         }
         boolean biomeFound = false;

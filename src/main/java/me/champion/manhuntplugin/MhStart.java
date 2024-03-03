@@ -76,10 +76,26 @@ public class MhStart implements CommandExecutor {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
+        // Debug message to verify the method is called
+        Bukkit.getLogger().info("Hello, player " + player.getName() + " joined the game.");
+
+        // Broadcast a message to all players
+        Bukkit.broadcastMessage("Player " + player.getName() + " joined the game!");
+
         // Check if the game has started and the player is not on any team
         if (gameStarted && !teamManager.isOnTeam(player, "Runners") && !teamManager.isOnTeam(player, "Zombies")) {
             player.setGameMode(GameMode.SPECTATOR);
+            Bukkit.getLogger().info("Player " + player.getName() + " joined the game without being on any team. Placed in spectator mode.");
             return;
+        }
+
+        // Print out which team the player is on (for debugging purposes)
+        if (teamManager.isOnTeam(player, "Runners")) {
+            Bukkit.getLogger().info("Player " + player.getName() + " is on the Runners team.");
+        } else if (teamManager.isOnTeam(player, "Zombies")) {
+            Bukkit.getLogger().info("Player " + player.getName() + " is on the Zombies team.");
+        } else {
+            Bukkit.getLogger().info("Player " + player.getName() + " is not on any team.");
         }
 
         // Set the player's game mode to adventure if they are not an operator and the game hasn't started yet
@@ -95,6 +111,8 @@ public class MhStart implements CommandExecutor {
             }, 20L); // 20 ticks = 1 second (1 tick = 0.05 seconds)
         }
     }
+
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
