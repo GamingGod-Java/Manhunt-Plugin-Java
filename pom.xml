@@ -6,7 +6,7 @@
 
   <groupId>me.champion</groupId>
 
-  <artifactId>ManhuntPlugin</artifactId>
+  <artifactId>Manhuntplugin</artifactId>
   <version>1.8.53-SNAPSHOT</version>
 
   <packaging>jar</packaging>

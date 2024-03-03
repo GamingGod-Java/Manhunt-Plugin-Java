@@ -1,8 +1,7 @@
 package me.champion.manhuntplugin;
 
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,10 +14,12 @@ import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.ChatColor;
 import org.bukkit.event.block.Action;
-import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.*;
+
 
 //import java.util.*;
 
@@ -41,6 +42,7 @@ public class MhCompass implements CommandExecutor, Listener {
     //private final Map<UUID, Double> previousOffsetDistances;
     //private final Map<UUID, Color> playerDyeColors;
     //private final Map<UUID, Inventory> dyeColorGUIs;
+    private Map<UUID, BukkitRunnable> compassUpdateTasks = new HashMap<>();
 
     public MhCompass(TeamManager teamManager, Plugin plugin) {
         this.teamManager = teamManager;
@@ -60,10 +62,10 @@ public class MhCompass implements CommandExecutor, Listener {
         }
 
         Player player = (Player) sender;
-        if (!isZombie(player)) {
+        /*if (!isZombie(player)) {
             player.sendMessage("§cYou need to be a zombie to use this command.");
             return true;
-        }
+        }*/
 
         giveRunnerCompass(player);
         return true;
@@ -81,6 +83,10 @@ public class MhCompass implements CommandExecutor, Listener {
             compassMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             compassMeta.setDisplayName("§cTrack Runners");
             compass.setItemMeta(compassMeta);
+            // Adding lore to the compass
+            List<String> lore = new ArrayList<>();
+            lore.add("§7Left click to update");
+            compassMeta.setLore(lore);
         }
         player.getInventory().addItem(compass);
     }
@@ -104,7 +110,6 @@ public void onPlayerInteract(PlayerInteractEvent event) {
     // Check if the action is a left-click and the player is holding the "Track Runners" compass
     if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
         if (isHoldingRunnerCompass(itemInHand)) {
-            // Check if the click occurred in the Nether
 
                 // Only perform lodestone-related actions in the Nether
                 updateTrackingCompass(player);
@@ -119,68 +124,53 @@ public void onPlayerInteract(PlayerInteractEvent event) {
     private void updateTrackingCompass(Player player) {
         Location playerLocation = player.getLocation();
         Player nearestRunner = teamManager.findNearestRunner(playerLocation);
+
+
         if (nearestRunner != null) {
             Location runnerLocation = nearestRunner.getLocation();
-            Location lodestoneLocation = new Location(runnerLocation.getWorld(), runnerLocation.getBlockX() + 0.5, 0, runnerLocation.getBlockZ() + 0.5);
 
-            if (player.getWorld().getEnvironment() == World.Environment.NETHER) {
+                stopCompassUpdaterTask(player);
+                UUID playerUUID = player.getUniqueId();
+                BukkitRunnable updaterTask = new BukkitRunnable() {
 
-                // Debug print when a runner is found
-                //System.out.println("Runner found: " + nearestRunner.getName());
+                    @Override
+                    public void run() {
+                        updateLodestoneLocation(player, runnerLocation);
+                    }
+                };
+                updaterTask.runTaskTimer(plugin, 0, 1);
+                compassUpdateTasks.put(playerUUID, updaterTask);
 
-                // Remove old lodestone if exists
-                removeOldLodestone(lodestoneLocation);
 
-                // Place new lodestone
-                placeLodestone(lodestoneLocation);
 
-                // Set compass to track new lodestone
-                setTrackingCompass(player, lodestoneLocation);
-            } if (player.getWorld().getEnvironment() == World.Environment.NORMAL) {
-                player.setCompassTarget(runnerLocation);
-            }
-
-            // Debug print when lodestone is set
-            //System.out.println("Lodestone set for player: " + player.getName());
         } else {
             player.sendMessage(ChatColor.RED + "No runner found to track.");
         }
-    }
+   }
 
-    private void removeOldLodestone(Location location) {
-        if (location.getBlock().getType() == Material.LODESTONE) {
-            location.getBlock().setType(Material.AIR);
-            // Debug print when old lodestone is removed
-            //System.out.println("Old lodestone removed at location: " + location.toString());
-        } else {
-            // Debug print if no old lodestone is found at the specified location
-            //System.out.println("No old lodestone found at location: " + location.toString());
+    public void stopCompassUpdaterTask(Player player) {
+        UUID playerUUID = player.getUniqueId();
+        if (compassUpdateTasks.containsKey(playerUUID)) {
+            BukkitRunnable updaterTask = compassUpdateTasks.remove(playerUUID);
+            if (updaterTask != null) {
+                updaterTask.cancel();
+            }
         }
     }
 
-    private void placeLodestone(Location location) {
-        World world = location.getWorld();
-        if (world != null) {
-            Block lodestoneBlock = world.getBlockAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            lodestoneBlock.setType(Material.LODESTONE);
 
-            Block bedrockBlock = world.getBlockAt(location.getBlockX(), location.getBlockY() + 1, location.getBlockZ());
-            bedrockBlock.setType(Material.BEDROCK);
+   public void updateLodestoneLocation(Player player, Location runnerLocation) {
+        if (isHoldingRunnerCompass(player.getInventory().getItemInMainHand())) {
+            ItemStack compass = player.getInventory().getItemInMainHand();
+            CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
+            if (compassMeta != null) {
+                compassMeta.setDisplayName("§cTrack Runners");
+                compassMeta.setLodestoneTracked(false); // Clear any previous tracked lodestone
+                compassMeta.setLodestone(runnerLocation);
+                compassMeta.setLodestoneTracked(true);
+                compass.setItemMeta(compassMeta);
+                System.out.println("Compass updated for player: " + player.getName() + " to track lodestone at " + runnerLocation.toString());
+            }
         }
-    }
-
-    private void setTrackingCompass(Player player, Location lodestoneLocation) {
-        ItemStack compass = player.getInventory().getItemInMainHand();
-        CompassMeta compassMeta = (CompassMeta) compass.getItemMeta();
-        if (compassMeta != null) {
-            compassMeta.setDisplayName("§cTrack Runners");
-            compassMeta.setLodestoneTracked(false); // Clear any previous tracked lodestone
-            compassMeta.setLodestone(lodestoneLocation);
-            compassMeta.setLodestoneTracked(true);
-            //player.sendMessage(ChatColor.GREEN + "Compass is now tracking the nearest runner.");
-            compass.setItemMeta(compassMeta);
-            // Debug print when compass is updated
-            //System.out.println("Compass updated for player: " + player.getName() + " to track lodestone at " + lodestoneLocation.toString());
-        }
-    }
+   }
 }
