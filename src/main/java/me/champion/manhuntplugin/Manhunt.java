@@ -141,7 +141,7 @@ public final class Manhunt extends JavaPlugin {
     private void setWorldBorder() {
         World overworld = Bukkit.getWorlds().get(0);
         World nether = Bukkit.getWorlds().get(1);
-        double overworldSize = 6000.0;
+        double overworldSize = 8000.0;
         double netherSize = overworldSize / 8;
 
         setWorldBorderSize(overworld, overworldSize);
