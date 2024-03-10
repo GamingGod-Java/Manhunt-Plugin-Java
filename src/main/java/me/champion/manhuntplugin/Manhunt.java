@@ -1,5 +1,7 @@
 package me.champion.manhuntplugin;
 
+import me.champion.manhuntplugin.commands.*;
+import me.champion.manhuntplugin.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -23,7 +25,7 @@ public final class Manhunt extends JavaPlugin {
     private MhStart mhStart;
     private TeamChat teamChat;
     private MhWheel mhWheel;
-    private WinCondition winCondition;
+    private WinConditionListener winConditionListener;
     private MhIso mhIso;
     File configFile = new File(getDataFolder(), "playerdata.yml");
     FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
@@ -76,7 +78,7 @@ public final class Manhunt extends JavaPlugin {
         mhStart = new MhStart(teamManager);
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here
-        winCondition = new WinCondition(teamManager, mhStart, this);
+        winConditionListener = new WinConditionListener(teamManager, mhStart, this);
         mhIso = new MhIso(teamManager, this);
 
         MhSettings mhSettings = new MhSettings();
@@ -107,19 +109,19 @@ public final class Manhunt extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamManager, this);
         getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(winConditionListener, this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
         getServer().getPluginManager().registerEvents(mhWheel, this);
-        getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(winConditionListener, this);
         getServer().getPluginManager().registerEvents(new EyeofEnderListener(teamManager, this), this);
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
         getServer().getPluginManager().registerEvents(new MhIso(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(new DamageNerf(teamManager), this);
-        winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
+        getServer().getPluginManager().registerEvents(new BedPlaceListener(teamManager, this), this);
+        getServer().getPluginManager().registerEvents(new DamageListener(teamManager), this);
+        winConditionListener.scheduleGameConditionCheck(); // Schedule the periodic check
     }
 
     @Override
