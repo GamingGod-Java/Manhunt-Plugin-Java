@@ -54,7 +54,10 @@ public class MhCompass implements CommandExecutor, Listener {
         //this.playerDyeColors = new HashMap<>();
         //this.dyeColorGUIs = new HashMap<>();
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        new ContinuousUpdateTask().runTaskTimer(plugin, 0, 20);
     }
+
+
 
     @SuppressWarnings("NullableProblems")
     @Override
@@ -121,25 +124,22 @@ public class MhCompass implements CommandExecutor, Listener {
         }
     }*/
 
-@EventHandler
-public void onPlayerInteract(PlayerInteractEvent event) {
-    Player player = event.getPlayer();
-    Action action = event.getAction();
-    ItemStack itemInHand = player.getInventory().getItemInMainHand();
+    private class ContinuousUpdateTask extends BukkitRunnable {
+        @Override
+        public void run() {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (isZombie(player)) {
+                    ItemStack itemInHand = player.getInventory().getItemInMainHand();
+                    ItemStack itemInOffHand = player.getInventory().getItemInOffHand();
 
-    // Check if the action is a left-click and the player is holding the "Track Runners" compass
-    if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
-        if (isHoldingRunnerCompass(itemInHand)) {
-
-                // Only perform lodestone-related actions in the Nether
-                updateTrackingCompass(player);
-                event.setCancelled(true); // Prevent normal left-click behavior
-                // Debug message for placing lodestone in the Nether
-                //player.sendMessage(ChatColor.GREEN + "Placed lodestone in the Nether.");
-
+                    if (isHoldingRunnerCompass(itemInHand) || isHoldingRunnerCompass(itemInOffHand)) {
+                        // Perform continuous updates while the compass is held
+                        updateTrackingCompass(player);
+                    }
+                }
+            }
         }
     }
-}
 
     private void updateTrackingCompass(Player player) {
         Location playerLocation = player.getLocation();
