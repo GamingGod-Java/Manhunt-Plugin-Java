@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -101,6 +102,24 @@ public class MhCompass implements CommandExecutor, Listener {
     }
 
 
+    /*@EventHandler
+    public void onPlayerItemHeld(PlayerItemHeldEvent event) {
+        Player player = event.getPlayer();
+        int newSlot = event.getNewSlot();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        // Perform actions based on the new held item or slot
+        // Example: Check if the player is holding a specific item
+        if (player.getInventory().getItem(newSlot) != null) {
+            if (isHoldingRunnerCompass(itemInHand)) {
+                updateTrackingCompass(player);
+                event.setCancelled(true); // Prevent normal left-click behavior
+                System.out.println("updoot");
+            }
+            // Your additional actions here
+        }
+    }*/
+
 @EventHandler
 public void onPlayerInteract(PlayerInteractEvent event) {
     Player player = event.getPlayer();
@@ -167,7 +186,7 @@ public void onPlayerInteract(PlayerInteractEvent event) {
                 compassMeta.setLodestone(runnerLocation);
                 compassMeta.setLodestoneTracked(true);
                 compass.setItemMeta(compassMeta);
-                System.out.println("Compass updated for player: " + player.getName() + " to track lodestone at " + runnerLocation.toString());
+                //System.out.println("Compass updated for player: " + player.getName() + " to track lodestone at " + runnerLocation.toString());
             }
         }
    }
