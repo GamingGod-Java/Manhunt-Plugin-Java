@@ -1,5 +1,7 @@
 package me.champion.manhuntplugin;
 
+import me.champion.manhuntplugin.commands.*;
+import me.champion.manhuntplugin.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
@@ -23,65 +25,48 @@ public final class Manhunt extends JavaPlugin {
     private MhStart mhStart;
     private TeamChat teamChat;
     private MhWheel mhWheel;
-    private WinCondition winCondition;
+    private WinConditionListener winConditionListener;
     private MhIso mhIso;
-    File configFile = new File(getDataFolder(), "playerdata.yml");
-    FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
 
-    File statisticsFile = new File(getDataFolder(), "statistics.yml");
-    FileConfiguration statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
+    FileConfiguration config;
 
     @Override
     public void onLoad() {
         getLogger().info("Manhunt plugin is loading!");
+
+        // Initialize PluginSetup and set up the folder
+        PluginSetup pluginSetup = new PluginSetup();
+        pluginSetup.setupFolder();
     }
 
     @Override
     public void onEnable() {
         getLogger().info("Manhunt plugin has started, have a nice day! :)");
 
+        // Load configuration from PluginSetup
+        config = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+
+        // Log the contents of the loaded config file
+        getLogger().info("Loaded config file contents:");
+        for (String key : config.getKeys(true)) {
+            getLogger().info(key + ": " + config.get(key));
+        }
+
         enableFlightInServerProperties();
         setDifficultyHardInServerProperties();
-
-        // Creating a directory to store session files if it doesn't exist
-        File sessionDirectory = new File(getDataFolder(), "sessions");
-        if (!sessionDirectory.exists()) {
-            sessionDirectory.mkdir();
-        }
 
         // Creating unique filenames based on date/time
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String currentDate = dateFormat.format(new Date());
 
-        statisticsFile = new File(sessionDirectory, "statistics_" + currentDate + ".yml");
-        // configFile = new File(sessionDirectory, "config_" + currentDate + ".yml");
-        statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
-
-        try {
-            statisticsConfig.save(statisticsFile);
-            getLogger().info("Created and saved " + statisticsFile.getName());
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to save " + statisticsFile.getName() + ": " + e.getMessage(), e);
-        }
-
-        config = new YamlConfiguration();
-        try {
-            config.save(configFile);
-        } catch (IOException e) {
-            getLogger().log(Level.SEVERE, "Failed to save configuration file: " + e.getMessage(), e);
-        }
-        getLogger().info("Emptied playerdata.yml");
-
         teamManager = new TeamManager(this, currentDate);
         mhStart = new MhStart(teamManager);
         teamChat = new TeamChat(teamManager);
         mhWheel = new MhWheel(this, teamManager); // Initialize MhWheel here
-        winCondition = new WinCondition(teamManager, mhStart, this);
+        winConditionListener = new WinConditionListener(teamManager, mhStart, this);
         mhIso = new MhIso(teamManager, this);
 
         MhSettings mhSettings = new MhSettings();
-
-        setWorldBorder();
 
         MhRestart mhRestart = new MhRestart(mhStart, teamManager);
 
@@ -102,24 +87,25 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhTracker", new MhTracker(this, teamManager));
         registerCommand("MhSearch", new MhSearch(this));
         registerCommand("MhCoords", new TeamChat(teamManager));
+        registerCommand("MhTp", new MhTp(config));
 
         // Register event listeners
         getServer().getPluginManager().registerEvents(new TeamSelection(this, teamManager, mhStart), this);
         getServer().getPluginManager().registerEvents(teamManager, this);
         getServer().getPluginManager().registerEvents(new MhCompass(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(winConditionListener, this);
         getServer().getPluginManager().registerEvents(teamChat, this);
         getServer().getPluginManager().registerEvents(mhWheel, this); // Register MhWheel as an event listener
         getServer().getPluginManager().registerEvents(mhWheel, this);
-        getServer().getPluginManager().registerEvents(winCondition, this);
+        getServer().getPluginManager().registerEvents(winConditionListener, this);
         getServer().getPluginManager().registerEvents(new EyeofEnderListener(teamManager, this), this);
         getServer().getPluginManager().registerEvents(new GameControlListener(mhStart), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(mhStart), this);
         getServer().getPluginManager().registerEvents(mhSettings, this);
         getServer().getPluginManager().registerEvents(new MhIso(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(new DisableBedBomb(teamManager, this), this);
-        getServer().getPluginManager().registerEvents(new DamageNerf(teamManager), this);
-        winCondition.scheduleGameConditionCheck(); // Schedule the periodic check
+        getServer().getPluginManager().registerEvents(new BedPlaceListener(teamManager, this), this);
+        getServer().getPluginManager().registerEvents(new DamageListener(teamManager), this);
+        winConditionListener.scheduleGameConditionCheck(); // Schedule the periodic check
     }
 
     @Override
@@ -136,22 +122,6 @@ public final class Manhunt extends JavaPlugin {
 
     public static Manhunt getPlugin() {
         return JavaPlugin.getPlugin(Manhunt.class);
-    }
-
-    private void setWorldBorder() {
-        World overworld = Bukkit.getWorlds().get(0);
-        World nether = Bukkit.getWorlds().get(1);
-        double overworldSize = 8000.0;
-        double netherSize = overworldSize / 8;
-
-        setWorldBorderSize(overworld, overworldSize);
-        setWorldBorderSize(nether, netherSize);
-        getLogger().info("World border set for Overworld and Nether.");
-    }
-
-    private void setWorldBorderSize(World world, double size) {
-        WorldBorder worldBorder = world.getWorldBorder();
-        worldBorder.setSize(size);
     }
 
     private void enableFlightInServerProperties() {
@@ -198,7 +168,7 @@ public final class Manhunt extends JavaPlugin {
         }
     }
 
-    private void registerCommand(String commandName, CommandExecutor commandExecutor) {
+    public void registerCommand(String commandName, CommandExecutor commandExecutor) {
         PluginCommand pluginCommand = getCommand(commandName);
         if (pluginCommand != null) {
             pluginCommand.setExecutor(commandExecutor);

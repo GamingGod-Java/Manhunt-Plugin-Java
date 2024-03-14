@@ -1,5 +1,6 @@
 package me.champion.manhuntplugin;
 
+import me.champion.manhuntplugin.commands.MhStart;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

@@ -60,3 +60,6 @@ commands:
   MhTracker:
     description: Toggles the tracking actionbar instead of the compass
     usage: /MhTracker
+  MhTp:
+    description: Teleports players to random locations
+    usage: /MhTp [random] or /MhTp @a random

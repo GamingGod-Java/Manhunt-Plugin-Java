@@ -47,14 +47,6 @@ public class TeamManager implements Listener {
 
     private BukkitTask potionEffectTask;
 
-
-
-    private final File statisticsFile;
-    private final FileConfiguration statisticsConfig;
-
-
-
-
     public void startPotionEffectLoop() {
         potionEffectTask = new BukkitRunnable() {
             @Override
@@ -189,17 +181,6 @@ public class TeamManager implements Listener {
 
     public TeamManager(Plugin plugin, String SessionID) {
         File sessionDirectory = new File(plugin.getDataFolder(), "sessions");
-        statisticsFile = new File(sessionDirectory,"statistics_" + SessionID + ".yml");
-        statisticsConfig = YamlConfiguration.loadConfiguration(statisticsFile);
-
-        if (!statisticsFile.exists()) {
-            try {
-                statisticsConfig.save(statisticsFile);
-                System.out.println("Created statistics.yml");
-            } catch (IOException e) {
-                System.out.println("FAILED to create statistics.yml");
-            }
-        }
 
         teams.put(Material.BLUE_WOOL, new Team("Runners"));
         teams.put(Material.RED_WOOL, new Team("Zombies"));
@@ -208,7 +189,12 @@ public class TeamManager implements Listener {
         this.plugin = plugin;
 
         playerDataFile = new File(plugin.getDataFolder(), "playerdata.yml");
-        playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+        if (!playerDataFile.exists()) {
+            System.out.println("playerdata.yml not found.");
+            playerData = null;
+        } else {
+            playerData = YamlConfiguration.loadConfiguration(playerDataFile);
+        }
     }
 
     public boolean isGamePaused() {
@@ -487,7 +473,6 @@ public class TeamManager implements Listener {
                     if ("by".equals(deathMessageSplits[i])) {
                         for (Player iplayer : Bukkit.getOnlinePlayers()) {
                             if (deathMessageSplits[i+1].equals(iplayer.getName())) {
-                                updatePlayerStatistics(iplayer.getName(), "player_kills");
                                 NaturalCauses = false;
                             }
                         }
@@ -510,9 +495,7 @@ public class TeamManager implements Listener {
                     //event.setDeathMessage(newDeathMessage);
 
                 } if (NaturalCauses == true) {
-                    updatePlayerStatistics(playername, "environment_deaths");
                 } if (NaturalCauses == false) {
-                    updatePlayerStatistics(playername, "player_deaths");
                 }
                 event.setDeathMessage(newDeathMessage);
 
@@ -521,18 +504,6 @@ public class TeamManager implements Listener {
         }
 
         System.out.println(wasDeadPlayerRunner + " restore debuff");
-    }
-
-    private void updatePlayerStatistics(String player, String statistic) {
-
-        int currentStatistic = statisticsConfig.getInt(player + "." + statistic, 0);
-        statisticsConfig.set(player + "." + statistic, currentStatistic + 1);
-
-        try {
-            statisticsConfig.save(statisticsFile);
-        } catch (IOException e) {
-            System.out.println("FAILED to save statistics.yml");
-        }
     }
 
     @EventHandler
