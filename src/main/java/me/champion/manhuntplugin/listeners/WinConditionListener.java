@@ -2,22 +2,25 @@ package me.champion.manhuntplugin.listeners;
 
 import me.champion.manhuntplugin.Manhunt;
 import me.champion.manhuntplugin.TeamManager;
+import me.champion.manhuntplugin.commands.MhPause;
+import me.champion.manhuntplugin.commands.MhUnpause;
 import me.champion.manhuntplugin.commands.MhStart;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
-import org.bukkit.entity.Firework;
 import org.bukkit.World;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 
 public class WinConditionListener implements Listener {
     private final TeamManager teamManager;
@@ -25,6 +28,7 @@ public class WinConditionListener implements Listener {
     private final Plugin plugin;
     private boolean ZombieWin = false;
     private boolean RunnerWin = false;
+    private boolean gamePaused = false;
 
     public WinConditionListener(TeamManager teamManager, MhStart mhstart, Plugin plugin) {
         this.teamManager = teamManager;
@@ -38,6 +42,7 @@ public class WinConditionListener implements Listener {
         ZombieWin = false;
         RunnerWin = false;
         teamManager.GameOver = false;
+        gamePaused = false;
     }
 
     @EventHandler
@@ -70,6 +75,16 @@ public class WinConditionListener implements Listener {
             }
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
+
+            // Pause and unpause the game with a delay of 2 seconds
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhpause");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhunpause");
+                    Bukkit.getLogger().info("Manually paused and unpaused using WinCondition");
+                }
+            }.runTaskLater(plugin, 40); // 2 seconds (20 ticks per second)
         }
     }
 
@@ -79,7 +94,9 @@ public class WinConditionListener implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                checkGameConditions();
+                if (!gamePaused) {
+                    checkGameConditions();
+                }
             }
         }.runTaskTimer(Manhunt.getPlugin(), delay, period);
     }
@@ -91,7 +108,6 @@ public class WinConditionListener implements Listener {
                     System.out.println(teamManager.playerTeams);
                     System.out.println("Zombie Win");
                     teamManager.GameOver = true;
-                    teamManager.unpauseGame(null);
                     ZombieWin = true;
 
                     // Increase title duration to 60 ticks (3 seconds)
@@ -108,6 +124,8 @@ public class WinConditionListener implements Listener {
                         public void run() {
                             if (count <= 0) {
                                 this.cancel();
+                                // Delay for 0.5 seconds before confirming restart
+                                Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm"), 10); // 10 ticks = 0.5 seconds
                                 return;
                             }
 
@@ -119,7 +137,11 @@ public class WinConditionListener implements Listener {
                         }
                     }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
 
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
+                    // Delay for 2 seconds before pausing the game
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhpause"), 40); // 40 ticks = 2 seconds
+
+                    // Delay for 3 seconds before unpausing the game
+                    Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhunpause"), 60); // 60 ticks = 3 seconds
                 }
             }
         }
@@ -151,3 +173,4 @@ public class WinConditionListener implements Listener {
         firework.setFireworkMeta(fireworkMeta);
     }
 }
+

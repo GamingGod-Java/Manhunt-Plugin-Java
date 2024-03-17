@@ -1,4 +1,4 @@
-package me.champion.manhuntplugin.commands;
+/*package me.champion.manhuntplugin.commands;
 
 import me.champion.manhuntplugin.TeamManager;
 import org.bukkit.Bukkit;
@@ -68,7 +68,7 @@ public class MhTracker implements CommandExecutor, Listener {
         String command = "minecraft:title " + player.getName() + " actionbar [\"\",{\"text\":\"" + message + "\"}]";
         Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
     }
-*/
+
 private void startSoundTask(Player zombie) {
     new BukkitRunnable() {
         @Override
@@ -151,3 +151,4 @@ private void startSoundTask(Player zombie) {
         return dot > 0.99;
     }
 }
+*/

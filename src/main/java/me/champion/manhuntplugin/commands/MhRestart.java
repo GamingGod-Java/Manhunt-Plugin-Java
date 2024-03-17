@@ -30,7 +30,10 @@ public class MhRestart implements CommandExecutor {
                 mhStart.resetGame(); // Reset game, including both countdowns and boss bar
                 // Broadcast message to all players
                 Bukkit.broadcastMessage("The game has been reset.");
-                teamManager.unpauseZombies();
+                // Unpause the game for each player
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    teamManager.unpauseGame(player);
+                }
                 return true;
             } else {
                 // Ask for confirmation

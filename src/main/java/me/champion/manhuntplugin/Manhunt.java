@@ -84,7 +84,7 @@ public final class Manhunt extends JavaPlugin {
         registerCommand("MhSettings", mhSettings);
         registerCommand("MhIntro", new MhIntro());
         registerCommand("MhIso", mhIso);
-        registerCommand("MhTracker", new MhTracker(this, teamManager));
+        //registerCommand("MhTracker", new MhTracker(this, teamManager));
         registerCommand("MhSearch", new MhSearch(this));
         registerCommand("MhCoords", new TeamChat(teamManager));
         registerCommand("MhTp", new MhTp(config));
