@@ -4,9 +4,13 @@ import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -279,10 +283,21 @@ public class TeamManager implements Listener {
     }
 
     public void pauseGame(Player pausingPlayer) {
+        System.out.println("Game paused");
+
         if (!isGamePaused()) {
+            for (World world : Bukkit.getWorlds()) {
+                for (Entity entity : world.getEntities()) {
+                    if (entity instanceof Item) {
+                        addDespawnTag((Item) entity);
+                    }
+                }
+            }
             setGamePaused(true);
             // Execute /tick freeze command
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "tick freeze");
+
+
 
             // Clear the playerPotionEffects HashMap
             playerPotionEffects.clear();
@@ -327,8 +342,20 @@ public class TeamManager implements Listener {
 
     public void unpauseGame(Player unpausingPlayer) {
         if (isGamePaused()) {
+            for (World world : Bukkit.getWorlds()) {
+                for (Entity entity : world.getEntities()) {
+                    if (entity instanceof Item) {
+                        entity.setTicksLived(6000);
+                        removeDespawnTag((Item) entity);
+
+                    }
+                }
+            }
+
             setGamePaused(false);
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tick unfreeze");
+
+
 
             // Restore player states
             for (Player player : Bukkit.getOnlinePlayers()) {
@@ -378,6 +405,24 @@ public class TeamManager implements Listener {
             } else {
                 onlinePlayer.sendMessage("");
             }
+        }
+    }
+
+    public void addDespawnTag(Item item) {
+        item.setMetadata("preventDespawn", new FixedMetadataValue(plugin, true));
+    }
+    public void removeDespawnTag(Item item) {
+        item.setMetadata("preventDespawn", new FixedMetadataValue(plugin, false));
+    }
+
+    @EventHandler
+    public void onItemDespawn(ItemDespawnEvent event) {
+        Item item = event.getEntity();
+
+        // Check if the item has a specific metadata tag to prevent despawning
+        if (item.hasMetadata("preventDespawn")) {
+            // Cancel the despawn event
+            event.setCancelled(true);
         }
     }
 
