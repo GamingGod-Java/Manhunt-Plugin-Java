@@ -58,6 +58,9 @@ public class MhCreate implements CommandExecutor {
         // Store the spawn location where the command is executed
         setSpawnLocation(player.getLocation());
 
+        // Save the worldSpawn location to the config file
+        saveWorldSpawnToConfig(player.getLocation());
+
         // Teleport the player to the exact center of the block they're standing on
         teleportPlayerToCenter(player);
         createGlassSphere(player);
@@ -217,6 +220,12 @@ public class MhCreate implements CommandExecutor {
             world.setSpawnLocation(location.getBlockX(), location.getBlockY(), location.getBlockZ());
             Bukkit.getLogger().info("Spawn location set to: X=" + location.getBlockX() + ", Y=" + location.getBlockY() + ", Z=" + location.getBlockZ());
         }
+    }
+
+    private void saveWorldSpawnToConfig(Location location) {
+        String worldSpawnString = location.getBlockX() + "," + location.getBlockY() + "," + location.getBlockZ();
+        plugin.getConfig().set("worldSpawn", worldSpawnString);
+        plugin.saveConfig();
     }
 
     // Method to get the spawn location

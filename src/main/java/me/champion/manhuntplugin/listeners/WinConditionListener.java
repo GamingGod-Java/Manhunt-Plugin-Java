@@ -1,26 +1,17 @@
 package me.champion.manhuntplugin.listeners;
 
-import me.champion.manhuntplugin.Manhunt;
 import me.champion.manhuntplugin.TeamManager;
-import me.champion.manhuntplugin.commands.MhPause;
-import me.champion.manhuntplugin.commands.MhUnpause;
 import me.champion.manhuntplugin.commands.MhStart;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.FireworkEffect;
-import org.bukkit.World;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.inventory.meta.FireworkMeta;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class WinConditionListener implements Listener {
     private final TeamManager teamManager;
@@ -28,149 +19,135 @@ public class WinConditionListener implements Listener {
     private final Plugin plugin;
     private boolean ZombieWin = false;
     private boolean RunnerWin = false;
-    private boolean gamePaused = false;
 
     public WinConditionListener(TeamManager teamManager, MhStart mhstart, Plugin plugin) {
         this.teamManager = teamManager;
         this.mhstart = mhstart;
         this.plugin = plugin;
+
+        // Start the game condition checks when the listener is instantiated
+        scheduleGameConditionCheck();
     }
 
-    public static boolean endEntered = false;
-
+    // Resets the win conditions and game state
     public void resetConditions() {
         ZombieWin = false;
         RunnerWin = false;
         teamManager.GameOver = false;
-        gamePaused = false;
     }
 
-    @EventHandler
-    public void onEntityDeath(EntityDeathEvent event) {
-        if (event.getEntity() instanceof EnderDragon && mhstart.isGameStarted()) {
-            RunnerWin = true;
-            teamManager.GameOver = true;
-            Bukkit.broadcastMessage("The §5Ender Dragon §fhas been defeated!");
-
-            new BukkitRunnable() {
-                int count = 10; // Runs for 5 seconds (10 times with 0.5s interval)
-
-                @Override
-                public void run() {
-                    if (count <= 0) {
-                        this.cancel();
-                        return;
-                    }
-
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        spawnFirework(player, Color.AQUA);
-                    }
-
-                    count--;
-                }
-            }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                player.sendTitle("§bRunners win", "Game Over", 60, 40, 60);
-            }
-
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
-
-            // Pause and unpause the game with a delay of 2 seconds
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhpause");
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhunpause");
-                    Bukkit.getLogger().info("Manually paused and unpaused using WinCondition");
-                }
-            }.runTaskLater(plugin, 40); // 2 seconds (20 ticks per second)
-        }
-    }
-
+    // This method schedules periodic checks on game conditions
     public void scheduleGameConditionCheck() {
         int delay = 0; // Initial delay (in ticks)
-        int period = 20; // Delay between each run (in ticks)
+        int period = 20; // Delay between each run (in ticks) - 20 ticks = 1 second
+
+        // Schedule a repeating task that checks game conditions every second
         new BukkitRunnable() {
             @Override
             public void run() {
-                if (!gamePaused) {
-                    checkGameConditions();
-                }
+                checkGameConditions();  // This method will contain the logic to check for win conditions
             }
-        }.runTaskTimer(Manhunt.getPlugin(), delay, period);
+        }.runTaskTimer(plugin, delay, period);  // Run the task repeatedly with the given period
     }
 
+    // Logic to check if win conditions have been met
     private void checkGameConditions() {
         if (mhstart.isGameStarted()) {
+            // Zombie Win Condition - Timer expired or all runners are dead
             if (!ZombieWin && !RunnerWin) {
                 if (mhstart.timerExpired || teamManager.getRunners().isEmpty()) {
-                    System.out.println(teamManager.playerTeams);
-                    System.out.println("Zombie Win");
-                    teamManager.GameOver = true;
                     ZombieWin = true;
+                    teamManager.GameOver = true;
+                    Bukkit.broadcastMessage("§cZombies win on time!");
 
-                    // Increase title duration to 60 ticks (3 seconds)
-                    int titleDuration = 60;
-
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        player.sendTitle("§cZombies Win", "Game Over", titleDuration, 40, titleDuration);
-                    }
-
-                    new BukkitRunnable() {
-                        int count = 10; // Runs for 5 seconds (10 times with 0.5s interval)
-
-                        @Override
-                        public void run() {
-                            if (count <= 0) {
-                                this.cancel();
-                                // Delay for 0.5 seconds before confirming restart
-                                Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm"), 10); // 10 ticks = 0.5 seconds
-                                return;
-                            }
-
-                            for (Player player : teamManager.getPlayersOnTeam("Zombies")) {
-                                spawnFirework(player, Color.RED);
-                            }
-
-                            count--;
-                        }
-                    }.runTaskTimer(plugin, 0, 10); // 10 ticks = 0.5 seconds
-
-                    // Delay for 2 seconds before pausing the game
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhpause"), 40); // 40 ticks = 2 seconds
-
-                    // Delay for 3 seconds before unpausing the game
-                    Bukkit.getScheduler().runTaskLater(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhunpause"), 60); // 60 ticks = 3 seconds
+                    // Reset the game immediately
+                    resetGame();
                 }
             }
         }
+
+        // If the game is no longer started, reset conditions
         if (!mhstart.isGameStarted()) {
             resetConditions();
-            //System.out.println("reset conditions");
         }
     }
 
+    // Log when an Ender Dragon is spawned
     @EventHandler
-    public void onPlayerPortal(PlayerPortalEvent event) {
-        Player player = event.getPlayer();
-
-        // Check if the player is a runner and has entered the End portal
-        if (teamManager.isOnTeam(player, "Runners") && event.getTo().getWorld().getEnvironment() == World.Environment.THE_END) {
-            endEntered = true;  // Set the flag to true
-            mhstart.hideBossBar();
+    public void onEntitySpawn(CreatureSpawnEvent event) {
+        if (event.getEntity() instanceof EnderDragon) {
+            Bukkit.getLogger().info("An Ender Dragon has been summoned or spawned at location: "
+                    + event.getLocation().toString());
         }
     }
 
-    private void spawnFirework(Player player, Color color) {
-        Firework firework = player.getWorld().spawn(player.getLocation(), Firework.class);
-        FireworkMeta fireworkMeta = firework.getFireworkMeta();
-        FireworkEffect effect = FireworkEffect.builder().withColor(color)
-                .with(FireworkEffect.Type.BALL_LARGE)
-                .trail(true).flicker(true).build();
-        fireworkMeta.addEffect(effect);
-        fireworkMeta.setPower(1);
-        firework.setFireworkMeta(fireworkMeta);
+    // Log when an Ender Dragon is killed and trigger Runner win condition
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        // Runner Win Condition - Any Ender Dragon is killed
+        if (event.getEntity() instanceof EnderDragon && mhstart.isGameStarted()) {
+            Bukkit.getLogger().info("An Ender Dragon has been killed at location: "
+                    + event.getEntity().getLocation().toString());
+
+            // Ensure the game win condition for Runners is triggered
+            if (!RunnerWin) {
+                RunnerWin = true;
+                teamManager.GameOver = true;
+
+                // Broadcast the proper "Runners Win!" message
+                Bukkit.broadcastMessage("§bRunners Win!");
+                Bukkit.broadcastMessage("The §5Ender Dragon §fhas been defeated!");
+
+                // Reset the game immediately
+                resetGame();
+            }
+        }
+    }
+
+    // Capture player commands (e.g., /kill @e[type=ender_dragon]) that could kill an Ender Dragon
+    @EventHandler
+    public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+        String command = event.getMessage().toLowerCase();
+        if (command.contains("/kill") && command.contains("ender_dragon")) {
+            Bukkit.getLogger().info("Detected a command to kill an Ender Dragon by player " + event.getPlayer().getName());
+
+            // Trigger the Runners' win condition if the game is started
+            if (mhstart.isGameStarted()) {
+                triggerRunnersWin();
+            }
+        }
+    }
+
+    // Capture console commands (e.g., /kill @e[type=ender_dragon])
+    @EventHandler
+    public void onServerCommand(ServerCommandEvent event) {
+        String command = event.getCommand().toLowerCase();
+        if (command.contains("kill") && command.contains("ender_dragon")) {
+            Bukkit.getLogger().info("Detected a command to kill an Ender Dragon via console.");
+
+            // Trigger the Runners' win condition if the game is started
+            if (mhstart.isGameStarted()) {
+                triggerRunnersWin();
+            }
+        }
+    }
+
+    // Method to trigger Runners' win condition
+    private void triggerRunnersWin() {
+        if (!RunnerWin) {
+            RunnerWin = true;
+            teamManager.GameOver = true;
+            Bukkit.broadcastMessage("§bRunners Win!");
+            Bukkit.broadcastMessage("The §5Ender Dragon §fhas been defeated!");
+
+
+            // Reset the game immediately
+            resetGame();
+        }
+    }
+
+    // Method to reset the game immediately
+    private void resetGame() {
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhrestart confirm");
     }
 }
-

@@ -42,4 +42,6 @@ Unfixed:
     triple message
 
     "Very mediocre compass"
+
+    If the last runner dies, they currently respawn with kit, there is no need for this though
 Fixed:

@@ -20,7 +20,7 @@ public class MhRestart implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.isOp()) {
-            sender.sendMessage("§cYou do not have permission to use this command.");
+            sender.sendMessage("[MhRestart.java] §cYou do not have permission to use this command.");
             return true;
         } else {
             if (args.length == 1 && args[0].equalsIgnoreCase("confirm")) {
@@ -29,7 +29,7 @@ public class MhRestart implements CommandExecutor {
                 }
                 mhStart.resetGame(); // Reset game, including both countdowns and boss bar
                 // Broadcast message to all players
-                Bukkit.broadcastMessage("The game has been reset.");
+                Bukkit.broadcastMessage("[MhRestart.java] The game has been reset.");
                 // Unpause the game for each player
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     teamManager.unpauseGame(player);
@@ -37,8 +37,8 @@ public class MhRestart implements CommandExecutor {
                 return true;
             } else {
                 // Ask for confirmation
-                sender.sendMessage("§aAre you sure you want to reset the game?");
-                sender.sendMessage("§aTo confirm, use: /mhrestart confirm");
+                sender.sendMessage("[MhRestart.java] §aAre you sure you want to reset the game?");
+                sender.sendMessage("[MhRestart.java] §aTo confirm, use: /mhrestart confirm");
                 return true;
             }
         }

@@ -4,6 +4,7 @@ main: me.champion.manhuntplugin.Manhunt
 api-version: '1.20'
 authors: [ GamingGod-Java, AndreBinbow ]
 description: Manhunt 2.0
+folia-supported: true
 commands:
   MhCreate:
     description: Creates the platforms for team selection
@@ -63,3 +64,9 @@ commands:
   MhTp:
     description: Teleports players to random locations
     usage: /MhTp [random] or /MhTp @a random
+  MhWorld:
+    description: Generates a new world
+    usage: /MhWorld
+  MhSwap:
+    description: Teleports players to different worlds (default world, world_spawn, CustomWorld, or world_hell)
+    usage: /MhSwap <World|World_Spawn|CustomWorld|World_Hell> <duration in seconds>

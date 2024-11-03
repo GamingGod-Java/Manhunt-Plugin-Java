@@ -2,6 +2,7 @@ package me.champion.manhuntplugin.commands;
 
 import me.champion.manhuntplugin.Manhunt;
 import me.champion.manhuntplugin.TeamManager;
+import me.champion.manhuntplugin.listeners.GameControlListener;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.World;
@@ -14,14 +15,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.Sound;
+
 public class MhStart implements CommandExecutor {
 
     private final TeamManager teamManager;
+    private GameControlListener gameControlListener; // Not final
+    private final long gameTimerDuration;  // Game timer duration from config
 
     public boolean gameStarted = false;
     private BukkitTask countdownTask;
@@ -31,9 +33,15 @@ public class MhStart implements CommandExecutor {
     private BukkitTask initialCountdownTask;
 
     public MhStart(TeamManager teamManager) {
-
         this.teamManager = teamManager;
+        // Load game timer duration from the config file
+        this.gameTimerDuration = Manhunt.getPlugin().getConfig().getLong("gameTimer", 8990); // Default to 8990 seconds if not set
     }
+
+    public void setGameControlListener(GameControlListener gameControlListener) {
+        this.gameControlListener = gameControlListener;
+    }
+
     public BossBar getBossBar() {
         return this.bossBar;
     }
@@ -74,48 +82,6 @@ public class MhStart implements CommandExecutor {
         }
     }
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-
-        // Debug message to verify the method is called
-        Bukkit.getLogger().info("Hello, player " + player.getName() + " joined the game.");
-
-        // Broadcast a message to all players
-        Bukkit.broadcastMessage("Player " + player.getName() + " joined the game!");
-
-        // Check if the game has started and the player is not on any team
-        if (gameStarted && !teamManager.isOnTeam(player, "Runners") && !teamManager.isOnTeam(player, "Zombies")) {
-            player.setGameMode(GameMode.SPECTATOR);
-            Bukkit.getLogger().info("Player " + player.getName() + " joined the game without being on any team. Placed in spectator mode.");
-            return;
-        }
-
-        // Print out which team the player is on (for debugging purposes)
-        if (teamManager.isOnTeam(player, "Runners")) {
-            Bukkit.getLogger().info("Player " + player.getName() + " is on the Runners team.");
-        } else if (teamManager.isOnTeam(player, "Zombies")) {
-            Bukkit.getLogger().info("Player " + player.getName() + " is on the Zombies team.");
-        } else {
-            Bukkit.getLogger().info("Player " + player.getName() + " is not on any team.");
-        }
-
-        // Set the player's game mode to adventure if they are not an operator and the game hasn't started yet
-        if (!player.isOp() && !gameStarted) {
-            player.setGameMode(GameMode.ADVENTURE);
-        }
-
-        // If the game has started, show the boss bar to the player after a short delay
-        if (gameStarted) {
-            Bukkit.getScheduler().runTaskLater(Manhunt.getPlugin(), () -> {
-                bossBar.setVisible(true);
-                bossBar.addPlayer(player);
-            }, 20L); // 20 ticks = 1 second (1 tick = 0.05 seconds)
-        }
-    }
-
-
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player) || !sender.isOp()) {
@@ -148,21 +114,28 @@ public class MhStart implements CommandExecutor {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doMobSpawning true");
 
         World world = ((Player) sender).getWorld();
-            // Iterate through all entities in the world
-            for (Entity entity : world.getEntities()) {
-                // Check if the entity is an item
-                if (entity instanceof Item) {
-                    // Remove the item entity
-                    entity.remove();
-                }
+        // Iterate through all entities in the world
+        for (Entity entity : world.getEntities()) {
+            // Check if the entity is an item
+            if (entity instanceof Item) {
+                // Remove the item entity
+                entity.remove();
             }
+        }
 
-
-        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager,this, new MhIso(teamManager, Manhunt.getPlugin()));
+        MhCreate mhCreate = new MhCreate(Manhunt.getPlugin(), teamManager, this, new MhIso(teamManager, Manhunt.getPlugin()));
         mhCreate.removeGlassSphere((Player) sender);
 
-        //resetBossBar();
+        // Reset boss bar and game state
         gameStarted = true;
+
+        // Remove the "Open Settings" command block from all operators
+        if (gameControlListener != null) {
+            gameControlListener.removeSettingsCommandBlocksFromAllOps();
+        } else {
+            Bukkit.getLogger().severe("GameControlListener is null in MhStart. Cannot remove command blocks.");
+        }
+
         teamManager.pauseZombies();
         startInitialCountdown();
         giveCompassesToZombies();
@@ -199,11 +172,21 @@ public class MhStart implements CommandExecutor {
         if (bossBar != null) {
             bossBar.removeAll(); // Reset the boss bar for a new game
         }
+
+        // Initialize the boss bar
         bossBar = Bukkit.createBossBar("Game Timer", BarColor.PURPLE, BarStyle.SEGMENTED_10);
         bossBar.setVisible(true); // Make the boss bar visible after the initial countdown
 
-        long totalSeconds = 2 * 3600 + 29 * 60 + 50; // 2 hours, 29 minutes, and 50 seconds
-        //long totalSeconds = 5;
+        // Debug: Check if boss bar is being created
+        Bukkit.getLogger().info("Boss bar created and set to visible.");
+
+        // Validate the timer value from the config
+        if (gameTimerDuration <= 0) {
+            Bukkit.getLogger().severe("Invalid gameTimer value from config: " + gameTimerDuration);
+            return;
+        }
+
+        long totalSeconds = gameTimerDuration;  // Use the config value here
         countdownTask = new BukkitRunnable() {
             long secondsLeft = totalSeconds;
 
@@ -225,6 +208,10 @@ public class MhStart implements CommandExecutor {
             }
         }.runTaskTimer(Manhunt.getPlugin(), 0L, 20L);
 
+        // Debug: Log how many players are online
+        Bukkit.getLogger().info("Adding boss bar to players. Online players count: " + Bukkit.getOnlinePlayers().size());
+
+        // Add all online players to the boss bar
         Bukkit.getOnlinePlayers().forEach(bossBar::addPlayer);
     }
 
@@ -243,4 +230,6 @@ public class MhStart implements CommandExecutor {
             }
         }
     }
+
+
 }

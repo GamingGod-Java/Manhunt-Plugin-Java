@@ -1,41 +1,55 @@
 package me.champion.manhuntplugin.listeners;
 
-import me.champion.manhuntplugin.commands.MhCreate;
+import me.champion.manhuntplugin.TeamManager;
 import me.champion.manhuntplugin.commands.MhStart;
-import org.bukkit.Location;
+import me.champion.manhuntplugin.Manhunt;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.boss.BossBar;
 
 public class PlayerJoinListener implements Listener {
 
     private final MhStart mhStart;
+    private final TeamManager teamManager;
 
-    public PlayerJoinListener(MhStart mhStart) {
+    public PlayerJoinListener(MhStart mhStart, TeamManager teamManager) {
         this.mhStart = mhStart;
+        this.teamManager = teamManager;
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        // Check if the game has already started
-        if (mhStart.isGameStarted()) {
-            // Get the boss bar from MhStart
-            BossBar bossBar = mhStart.getBossBar();
+        // Log the player joining
+        Bukkit.getLogger().info("Player " + player.getName() + " joined the game.");
 
-            // If the boss bar exists and is visible, add the player to the boss bar
+        // Check if the game has started
+        if (mhStart.isGameStarted()) {
+            // Game has started: set player to Spectator mode
+            player.setGameMode(GameMode.SPECTATOR);
+            Bukkit.getLogger().info("Game has started. Player " + player.getName() + " set to Spectator mode.");
+
+            // Add player to the boss bar if it exists and is visible
+            BossBar bossBar = mhStart.getBossBar();
             if (bossBar != null && bossBar.isVisible()) {
-                bossBar.addPlayer(player);
+                Bukkit.getScheduler().runTaskLater(Manhunt.getPlugin(), () -> {
+                    bossBar.addPlayer(player);
+                    Bukkit.getLogger().info("Player " + player.getName() + " added to the boss bar.");
+                }, 20L); // 1-second delay
             }
         } else {
-            // The game has not started, handle the player joining as per your existing logic
-            Location spawnLocation = MhCreate.getSpawnLocation();
-            if (spawnLocation != null) {
-                player.teleport(spawnLocation);
-            }
+            // Game has not started: set player to Adventure mode
+            player.setGameMode(GameMode.ADVENTURE);
+            Bukkit.getLogger().info("Game has not started. Player " + player.getName() + " set to Adventure mode.");
+
+            // Teleport the player to the world_spawn using the /mhswap command
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mhswap " + player.getName() + " world_spawn");
+            Bukkit.getLogger().info("Player " + player.getName() + " teleported to world_spawn.");
         }
     }
 }

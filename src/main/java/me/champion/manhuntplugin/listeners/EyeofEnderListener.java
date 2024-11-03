@@ -11,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.generator.structure.StructureType;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.entity.EnderSignal;
+import org.bukkit.util.StructureSearchResult;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,30 +122,38 @@ public class EyeofEnderListener implements Listener {
     }
 
     private Location findStrongholds() {
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             int X = -1500;
             int Z = -1500;
             if (i == 1) {
                 X = 1500;
                 Z = -1500;
-            }
-            if (i == 2) {
+            } else if (i == 2) {
                 X = -1500;
                 Z = 1500;
-            }
-            if (i == 3) {
+            } else if (i == 3) {
                 X = 1500;
                 Z = 1500;
             }
-            //this code is a crime against for loops but idk how to programmatically do a square
-            Location Strongholdsearch = Bukkit.getWorld("world").locateNearestStructure(new Location(Bukkit.getWorld("world"), X, 0, Z), StructureType.STRONGHOLD, 800, false).getLocation();
-            if (Strongholdsearch.getBlockX() > 3000 || Strongholdsearch.getBlockX() < -3000 || Strongholdsearch.getBlockZ() > 3000 || Strongholdsearch.getBlockZ() < -3000) {
-                continue;
+
+            // Perform structure search and get the result
+            StructureSearchResult searchResult = Bukkit.getWorld("world").locateNearestStructure(
+                    new Location(Bukkit.getWorld("world"), X, 0, Z), StructureType.STRONGHOLD, 800, false
+            );
+
+            // Check if the search result found a structure
+            if (searchResult != null) {
+                Location strongholdLocation = searchResult.getLocation();
+
+                // Validate coordinates to keep within specified bounds
+                if (Math.abs(strongholdLocation.getBlockX()) <= 3000 && Math.abs(strongholdLocation.getBlockZ()) <= 3000) {
+                    if (!closestStrongholds.contains(strongholdLocation)) {
+                        closestStrongholds.add(strongholdLocation);
+                    }
+                }
             }
-            if (!closestStrongholds.contains(Strongholdsearch)) {
-                closestStrongholds.add(Strongholdsearch);
-                //System.out.println(Strongholdsearch);
-            }
+
+            // Stop if we've found enough strongholds
             if (closestStrongholds.size() > 2) {
                 break;
             }

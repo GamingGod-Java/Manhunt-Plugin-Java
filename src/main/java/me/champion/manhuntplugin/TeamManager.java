@@ -206,7 +206,6 @@ public class TeamManager implements Listener {
     }
 
     public void addToTeam(Player player, String team) {
-        //System.out.println("adding " + player.getName() + " to " + team);
         UUID playerUUID = player.getUniqueId();
         String currentTeam = playerTeams.get(playerUUID);
 
@@ -217,7 +216,15 @@ public class TeamManager implements Listener {
 
         playerTeams.put(playerUUID, team);
 
-// Update their display name, nametag, and play a sound based on the team
+        // **Update playerData configuration**
+        playerData.set(playerUUID.toString(), team);
+        try {
+            playerData.save(playerDataFile);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "[TeamManager.java] Error saving player data for " + player.getName(), e);
+        }
+
+        // Update their display name, nametag, and play a sound based on the team
         if (team.equalsIgnoreCase("Zombies")) {
             player.setDisplayName("§c" + player.getName()); // Red "Zombie" prefix
             player.setPlayerListName("§cZ " + player.getName()); // Red "Zombie" prefix
@@ -261,11 +268,24 @@ public class TeamManager implements Listener {
     }
 
     public void removeFromTeam(Player player) {
-        playerTeams.remove(player.getUniqueId());
-        player.setDisplayName(player.getName()); // Resetting the display name to default
-        player.setPlayerListName(player.getName()); // Resetting the list name to default
-    }
+        if (playerTeams.containsKey(player.getUniqueId())) {
+            playerTeams.remove(player.getUniqueId()); // Remove the player from the team
+            player.setDisplayName(player.getName());  // Resetting the display name to default
+            player.setPlayerListName(player.getName()); // Resetting the player list name to default
+            Bukkit.getLogger().info("[TeamManager.java] Player " + player.getName() + " has been removed from all teams.");
 
+            // Update playerData
+            playerData.set(player.getUniqueId().toString(), "none");
+            try {
+                playerData.save(playerDataFile);
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.SEVERE, "[TeamManager.java] Error saving player data for " + player.getName(), e);
+            }
+
+        } else {
+            Bukkit.getLogger().info("[TeamManager.java] Player " + player.getName() + " is not on any team.");
+        }
+    }
     public void registerPlatform(String teamName, Location platformLocation) {
         Team team = getTeamByName(teamName);
         if (team != null) {
@@ -305,7 +325,7 @@ public class TeamManager implements Listener {
                         Vehicle boat = (Vehicle) player.getVehicle();
                         savedBoats.put(boat.getUniqueId(), new BoatData(boat)); // Save the boat (vehicle) with passengers
                         boat.eject(); // Eject all passengers
-                        player.sendMessage(ChatColor.DARK_PURPLE + "You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
+                        player.sendMessage(ChatColor.DARK_PURPLE + "[TeamManager.java] You were in a vehicle and have been kicked out of it, please remount it when the game restarts");
                     }
                 }
             }
@@ -412,99 +432,88 @@ public class TeamManager implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        /*if (deathEventHandled) {
-            return;  // Skip processing if the death event has already been handled
-        }*/
-        //System.out.println("onPlayerDeath invoked for " + event.getEntity().getName());
-        wasDeadPlayerRunner = false;
+        wasDeadPlayerRunner = false; // Reset this flag for every death event
+
         if (!GameOver) {
             boolean NaturalCauses = true;
-            //
-            // deathEventHandled = true;
-            //Bukkit.getScheduler().runTaskLater(plugin, () -> deathEventHandled = false, 100L);
-            savePotionEffects(event.getEntity());
+            savePotionEffects(event.getEntity()); // Save potion effects before processing death
+
             Player player = event.getEntity();
-            //EntityDamageEvent lastDamageCause = player.getLastDamageCause();
-
-            UUID playerUUID = player.getUniqueId(); // Declare playerUUID here
+            UUID playerUUID = player.getUniqueId(); // Declare playerUUID
             String team = playerTeams.get(playerUUID);
-
 
             // Remove the player from the saved boat data if they die while in a boat
             for (BoatData boatData : savedBoats.values()) {
-                boatData.getPassengers().remove(playerUUID); // playerUUID is in scope here
+                boatData.getPassengers().remove(playerUUID); // Remove dead player from boat passengers
             }
-            String deathMessage = event.getDeathMessage();
-            //String newDeathMessage = deathMessage;
-            String[] deathMessageParts = deathMessage.split(" ");
-            StringBuilder newDeathMessageBuilder = new StringBuilder();
 
-            for (String part : deathMessageParts) {
-                boolean playerFound = false;
-                System.out.println(part);
+            // Process the player's death and check team
+            if (team != null && team.equalsIgnoreCase("Runners")) {
+                wasDeadPlayerRunner = true;
 
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if (part.equalsIgnoreCase(onlinePlayer.getName())) {
-                        String coloredName;
-                        if (playerTeams.get(onlinePlayer.getUniqueId()).equalsIgnoreCase("Runners")) {
-                            coloredName = "§b" + onlinePlayer.getName() + "§f";
-                        } else if (playerTeams.get(onlinePlayer.getUniqueId()).equalsIgnoreCase("Zombies")) {
-                            coloredName = "§c" + onlinePlayer.getName() + "§f";
-                        } else {
-                            coloredName = onlinePlayer.getName();
-                        }
+                // Move the dead runner to the Zombies team FIRST
+                addToTeam(player, "Zombies");
 
-                        // Append the colored name to the newDeathMessage
-                        newDeathMessageBuilder.append(coloredName).append(" ");
-                        playerFound = true;
-                        break;  // Break from the loop once a player is found
-                    }
-                }
+                // NOW check if there are any runners left
+                if (getRunners().isEmpty()) {
+                    // No runners left, end the game and declare Zombies the winner
+                    Bukkit.broadcastMessage("[TeamManager.java] §cZombies Win! No runners are left.");
+                    GameOver = true; // Set GameOver to true to indicate the game has ended
 
-                if (!playerFound) {
-                    // Append the unchanged part to the newDeathMessage
-                    newDeathMessageBuilder.append(part).append(" ");
+                    // Trigger game reset
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "[TeamManager.java] mhrestart confirm");
+                    unpauseGame(null); // Ensure game is unpaused before reset
+
+                } else {
+                    // There are still runners left, so pause the game
+                    Bukkit.broadcastMessage(player.getName() + "[TeamManager.java]  has been converted to a Zombie. Pausing the game.");
+                    pauseGame(player); // Pause the game as per existing logic
                 }
             }
-            String newDeathMessage = newDeathMessageBuilder.toString().trim();
-            if (newDeathMessage.contains("by")) {
-                String[] deathMessageSplits = deathMessage.split(" ");
-                for (int i = 0; i < deathMessageSplits.length; i++) {
-                    if ("by".equals(deathMessageSplits[i])) {
-                        for (Player iplayer : Bukkit.getOnlinePlayers()) {
-                            if (deathMessageSplits[i+1].equals(iplayer.getName())) {
-                                NaturalCauses = false;
-                            }
-                        }
-                    }
-                }
+            else if (team != null && team.equalsIgnoreCase("Zombies")) {
+                // Handle Zombies' death here, if needed
             }
-            assert newDeathMessage != null;
-            String playername = player.getName();
-            if (newDeathMessage.contains(playername)) {
-                System.out.println(getPlayersOnTeam("Runners"));
-                System.out.println(getPlayersOnTeam("Zombies"));
-                if (team != null && team.equalsIgnoreCase("Runners")) {
-                    wasDeadPlayerRunner = true;
-                    addToTeam(player, "Zombies");
-                    pauseGame(player);
-                    //event.setDeathMessage(newDeathMessage);
 
-
-                } if (team != null && team.equalsIgnoreCase("Zombies")) {
-                    //event.setDeathMessage(newDeathMessage);
-
-                } if (NaturalCauses == true) {
-                } if (NaturalCauses == false) {
-                }
-                event.setDeathMessage(newDeathMessage);
-
-
-            }
+            // Set the final death message
+            String deathMessage = formatDeathMessage(event.getDeathMessage(), player);
+            event.setDeathMessage(deathMessage);
         }
 
         System.out.println(wasDeadPlayerRunner + " restore debuff");
     }
+
+    private String formatDeathMessage(String originalMessage, Player player) {
+        String[] deathMessageParts = originalMessage.split(" ");
+        StringBuilder newDeathMessageBuilder = new StringBuilder();
+
+        for (String part : deathMessageParts) {
+            boolean playerFound = false;
+
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                if (part.equalsIgnoreCase(onlinePlayer.getName())) {
+                    String coloredName;
+                    if (isOnTeam(onlinePlayer, "Runners")) {
+                        coloredName = "§b" + onlinePlayer.getName() + "§f"; // Blue for Runners
+                    } else if (isOnTeam(onlinePlayer, "Zombies")) {
+                        coloredName = "§c" + onlinePlayer.getName() + "§f"; // Red for Zombies
+                    } else {
+                        coloredName = onlinePlayer.getName();
+                    }
+
+                    newDeathMessageBuilder.append(coloredName).append(" ");
+                    playerFound = true;
+                    break;
+                }
+            }
+
+            if (!playerFound) {
+                newDeathMessageBuilder.append(part).append(" ");
+            }
+        }
+
+        return newDeathMessageBuilder.toString().trim();
+    }
+
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -583,28 +592,32 @@ public class TeamManager implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         UUID playerUUID = player.getUniqueId();
-        if (isGamePaused()) {
-            player.setWalkSpeed(0);
-        }
-        if (!isGamePaused()) {
-            player.setWalkSpeed(0.2f);
-        }
 
+        // Set walk speed based on whether the game is paused or not
+        player.setWalkSpeed(isGamePaused() ? 0 : 0.2f);
+
+        // If player data contains their UUID, restore the team
         if (playerData.contains(playerUUID.toString())) {
             String team = playerData.getString(playerUUID.toString());
-            System.out.println("Added " + playerUUID + " to " + team);
 
-            // Check if 'team' is not null before performing operations
-            if (team != null) {
-                addToTeam(player, team);
-                // Reapply display name and prefix
-                updatePlayerDisplayName(player, team);
+            // If team is null or "none", ensure the player is not on any team
+            if (team == null || team.equalsIgnoreCase("none")) {
+                player.sendMessage("[TeamManager.java] You are not assigned to any team.");
+                removeFromTeam(player); // Ensure they are not assigned to any team
+                player.setGameMode(GameMode.SPECTATOR); // Put them in spectator mode if they're not on a team
             } else {
-                // Handle the case where 'team' is null (e.g., provide a default behavior or log a message)
-                player.sendMessage("No team found");
+                // Otherwise, restore the player to their previous team and update display name
+                addToTeam(player, team);
+                updatePlayerDisplayName(player, team);
             }
+        } else {
+            // If no team data is found, ensure they're not on a team
+            player.sendMessage("[TeamManager.java] You are not assigned to any team.");
+            removeFromTeam(player);
+            player.setGameMode(GameMode.SPECTATOR); // Spectator mode by default
         }
     }
+
     private void updatePlayerDisplayName(Player player, String team) {
         if (team.equalsIgnoreCase("Zombies")) {
             player.setDisplayName("§c" + player.getName());
@@ -618,6 +631,7 @@ public class TeamManager implements Listener {
             player.setPlayerListName(player.getName());
         }
     }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -631,7 +645,7 @@ public class TeamManager implements Listener {
                 playerData.save(playerDataFile);
             } catch (IOException e) {
                 // Using Bukkit's logger for logging the exception
-                plugin.getLogger().log(Level.SEVERE, "Error saving player data for " + player.getName(), e);
+                plugin.getLogger().log(Level.SEVERE, "[TeamManager.java] Error saving player data for " + player.getName(), e);
             }
         }
     }
@@ -663,7 +677,7 @@ public class TeamManager implements Listener {
             event.setCancelled(true);
             if (event.getEntered() instanceof Player) {
                 Player player = (Player) event.getEntered();
-                player.sendMessage(ChatColor.RED + "Nice try Andre, you cannot enter a boat while the game is paused.");
+                player.sendMessage(ChatColor.RED + "[TeamManager.java] Nice try Andre, you cannot enter a boat while the game is paused.");
             }
         }
     }
