@@ -1,0 +1,65 @@
+name: Manhunt
+version: '1.8.83-SNAPSHOT'
+main: me.champion.manhuntplugin.Manhunt
+api-version: '1.20'
+authors: [ GamingGod-Java, AndreBinbow ]
+description: Manhunt 2.0
+commands:
+  MhCreate:
+    description: Creates the platforms for team selection
+    usage: /MhCreate
+  MhMove:
+    description: Moves a player to a team
+    usage: /MhMove
+  MhPause:
+    description: Triggers a pause of the game, force a manual pause
+    usage: /MhPause
+  MhUnpause:
+    description: Triggers an unpause of the game, force a manual unpause
+    usage: /MhUnpause
+  MhReady:
+    description: This command can only be typed by an OP player, it also includes an alias /mhr and a countdown in chat
+    usage: /MhReady
+    aliases:
+      - mhr
+  MhSearch:
+    description: Searches for tools necessary for a manhunt
+    usage: /MhSearch
+  MhCompass:
+    description: Gives a runner compass to a player on the Zombies team
+    usage: /MhCompass
+  MhStart:
+    description: Starts both countdowns
+    usage: /MhStart
+  MhRestart:
+    description: Restarts the game so /MhStart can be done all over again
+    usage: /MhRestart
+  MhTeamChat:
+    description: Enables or disables team chat (player has to be on a team)
+    usage: /MhTeamChat
+    aliases:
+      - teamchat
+      - tc
+  MhCoords:
+    description: Sends your coords in the chat
+    usage: /MhCoords
+  MhWheel:
+    description: After spinning the wheel on Discord, you can type this command to add the buff or debuff
+    usage: /MhWheel
+  MhSettings:
+    description: Settings menu for Operators
+    usage: /MhSettings
+    aliases:
+      - mhs
+  MhIntro:
+    description: Plays the intro sound
+    usage: /MhIntro
+  MhIso:
+    description: Places 2 players into a 1v1 arena
+    usage: /<command> <player1> <player2> OR /<command> end
+  MhTracker:
+    description: Toggles the tracking actionbar instead of the compass
+    usage: /MhTracker
+  MhTp:
+    description: Teleports players to random locations
+    usage: /MhTp [random] or /MhTp @a random

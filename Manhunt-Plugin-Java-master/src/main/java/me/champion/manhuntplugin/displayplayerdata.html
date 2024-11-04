@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+<style>
+    body {
+        background-color: gray;
+    }
+    .playerList {
+        display: block;
+        justify-self: center;
+        text-align: center;
+        font-size:30px;
+    }
+    .kills {
+        color: rgb(31, 255, 31); /* Set the text color for kills to green */
+    }
+    .deaths {
+        color: rgb(96, 52, 52); /* Set the text color for deaths to red */
+    }
+    .naturalcauses {
+        color: rgb(255, 0, 0);
+    }
+    .lb {
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        font-size: 50px;
+    }
+    ol {
+        list-style-position: inside; /* Center the list numbers */
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+</head>
+<body>
+    <h1 class = "lb">Child Stabbing leaderboard</h1>
+    <ol class = "playerList"></ol>
+    <script>
+        const yamlFilePath = 'statistics.yml';
+const cacheBuster = new Date().getTime();
+const urlWithCacheBuster = `${yamlFilePath}?cache=${cacheBuster}`;
+
+fetch(urlWithCacheBuster)
+    .then(response => {
+        // Check if the request was successful (status code 200)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch YAML: ${response.status} ${response.statusText}`);
+        }
+
+        // Parse the YAML data using js-yaml
+        return response.text();
+    })
+    .then(yamlData => {
+        // Use js-yaml to parse YAML into an object
+        const jsonData = jsyaml.load(yamlData);
+
+        // Assuming jsonData is your YAML data
+        const playersArray = Object.entries(jsonData).map(([IGN, stats]) => ({ IGN, ...stats }));
+
+        // Now you can sort the array based on kills
+        const sortedData = playersArray.sort((a, b) => b.player_kills - a.player_kills);
+
+        // Rest of your code remains the same
+        const playerList = document.querySelector(".playerList");
+        sortedData.forEach(player => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `${player.IGN}: <span class="kills">Kills: ${player.player_kills}</span> <span class="deaths">Deaths to player: ${player.player_deaths}</span> <span class="naturalcauses">Deaths to environment: ${player.environment_deaths}</span>`;
+            playerList.appendChild(listItem);
+        });
+
+        console.log(jsonData);
+    })
+    .catch(error => {
+        // Handle errors
+        console.error(error);
+    });
+
+    </script>
+    
+</body>

@@ -1,0 +1,46 @@
+Ideas:
+    Create an inventory with a /MhSettings that allows you to choose particles, bossBar colour and add more customisation
+
+    Anti combat log
+
+    Rewrite in Kotlin (pain)
+
+    Cursed manhunt:
+        Lower tick rate
+        Slow pause/unpause
+        Random time to unpause
+
+    Custom manhunt client
+
+    Add way to enable/disable MhIntro
+
+    Add duration to statistics tracking
+    Add wins/losses (locked to starting teams)
+
+    Create multiple versions of the same text for joining teams
+
+   TestChange
+
+Unfixed:
+    Disable inventory management during pause?
+
+    When glass sphere disappears, it doesnt replace snow/grass it destroyed
+
+    Autocomplete in mhmove is broken, maybe because it only works on capital letters
+
+    Change how to get kit to avoid instance suicide
+
+    Statistics redo
+
+    should only track statistics if we type /mhstart track
+
+    Organise tab list
+
+    Add spawn to positions when mhiso is created
+
+    Joseph dislikes click to update (compass should autoupdate)
+
+    triple message
+
+    "Very mediocre compass"
+Fixed:
